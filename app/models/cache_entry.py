@@ -24,14 +24,10 @@ class CacheEntry(BaseModel):
     prompt_tokens: int = Field(..., ge=0, description="Prompt tokens")
     completion_tokens: int = Field(..., ge=0, description="Completion tokens")
     created_at: datetime = Field(
-        default_factory=datetime.utcnow,
-        description="Cache entry creation time"
+        default_factory=datetime.utcnow, description="Cache entry creation time"
     )
     hit_count: int = Field(default=0, ge=0, description="Number of cache hits")
-    embedding: Optional[list[float]] = Field(
-        None,
-        description="Query embedding vector"
-    )
+    embedding: Optional[list[float]] = Field(None, description="Query embedding vector")
 
     @property
     def total_tokens(self) -> int:
@@ -52,12 +48,7 @@ class SemanticMatch(BaseModel):
     """Semantic similarity match result."""
 
     entry: CacheEntry = Field(..., description="Matched cache entry")
-    similarity_score: float = Field(
-        ...,
-        ge=0.0,
-        le=1.0,
-        description="Similarity score"
-    )
+    similarity_score: float = Field(..., ge=0.0, le=1.0, description="Similarity score")
     query_hash: str = Field(..., description="Matched query hash")
 
     @property

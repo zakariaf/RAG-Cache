@@ -137,5 +137,5 @@ def log_error(error: Exception, context: str, **kwargs: Any) -> None:
         error=str(error),
         error_type=type(error).__name__,
         context=context,
-        **kwargs
+        **kwargs,
     )

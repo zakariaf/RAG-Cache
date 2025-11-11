@@ -25,7 +25,7 @@ class UsageMetrics(BaseModel):
         return cls(
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
-            total_tokens=prompt_tokens + completion_tokens
+            total_tokens=prompt_tokens + completion_tokens,
         )
 
 
@@ -34,14 +34,10 @@ class CacheInfo(BaseModel):
 
     cache_hit: bool = Field(..., description="Whether cache was hit")
     cache_type: Optional[Literal["exact", "semantic"]] = Field(
-        None,
-        description="Type of cache hit"
+        None, description="Type of cache hit"
     )
     similarity_score: Optional[float] = Field(
-        None,
-        ge=0.0,
-        le=1.0,
-        description="Semantic similarity score"
+        None, ge=0.0, le=1.0, description="Semantic similarity score"
     )
 
     @classmethod
@@ -58,9 +54,7 @@ class CacheInfo(BaseModel):
     def semantic_hit(cls, similarity_score: float) -> "CacheInfo":
         """Create semantic cache hit info."""
         return cls(
-            cache_hit=True,
-            cache_type="semantic",
-            similarity_score=similarity_score
+            cache_hit=True, cache_type="semantic", similarity_score=similarity_score
         )
 
 
@@ -82,18 +76,12 @@ class QueryResponse(BaseModel):
     @property
     def is_exact_match(self) -> bool:
         """Check if response was exact cache match."""
-        return (
-            self.cache_info.cache_hit
-            and self.cache_info.cache_type == "exact"
-        )
+        return self.cache_info.cache_hit and self.cache_info.cache_type == "exact"
 
     @property
     def is_semantic_match(self) -> bool:
         """Check if response was semantic cache match."""
-        return (
-            self.cache_info.cache_hit
-            and self.cache_info.cache_type == "semantic"
-        )
+        return self.cache_info.cache_hit and self.cache_info.cache_type == "semantic"
 
 
 class HealthResponse(BaseModel):

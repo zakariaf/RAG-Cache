@@ -34,7 +34,9 @@ class LLMProvider(Protocol):
     Follows Liskov Substitution Principle.
     """
 
-    async def complete(self, request: "QueryRequest") -> LLMResponse:  # type: ignore # noqa: F821
+    async def complete(
+        self, request: "QueryRequest"  # type: ignore  # noqa: F821
+    ) -> LLMResponse:
         """
         Generate completion for query.
 

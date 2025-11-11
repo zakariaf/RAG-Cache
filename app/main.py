@@ -29,7 +29,7 @@ class ApplicationState:
     Single Responsibility: Lifecycle management of shared resources.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.redis_pool: Optional[object] = None
         self.qdrant_client: Optional[object] = None
         self.embedding_model: Optional[object] = None
@@ -52,7 +52,7 @@ class ApplicationState:
         logger.info("Shutting down RAGCache")
         try:
             if self.redis_pool:
-                await self.redis_pool.disconnect()
+                await self.redis_pool.disconnect()  # type: ignore
                 logger.info("Redis pool closed")
             # TODO: Cleanup Qdrant and embedding model
             logger.info("RAGCache shut down successfully")
@@ -99,11 +99,7 @@ def create_application() -> FastAPI:
 
     # Include routers
     app.include_router(health.router, tags=["health"])
-    app.include_router(
-        query.router,
-        prefix="/api/v1",
-        tags=["query"]
-    )
+    app.include_router(query.router, prefix="/api/v1", tags=["query"])
 
     return app
 
