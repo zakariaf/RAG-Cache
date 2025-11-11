@@ -43,12 +43,12 @@ class CacheInfo(BaseModel):
     @classmethod
     def miss(cls) -> "CacheInfo":
         """Create cache miss info."""
-        return cls(cache_hit=False)
+        return cls(cache_hit=False, cache_type=None, similarity_score=None)
 
     @classmethod
     def exact_hit(cls) -> "CacheInfo":
         """Create exact cache hit info."""
-        return cls(cache_hit=True, cache_type="exact")
+        return cls(cache_hit=True, cache_type="exact", similarity_score=None)
 
     @classmethod
     def semantic_hit(cls, similarity_score: float) -> "CacheInfo":

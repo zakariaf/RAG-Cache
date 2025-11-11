@@ -113,6 +113,7 @@ class QueryService:
             model=llm_response.model,
             prompt_tokens=llm_response.prompt_tokens,
             completion_tokens=llm_response.completion_tokens,
+            embedding=None,
         )
 
         try:
