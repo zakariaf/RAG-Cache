@@ -93,7 +93,7 @@ class TestQueryRoutes:
         data = response.json()
         assert data["response"] == "Python is a programming language"
         assert data["provider"] == "openai"
-        assert data["from_cache"] is False
+        assert data["cache_info"]["cache_hit"] is False
 
     def test_should_validate_request(self, client):
         """Test request validation."""
