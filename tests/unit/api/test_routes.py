@@ -82,7 +82,9 @@ class TestQueryRoutes:
         """Test processing query."""
         mock_query_service.process.return_value = sample_response
 
-        with patch("app.api.routes.query.get_query_service", return_value=mock_query_service):
+        with patch(
+            "app.api.routes.query.get_query_service", return_value=mock_query_service
+        ):
             response = client.post(
                 "/api/v1/query",
                 json={"query": "What is Python?", "use_cache": True},
@@ -104,7 +106,9 @@ class TestQueryRoutes:
         """Test handling LLM provider errors."""
         mock_query_service.process.side_effect = LLMProviderError("API error")
 
-        with patch("app.api.routes.query.get_query_service", return_value=mock_query_service):
+        with patch(
+            "app.api.routes.query.get_query_service", return_value=mock_query_service
+        ):
             response = client.post(
                 "/api/v1/query",
                 json={"query": "What is Python?"},
@@ -117,7 +121,9 @@ class TestQueryRoutes:
         """Test handling unexpected errors."""
         mock_query_service.process.side_effect = RuntimeError("Unexpected error")
 
-        with patch("app.api.routes.query.get_query_service", return_value=mock_query_service):
+        with patch(
+            "app.api.routes.query.get_query_service", return_value=mock_query_service
+        ):
             response = client.post(
                 "/api/v1/query",
                 json={"query": "What is Python?"},
@@ -132,7 +138,9 @@ class TestQueryRoutes:
         """Test accepting custom parameters."""
         mock_query_service.process.return_value = sample_response
 
-        with patch("app.api.routes.query.get_query_service", return_value=mock_query_service):
+        with patch(
+            "app.api.routes.query.get_query_service", return_value=mock_query_service
+        ):
             response = client.post(
                 "/api/v1/query",
                 json={

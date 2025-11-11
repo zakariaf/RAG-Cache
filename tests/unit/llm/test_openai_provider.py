@@ -65,9 +65,7 @@ class TestOpenAIProvider:
         """Test handling OpenAI API errors."""
         with patch("app.llm.openai_provider.AsyncOpenAI") as mock_client_class:
             mock_client = AsyncMock()
-            mock_client.chat.completions.create.side_effect = OpenAIError(
-                "API Error"
-            )
+            mock_client.chat.completions.create.side_effect = OpenAIError("API Error")
             mock_client_class.return_value = mock_client
 
             with pytest.raises(LLMProviderError, match="OpenAI API call failed"):

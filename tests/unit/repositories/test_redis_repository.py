@@ -66,9 +66,7 @@ class TestRedisRepository:
             assert result is None
 
     @pytest.mark.asyncio
-    async def test_should_store_entry_with_ttl(
-        self, redis_repository, sample_entry
-    ):
+    async def test_should_store_entry_with_ttl(self, redis_repository, sample_entry):
         """Test storing cache entry with TTL."""
         mock_redis = AsyncMock()
 
@@ -81,9 +79,7 @@ class TestRedisRepository:
             mock_redis.setex.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_should_store_entry_without_ttl(
-        self, redis_repository, sample_entry
-    ):
+    async def test_should_store_entry_without_ttl(self, redis_repository, sample_entry):
         """Test storing cache entry without TTL."""
         mock_redis = AsyncMock()
 
@@ -96,9 +92,7 @@ class TestRedisRepository:
             mock_redis.set.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_should_handle_store_error(
-        self, redis_repository, sample_entry
-    ):
+    async def test_should_handle_store_error(self, redis_repository, sample_entry):
         """Test handling store errors."""
         mock_redis = AsyncMock()
         mock_redis.setex.side_effect = Exception("Store failed")
