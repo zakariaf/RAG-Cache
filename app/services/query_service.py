@@ -30,11 +30,7 @@ class QueryService:
     Coordinates cache and LLM operations.
     """
 
-    def __init__(
-        self,
-        cache: RedisCache,
-        llm_provider: BaseLLMProvider
-    ):
+    def __init__(self, cache: RedisCache, llm_provider: BaseLLMProvider):
         """
         Initialize service.
 
@@ -73,10 +69,7 @@ class QueryService:
         # Build response
         return self._build_response(llm_response, start_time)
 
-    async def _check_cache(
-        self,
-        request: QueryRequest
-    ) -> Optional[CacheEntry]:
+    async def _check_cache(self, request: QueryRequest) -> Optional[CacheEntry]:
         """
         Check cache for query.
 
@@ -120,6 +113,7 @@ class QueryService:
             model=llm_response.model,
             prompt_tokens=llm_response.prompt_tokens,
             completion_tokens=llm_response.completion_tokens,
+            embedding=None,
         )
 
         try:
@@ -128,9 +122,7 @@ class QueryService:
             logger.error("Cache store failed", error=str(e))
 
     def _build_cached_response(
-        self,
-        entry: CacheEntry,
-        start_time: float
+        self, entry: CacheEntry, start_time: float
     ) -> QueryResponse:
         """
         Build response from cache entry.
@@ -148,10 +140,7 @@ class QueryService:
             response=entry.response,
             provider=entry.provider,
             model=entry.model,
-            usage=UsageMetrics.create(
-                entry.prompt_tokens,
-                entry.completion_tokens
-            ),
+            usage=UsageMetrics.create(entry.prompt_tokens, entry.completion_tokens),
             cache_info=CacheInfo.exact_hit(),
             latency_ms=latency,
         )
@@ -174,8 +163,7 @@ class QueryService:
             provider=self._llm.get_name(),
             model=llm_response.model,
             usage=UsageMetrics.create(
-                llm_response.prompt_tokens,
-                llm_response.completion_tokens
+                llm_response.prompt_tokens, llm_response.completion_tokens
             ),
             cache_info=CacheInfo.miss(),
             latency_ms=latency,

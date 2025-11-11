@@ -1,8 +1,6 @@
 """Test hash utilities."""
 
-import pytest
-
-from app.utils.hasher import normalize_query, generate_cache_key, generate_embedding_key
+from app.utils.hasher import generate_cache_key, generate_embedding_key, normalize_query
 
 
 class TestHashUtilities:

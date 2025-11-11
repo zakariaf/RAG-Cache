@@ -1,8 +1,6 @@
 """Test response models."""
 
-import pytest
-
-from app.models.response import UsageMetrics, CacheInfo, QueryResponse
+from app.models.response import CacheInfo, QueryResponse, UsageMetrics
 
 
 class TestUsageMetrics:
@@ -50,7 +48,7 @@ class TestQueryResponse:
             model="gpt-3.5-turbo",
             usage=UsageMetrics.create(10, 5),
             cache_info=CacheInfo.miss(),
-            latency_ms=150.5
+            latency_ms=150.5,
         )
         assert response.response == "Paris"
         assert response.provider == "openai"
@@ -65,7 +63,7 @@ class TestQueryResponse:
             model="gpt-3.5-turbo",
             usage=UsageMetrics.create(1, 1),
             cache_info=CacheInfo.miss(),
-            latency_ms=100.0
+            latency_ms=100.0,
         )
         assert response.from_cache is False
         assert response.is_exact_match is False
@@ -78,7 +76,7 @@ class TestQueryResponse:
             model="gpt-3.5-turbo",
             usage=UsageMetrics.create(1, 1),
             cache_info=CacheInfo.exact_hit(),
-            latency_ms=10.0
+            latency_ms=10.0,
         )
         assert response.from_cache is True
         assert response.is_exact_match is True

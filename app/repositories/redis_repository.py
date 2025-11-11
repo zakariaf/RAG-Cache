@@ -70,10 +70,7 @@ class RedisRepository:
             return None
 
     async def store(
-        self,
-        key: str,
-        entry: CacheEntry,
-        ttl_seconds: Optional[int] = None
+        self, key: str, entry: CacheEntry, ttl_seconds: Optional[int] = None
     ) -> bool:
         """
         Store cache entry.

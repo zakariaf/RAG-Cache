@@ -20,42 +20,34 @@ class QueryRequest(BaseModel):
         min_length=1,
         max_length=10000,
         description="User query text",
-        examples=["What is the capital of France?"]
+        examples=["What is the capital of France?"],
     )
 
     provider: Optional[Literal["openai", "anthropic"]] = Field(
-        None,
-        description="LLM provider to use (defaults to config)"
+        None, description="LLM provider to use (defaults to config)"
     )
 
     model: Optional[str] = Field(
         None,
         description="Specific model name",
-        examples=["gpt-3.5-turbo", "claude-3-sonnet-20240229"]
+        examples=["gpt-3.5-turbo", "claude-3-sonnet-20240229"],
     )
 
     max_tokens: Optional[int] = Field(
-        None,
-        ge=1,
-        le=4000,
-        description="Maximum tokens in response"
+        None, ge=1, le=4000, description="Maximum tokens in response"
     )
 
     temperature: Optional[float] = Field(
         None,
         ge=0.0,
         le=2.0,
-        description="Response randomness (0=deterministic, 2=creative)"
+        description="Response randomness (0=deterministic, 2=creative)",
     )
 
-    use_cache: bool = Field(
-        default=True,
-        description="Enable cache lookup"
-    )
+    use_cache: bool = Field(default=True, description="Enable cache lookup")
 
     use_semantic_cache: bool = Field(
-        default=True,
-        description="Enable semantic similarity search"
+        default=True, description="Enable semantic similarity search"
     )
 
     @field_validator("query")

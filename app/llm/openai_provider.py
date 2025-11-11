@@ -62,14 +62,16 @@ class OpenAIProvider(BaseLLMProvider):
             llm_response = LLMResponse(
                 content=response.choices[0].message.content or "",
                 prompt_tokens=response.usage.prompt_tokens if response.usage else 0,
-                completion_tokens=response.usage.completion_tokens if response.usage else 0,
+                completion_tokens=(
+                    response.usage.completion_tokens if response.usage else 0
+                ),
                 model=response.model,
             )
 
             log_llm_call(
                 provider="openai",
                 model=llm_response.model,
-                tokens=llm_response.total_tokens
+                tokens=llm_response.total_tokens,
             )
 
             return llm_response
@@ -79,7 +81,9 @@ class OpenAIProvider(BaseLLMProvider):
             logger.error("OpenAI error", error=str(e))
             raise LLMProviderError(error_msg) from e
         except Exception as e:
-            error_msg = self._build_error_message(e, "Unexpected error in OpenAI provider")
+            error_msg = self._build_error_message(
+                e, "Unexpected error in OpenAI provider"
+            )
             logger.error("Unexpected error", error=str(e))
             raise LLMProviderError(error_msg) from e
 
