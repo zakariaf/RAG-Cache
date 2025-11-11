@@ -1,10 +1,11 @@
 """Test Redis repository."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.repositories.redis_repository import RedisRepository
+import pytest
+
 from app.models.cache_entry import CacheEntry
+from app.repositories.redis_repository import RedisRepository
 
 
 @pytest.fixture

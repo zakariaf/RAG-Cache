@@ -1,13 +1,13 @@
 """Test OpenAI LLM provider."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from openai import OpenAIError
 
+from app.exceptions import LLMProviderError
 from app.llm.openai_provider import OpenAIProvider
 from app.models.query import QueryRequest
-from app.exceptions import LLMProviderError
 
 
 @pytest.fixture

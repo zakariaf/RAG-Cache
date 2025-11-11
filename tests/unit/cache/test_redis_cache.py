@@ -1,7 +1,8 @@
 """Test Redis cache service."""
 
-import pytest
 from unittest.mock import AsyncMock, Mock
+
+import pytest
 
 from app.cache.redis_cache import RedisCache
 from app.models.cache_entry import CacheEntry

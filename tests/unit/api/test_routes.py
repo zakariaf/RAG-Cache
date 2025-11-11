@@ -1,15 +1,16 @@
 """Test API routes."""
 
-import pytest
 from unittest.mock import AsyncMock, patch
+
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.api.routes.health import router as health_router
 from app.api.routes.query import router as query_router
-from app.models.query import QueryRequest
-from app.models.response import QueryResponse, UsageMetrics, CacheInfo
 from app.exceptions import LLMProviderError
+from app.models.query import QueryRequest
+from app.models.response import CacheInfo, QueryResponse, UsageMetrics
 
 
 @pytest.fixture

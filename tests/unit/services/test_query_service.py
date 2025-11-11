@@ -1,12 +1,13 @@
 """Test query service."""
 
-import pytest
 from unittest.mock import AsyncMock
 
-from app.services.query_service import QueryService
-from app.models.query import QueryRequest
-from app.models.llm import LLMResponse
+import pytest
+
 from app.models.cache_entry import CacheEntry
+from app.models.llm import LLMResponse
+from app.models.query import QueryRequest
+from app.services.query_service import QueryService
 
 
 @pytest.fixture
