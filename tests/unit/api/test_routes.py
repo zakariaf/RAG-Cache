@@ -9,7 +9,6 @@ from fastapi.testclient import TestClient
 from app.api.routes.health import router as health_router
 from app.api.routes.query import router as query_router
 from app.exceptions import LLMProviderError
-from app.models.query import QueryRequest
 from app.models.response import CacheInfo, QueryResponse, UsageMetrics
 
 
