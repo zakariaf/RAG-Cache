@@ -1,11 +1,12 @@
 """Test API routes."""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from app.api.deps import get_query_service
 from app.api.routes.health import router as health_router
 from app.api.routes.query import router as query_router
 from app.exceptions import LLMProviderError
@@ -22,8 +23,9 @@ def app():
 
 
 @pytest.fixture
-def client(app):
-    """Create test client."""
+def client(app, mock_query_service):
+    """Create test client with dependency override."""
+    app.dependency_overrides[get_query_service] = lambda: mock_query_service
     return TestClient(app)
 
 
@@ -82,19 +84,16 @@ class TestQueryRoutes:
         """Test processing query."""
         mock_query_service.process.return_value = sample_response
 
-        with patch(
-            "app.api.routes.query.get_query_service", return_value=mock_query_service
-        ):
-            response = client.post(
-                "/api/v1/query",
-                json={"query": "What is Python?", "use_cache": True},
-            )
+        response = client.post(
+            "/api/v1/query",
+            json={"query": "What is Python?", "use_cache": True},
+        )
 
-            assert response.status_code == 200
-            data = response.json()
-            assert data["response"] == "Python is a programming language"
-            assert data["provider"] == "openai"
-            assert data["from_cache"] is False
+        assert response.status_code == 200
+        data = response.json()
+        assert data["response"] == "Python is a programming language"
+        assert data["provider"] == "openai"
+        assert data["from_cache"] is False
 
     def test_should_validate_request(self, client):
         """Test request validation."""
@@ -106,31 +105,25 @@ class TestQueryRoutes:
         """Test handling LLM provider errors."""
         mock_query_service.process.side_effect = LLMProviderError("API error")
 
-        with patch(
-            "app.api.routes.query.get_query_service", return_value=mock_query_service
-        ):
-            response = client.post(
-                "/api/v1/query",
-                json={"query": "What is Python?"},
-            )
+        response = client.post(
+            "/api/v1/query",
+            json={"query": "What is Python?"},
+        )
 
-            assert response.status_code == 502
-            assert "API error" in response.json()["detail"]
+        assert response.status_code == 502
+        assert "API error" in response.json()["detail"]
 
     def test_should_handle_unexpected_error(self, client, mock_query_service):
         """Test handling unexpected errors."""
         mock_query_service.process.side_effect = RuntimeError("Unexpected error")
 
-        with patch(
-            "app.api.routes.query.get_query_service", return_value=mock_query_service
-        ):
-            response = client.post(
-                "/api/v1/query",
-                json={"query": "What is Python?"},
-            )
+        response = client.post(
+            "/api/v1/query",
+            json={"query": "What is Python?"},
+        )
 
-            assert response.status_code == 500
-            assert "Internal server error" in response.json()["detail"]
+        assert response.status_code == 500
+        assert "Internal server error" in response.json()["detail"]
 
     def test_should_accept_custom_parameters(
         self, client, mock_query_service, sample_response
@@ -138,20 +131,17 @@ class TestQueryRoutes:
         """Test accepting custom parameters."""
         mock_query_service.process.return_value = sample_response
 
-        with patch(
-            "app.api.routes.query.get_query_service", return_value=mock_query_service
-        ):
-            response = client.post(
-                "/api/v1/query",
-                json={
-                    "query": "What is Python?",
-                    "model": "gpt-4",
-                    "max_tokens": 500,
-                    "temperature": 0.7,
-                    "use_cache": False,
-                },
-            )
+        response = client.post(
+            "/api/v1/query",
+            json={
+                "query": "What is Python?",
+                "model": "gpt-4",
+                "max_tokens": 500,
+                "temperature": 0.7,
+                "use_cache": False,
+            },
+        )
 
-            assert response.status_code == 200
-            # Verify service was called with the request
-            mock_query_service.process.assert_called_once()
+        assert response.status_code == 200
+        # Verify service was called with the request
+        mock_query_service.process.assert_called_once()

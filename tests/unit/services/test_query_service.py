@@ -1,6 +1,6 @@
 """Test query service."""
 
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -19,7 +19,8 @@ def mock_cache():
 @pytest.fixture
 def mock_llm():
     """Create mock LLM provider."""
-    llm = AsyncMock()
+    llm = Mock()
+    llm.complete = AsyncMock()
     llm.get_name.return_value = "openai"
     return llm
 
