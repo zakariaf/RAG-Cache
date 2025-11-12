@@ -15,13 +15,21 @@ from pydantic import BaseModel, Field, field_validator
 class ProviderConfig(BaseModel):
     """LLM provider configuration."""
 
-    provider: Literal["openai", "anthropic"] = Field(..., description="LLM provider name")
+    provider: Literal["openai", "anthropic"] = Field(
+        ..., description="LLM provider name"
+    )
     api_key: str = Field(..., description="API key for the provider")
     model: str = Field(..., description="Model name/identifier")
-    max_tokens: int = Field(..., ge=1, le=100000, description="Maximum tokens per request")
+    max_tokens: int = Field(
+        ..., ge=1, le=100000, description="Maximum tokens per request"
+    )
     temperature: float = Field(..., ge=0.0, le=2.0, description="Sampling temperature")
-    timeout_seconds: int = Field(default=30, ge=1, le=300, description="Request timeout")
-    retry_attempts: int = Field(default=3, ge=0, le=10, description="Number of retry attempts")
+    timeout_seconds: int = Field(
+        default=30, ge=1, le=300, description="Request timeout"
+    )
+    retry_attempts: int = Field(
+        default=3, ge=0, le=10, description="Number of retry attempts"
+    )
     retry_delay_seconds: int = Field(
         default=1, ge=0, le=60, description="Delay between retries"
     )

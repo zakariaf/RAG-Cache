@@ -101,7 +101,9 @@ class TestCacheStatistics:
 
     def test_should_validate_total_equals_hits_plus_misses(self):
         """Test validation that total equals hits plus misses."""
-        with pytest.raises(ValueError, match="total_queries.*must equal.*cache_hits.*cache_misses"):
+        with pytest.raises(
+            ValueError, match="total_queries.*must equal.*cache_hits.*cache_misses"
+        ):
             CacheStatistics.create(
                 total_queries=100,  # Should be 150
                 cache_hits=100,
@@ -117,7 +119,9 @@ class TestCacheStatistics:
 
     def test_should_validate_cache_hits_equals_exact_plus_semantic(self):
         """Test validation that cache hits equals exact plus semantic."""
-        with pytest.raises(ValueError, match="cache_hits.*must equal.*exact_hits.*semantic_hits"):
+        with pytest.raises(
+            ValueError, match="cache_hits.*must equal.*exact_hits.*semantic_hits"
+        ):
             CacheStatistics.create(
                 total_queries=150,
                 cache_hits=100,  # Should be 120

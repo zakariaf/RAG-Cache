@@ -168,7 +168,9 @@ class TestEmbeddingVector:
         v1 = EmbeddingVector.create(vector=[0.0, 0.0], model="test-model")
         v2 = EmbeddingVector.create(vector=[1.0, 2.0], model="test-model")
 
-        with pytest.raises(ValueError, match="Cannot calculate cosine similarity with zero vector"):
+        with pytest.raises(
+            ValueError, match="Cannot calculate cosine similarity with zero vector"
+        ):
             v1.cosine_similarity(v2)
 
     def test_should_convert_to_list(self):

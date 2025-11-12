@@ -16,7 +16,9 @@ from pydantic import BaseModel, Field, field_validator
 class RateLimitInfo(BaseModel):
     """Rate limit information for API responses."""
 
-    requests_remaining: int = Field(..., ge=0, description="Requests remaining in window")
+    requests_remaining: int = Field(
+        ..., ge=0, description="Requests remaining in window"
+    )
     reset_at: datetime = Field(..., description="When the limit resets (UTC)")
     limit: int = Field(..., ge=1, description="Total requests allowed per window")
     window_seconds: int = Field(..., ge=1, description="Time window in seconds")
@@ -57,7 +59,9 @@ class RateLimitInfo(BaseModel):
             )
 
         if requests_remaining < 0:
-            raise ValueError(f"requests_remaining cannot be negative: {requests_remaining}")
+            raise ValueError(
+                f"requests_remaining cannot be negative: {requests_remaining}"
+            )
 
         return cls(
             requests_remaining=requests_remaining,

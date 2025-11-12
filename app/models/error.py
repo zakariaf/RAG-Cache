@@ -40,7 +40,9 @@ class ErrorResponse(BaseModel):
     )
 
     @classmethod
-    def invalid_query(cls, detail: str = "Query text is empty or invalid") -> "ErrorResponse":
+    def invalid_query(
+        cls, detail: str = "Query text is empty or invalid"
+    ) -> "ErrorResponse":
         """Create invalid query error."""
         return cls(detail=detail, error_code=ErrorCode.INVALID_QUERY)
 

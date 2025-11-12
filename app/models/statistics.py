@@ -15,13 +15,19 @@ from pydantic import BaseModel, Field, field_validator
 class CacheStatistics(BaseModel):
     """Cache performance statistics."""
 
-    total_queries: int = Field(..., ge=0, description="Total number of queries processed")
+    total_queries: int = Field(
+        ..., ge=0, description="Total number of queries processed"
+    )
     cache_hits: int = Field(..., ge=0, description="Total cache hits")
     cache_misses: int = Field(..., ge=0, description="Total cache misses")
-    hit_rate: float = Field(..., ge=0.0, le=100.0, description="Cache hit rate percentage")
+    hit_rate: float = Field(
+        ..., ge=0.0, le=100.0, description="Cache hit rate percentage"
+    )
     exact_hits: int = Field(..., ge=0, description="Exact cache hits")
     semantic_hits: int = Field(..., ge=0, description="Semantic cache hits")
-    avg_latency_ms: int = Field(..., ge=0, description="Average query latency in milliseconds")
+    avg_latency_ms: int = Field(
+        ..., ge=0, description="Average query latency in milliseconds"
+    )
     avg_cache_latency_ms: int = Field(
         ..., ge=0, description="Average cache hit latency in milliseconds"
     )
@@ -160,6 +166,7 @@ class CacheStatistics(BaseModel):
         if self.avg_llm_latency_ms == 0:
             return None
         improvement = (
-            (self.avg_llm_latency_ms - self.avg_cache_latency_ms) / self.avg_llm_latency_ms
+            (self.avg_llm_latency_ms - self.avg_cache_latency_ms)
+            / self.avg_llm_latency_ms
         ) * 100.0
         return round(improvement, 2)

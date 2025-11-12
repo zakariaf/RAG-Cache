@@ -298,7 +298,9 @@ class TestSemanticMatch:
         assert strong.is_weak_match is False
 
         # Exactly 0.90
-        strong_edge = SemanticMatch(entry=entry, similarity_score=0.90, query_hash="hash456")
+        strong_edge = SemanticMatch(
+            entry=entry, similarity_score=0.90, query_hash="hash456"
+        )
         assert strong_edge.is_strong_match is True
 
     def test_should_identify_moderate_match(self):
@@ -314,17 +316,23 @@ class TestSemanticMatch:
         )
 
         # Moderate match (0.80 - 0.89)
-        moderate = SemanticMatch(entry=entry, similarity_score=0.85, query_hash="hash456")
+        moderate = SemanticMatch(
+            entry=entry, similarity_score=0.85, query_hash="hash456"
+        )
         assert moderate.is_moderate_match is True
         assert moderate.is_strong_match is False
         assert moderate.is_weak_match is False
 
         # Lower edge (0.80)
-        moderate_low = SemanticMatch(entry=entry, similarity_score=0.80, query_hash="hash456")
+        moderate_low = SemanticMatch(
+            entry=entry, similarity_score=0.80, query_hash="hash456"
+        )
         assert moderate_low.is_moderate_match is True
 
         # Upper edge (0.89)
-        moderate_high = SemanticMatch(entry=entry, similarity_score=0.89, query_hash="hash456")
+        moderate_high = SemanticMatch(
+            entry=entry, similarity_score=0.89, query_hash="hash456"
+        )
         assert moderate_high.is_moderate_match is True
 
     def test_should_identify_weak_match(self):
@@ -346,7 +354,9 @@ class TestSemanticMatch:
         assert weak.is_strong_match is False
 
         # Very weak
-        very_weak = SemanticMatch(entry=entry, similarity_score=0.50, query_hash="hash456")
+        very_weak = SemanticMatch(
+            entry=entry, similarity_score=0.50, query_hash="hash456"
+        )
         assert very_weak.is_weak_match is True
 
     def test_should_validate_similarity_score_range(self):
@@ -362,10 +372,14 @@ class TestSemanticMatch:
         )
 
         # Valid range: 0.0 to 1.0
-        valid_low = SemanticMatch(entry=entry, similarity_score=0.0, query_hash="hash456")
+        valid_low = SemanticMatch(
+            entry=entry, similarity_score=0.0, query_hash="hash456"
+        )
         assert valid_low.similarity_score == 0.0
 
-        valid_high = SemanticMatch(entry=entry, similarity_score=1.0, query_hash="hash456")
+        valid_high = SemanticMatch(
+            entry=entry, similarity_score=1.0, query_hash="hash456"
+        )
         assert valid_high.similarity_score == 1.0
 
         # Invalid: below 0.0

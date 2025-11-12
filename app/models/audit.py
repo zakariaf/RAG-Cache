@@ -38,10 +38,14 @@ class AuditLogEntry(BaseModel):
     )
     event_type: EventType = Field(..., description="Type of event")
     request_id: str = Field(..., description="Unique request identifier")
-    user_id: Optional[str] = Field(None, description="User identifier (if authenticated)")
+    user_id: Optional[str] = Field(
+        None, description="User identifier (if authenticated)"
+    )
     query_hash: Optional[str] = Field(None, description="Query hash (for query events)")
     provider: Optional[str] = Field(None, description="LLM provider used")
-    latency_ms: float = Field(..., ge=0.0, description="Request latency in milliseconds")
+    latency_ms: float = Field(
+        ..., ge=0.0, description="Request latency in milliseconds"
+    )
     success: bool = Field(..., description="Whether the operation succeeded")
     error_code: Optional[str] = Field(None, description="Error code (if failed)")
     error_message: Optional[str] = Field(None, description="Error message (if failed)")
@@ -274,8 +278,12 @@ class AuditLogSummary(BaseModel):
         failed = total - successful
 
         query_events = sum(1 for e in entries if e.event_type == EventType.QUERY)
-        cache_hit_events = sum(1 for e in entries if e.event_type == EventType.CACHE_HIT)
-        cache_miss_events = sum(1 for e in entries if e.event_type == EventType.CACHE_MISS)
+        cache_hit_events = sum(
+            1 for e in entries if e.event_type == EventType.CACHE_HIT
+        )
+        cache_miss_events = sum(
+            1 for e in entries if e.event_type == EventType.CACHE_MISS
+        )
         error_events = sum(1 for e in entries if e.event_type == EventType.ERROR)
 
         avg_latency = sum(e.latency_ms for e in entries) / total if total > 0 else 0.0

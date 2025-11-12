@@ -319,7 +319,9 @@ class TestAuditLogSummary:
         """Test counting successful and failed events."""
         entries = [
             AuditLogEntry.query_event("req-1", "hash-1", "openai", 100.0, success=True),
-            AuditLogEntry.query_event("req-2", "hash-2", "openai", 100.0, success=False),
+            AuditLogEntry.query_event(
+                "req-2", "hash-2", "openai", 100.0, success=False
+            ),
             AuditLogEntry.error_event("req-3", "ERROR", "Test", 10.0),
         ]
 
@@ -337,7 +339,9 @@ class TestAuditLogSummary:
             AuditLogEntry.query_event("req-1", "hash-1", "openai", 100.0, success=True),
             AuditLogEntry.query_event("req-2", "hash-2", "openai", 100.0, success=True),
             AuditLogEntry.query_event("req-3", "hash-3", "openai", 100.0, success=True),
-            AuditLogEntry.query_event("req-4", "hash-4", "openai", 100.0, success=False),
+            AuditLogEntry.query_event(
+                "req-4", "hash-4", "openai", 100.0, success=False
+            ),
         ]
 
         start = datetime.now(timezone.utc)

@@ -282,7 +282,9 @@ class TestProviderRegistry:
         """Test validation when setting unregistered provider as default."""
         registry = ProviderRegistry()
 
-        with pytest.raises(ValueError, match="Cannot set default: provider not registered"):
+        with pytest.raises(
+            ValueError, match="Cannot set default: provider not registered"
+        ):
             registry.set_default("unknown")
 
     def test_should_get_default_provider(self):
