@@ -136,7 +136,9 @@ class TestRedisCachePerformance:
         print(f"Batch Size: {batch_size}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
-        print(f"Avg Latency: {(elapsed / (total_written / batch_size)) * 1000:.2f}ms per batch")
+        print(
+            f"Avg Latency: {(elapsed / (total_written / batch_size)) * 1000:.2f}ms per batch"
+        )
 
         assert total_written == 1000
         assert throughput > 500  # Batch should be faster
@@ -166,7 +168,9 @@ class TestRedisCachePerformance:
         print(f"Batch Size: {batch_size}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
-        print(f"Avg Latency: {(elapsed / (total_read / batch_size)) * 1000:.2f}ms per batch")
+        print(
+            f"Avg Latency: {(elapsed / (total_read / batch_size)) * 1000:.2f}ms per batch"
+        )
 
         assert total_read == 1000
         assert throughput > 1000  # Batch reads should be very fast

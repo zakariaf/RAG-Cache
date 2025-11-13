@@ -361,7 +361,9 @@ class RedisCache:
                 )
                 entries.append(entry)
             except Exception as e:
-                logger.error("Failed to create warming entry", query=query, error=str(e))
+                logger.error(
+                    "Failed to create warming entry", query=query, error=str(e)
+                )
 
         # Warm cache with generated entries
         return await self.warm_cache(entries, batch_size=batch_size)

@@ -284,7 +284,9 @@ class TestRedisCache:
         def progress_callback(current, total):
             progress_calls.append((current, total))
 
-        result = await redis_cache.warm_cache(entries, progress_callback=progress_callback)
+        result = await redis_cache.warm_cache(
+            entries, progress_callback=progress_callback
+        )
 
         assert result["total"] == 5
         assert len(progress_calls) > 0
@@ -302,7 +304,9 @@ class TestRedisCache:
         assert result["success"] == 2
 
     @pytest.mark.asyncio
-    async def test_should_skip_already_cached_queries(self, redis_cache, mock_repository):
+    async def test_should_skip_already_cached_queries(
+        self, redis_cache, mock_repository
+    ):
         """Test cache warming skips already cached queries."""
         queries = ["What is Python?"]
         mock_repository.exists.return_value = True
