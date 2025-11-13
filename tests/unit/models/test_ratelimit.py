@@ -54,7 +54,7 @@ class TestRateLimitInfo:
         """Test validation that remaining is not negative."""
         reset_at = datetime.now(timezone.utc) + timedelta(seconds=60)
 
-        with pytest.raises(ValueError, match="cannot be negative"):
+        with pytest.raises(ValueError, match="greater than or equal to 0"):
             RateLimitInfo.create(
                 requests_remaining=-1,
                 reset_at=reset_at,
