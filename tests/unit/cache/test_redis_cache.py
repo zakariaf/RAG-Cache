@@ -6,6 +6,7 @@ import pytest
 
 from app.cache.redis_cache import RedisCache
 from app.models.cache_entry import CacheEntry
+from app.models.statistics import RedisMetrics
 
 
 @pytest.fixture
@@ -147,3 +148,47 @@ class TestRedisCache:
 
         assert result == mock_keys
         mock_repository.get_keys_by_pattern.assert_called_once_with("*")
+
+    @pytest.mark.asyncio
+    async def test_should_get_metrics(self, redis_cache, mock_repository):
+        """Test getting Redis metrics."""
+        mock_metrics = RedisMetrics(
+            total_keys=100,
+            memory_used_bytes=1024000,
+            memory_peak_bytes=2048000,
+            total_connections=50,
+            connected_clients=5,
+            total_commands_processed=1000,
+            uptime_seconds=3600,
+            hits=80,
+            misses=20,
+            evicted_keys=5,
+            expired_keys=10,
+        )
+        mock_repository.get_metrics.return_value = mock_metrics
+
+        result = await redis_cache.get_metrics()
+
+        assert result == mock_metrics
+        assert result.hit_rate == 80.0
+        mock_repository.get_metrics.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_get_cache_size(self, redis_cache, mock_repository):
+        """Test getting cache size."""
+        mock_repository.get_key_count.return_value = 42
+
+        result = await redis_cache.get_cache_size()
+
+        assert result == 42
+        mock_repository.get_key_count.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_get_entry_memory(self, redis_cache, mock_repository):
+        """Test getting entry memory usage."""
+        mock_repository.get_memory_usage.return_value = 1024
+
+        result = await redis_cache.get_entry_memory("What is Python?")
+
+        assert result == 1024
+        mock_repository.get_memory_usage.assert_called_once()

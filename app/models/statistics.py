@@ -7,6 +7,7 @@ Sandi Metz Principles:
 - Clear naming conventions
 """
 
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
@@ -169,3 +170,50 @@ class CacheStatistics(BaseModel):
             / self.avg_llm_latency_ms
         ) * 100.0
         return round(improvement, 2)
+
+
+class RedisMetrics(BaseModel):
+    """Redis cache metrics and statistics."""
+
+    total_keys: int = Field(..., ge=0, description="Total number of keys in Redis")
+    memory_used_bytes: int = Field(..., ge=0, description="Memory used in bytes")
+    memory_peak_bytes: int = Field(..., ge=0, description="Peak memory used in bytes")
+    total_connections: int = Field(..., ge=0, description="Total client connections")
+    connected_clients: int = Field(..., ge=0, description="Currently connected clients")
+    total_commands_processed: int = Field(
+        ..., ge=0, description="Total commands processed"
+    )
+    uptime_seconds: int = Field(..., ge=0, description="Redis server uptime in seconds")
+    hits: int = Field(..., ge=0, description="Number of successful key lookups")
+    misses: int = Field(..., ge=0, description="Number of failed key lookups")
+    evicted_keys: int = Field(..., ge=0, description="Number of evicted keys")
+    expired_keys: int = Field(..., ge=0, description="Number of expired keys")
+    timestamp: datetime = Field(
+        default_factory=datetime.utcnow, description="Metrics collection timestamp"
+    )
+
+    @property
+    def memory_used_mb(self) -> float:
+        """Get memory used in megabytes."""
+        return round(self.memory_used_bytes / (1024 * 1024), 2)
+
+    @property
+    def memory_peak_mb(self) -> float:
+        """Get peak memory in megabytes."""
+        return round(self.memory_peak_bytes / (1024 * 1024), 2)
+
+    @property
+    def hit_rate(self) -> float:
+        """Calculate cache hit rate percentage."""
+        total = self.hits + self.misses
+        if total == 0:
+            return 0.0
+        return round((self.hits / total) * 100.0, 2)
+
+    @property
+    def is_healthy(self) -> bool:
+        """Check if Redis metrics indicate healthy state."""
+        return (
+            self.connected_clients > 0
+            and self.memory_used_bytes < self.memory_peak_bytes * 0.95
+        )

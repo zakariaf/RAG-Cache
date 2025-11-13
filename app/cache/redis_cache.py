@@ -11,6 +11,7 @@ from typing import Optional
 
 from app.config import config
 from app.models.cache_entry import CacheEntry
+from app.models.statistics import RedisMetrics
 from app.repositories.redis_repository import RedisRepository
 from app.utils.hasher import generate_cache_key
 from app.utils.logger import get_logger, log_cache_hit, log_cache_miss
@@ -147,3 +148,37 @@ class RedisCache:
             List of cache keys
         """
         return await self._repository.get_keys_by_pattern(pattern)
+
+    async def get_metrics(self) -> Optional[RedisMetrics]:
+        """
+        Collect Redis metrics.
+
+        Returns:
+            Redis metrics if successful
+        """
+        metrics = await self._repository.get_metrics()
+        if metrics:
+            logger.info("Metrics collected", total_keys=metrics.total_keys)
+        return metrics
+
+    async def get_cache_size(self) -> int:
+        """
+        Get total number of cached entries.
+
+        Returns:
+            Number of cache entries
+        """
+        return await self._repository.get_key_count()
+
+    async def get_entry_memory(self, query: str) -> int:
+        """
+        Get memory usage of cached entry.
+
+        Args:
+            query: Query text
+
+        Returns:
+            Memory usage in bytes
+        """
+        key = generate_cache_key(query)
+        return await self._repository.get_memory_usage(key)
