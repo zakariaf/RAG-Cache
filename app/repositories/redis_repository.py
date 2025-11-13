@@ -273,3 +273,115 @@ class RedisRepository:
         except Exception as e:
             logger.error("Memory usage check failed", key=key, error=str(e))
             return 0
+
+    async def batch_store(
+        self, entries: dict[str, CacheEntry], ttl_seconds: Optional[int] = None
+    ) -> int:
+        """
+        Store multiple cache entries in batch.
+
+        Args:
+            entries: Dictionary of key -> CacheEntry
+            ttl_seconds: Time-to-live in seconds
+
+        Returns:
+            Number of entries stored successfully
+        """
+        if not entries:
+            return 0
+
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                async with client.pipeline() as pipe:
+                    for key, entry in entries.items():
+                        data = entry.model_dump_json()
+                        if ttl_seconds:
+                            pipe.setex(key, ttl_seconds, data)
+                        else:
+                            pipe.set(key, data)
+                    results = await pipe.execute()
+                    success_count = sum(1 for r in results if r)
+                    logger.info("Batch store completed", count=success_count)
+                    return success_count
+        except Exception as e:
+            logger.error("Batch store failed", error=str(e))
+            return 0
+
+    async def batch_fetch(self, keys: list[str]) -> dict[str, Optional[CacheEntry]]:
+        """
+        Fetch multiple cache entries in batch.
+
+        Args:
+            keys: List of cache keys
+
+        Returns:
+            Dictionary of key -> CacheEntry (None if not found)
+        """
+        if not keys:
+            return {}
+
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                values = await client.mget(keys)
+                results = {}
+                for key, value in zip(keys, values):
+                    if value:
+                        try:
+                            results[key] = CacheEntry(**json.loads(value))
+                        except Exception as parse_error:
+                            logger.error(
+                                "Entry parse failed", key=key, error=str(parse_error)
+                            )
+                            results[key] = None
+                    else:
+                        results[key] = None
+                return results
+        except Exception as e:
+            logger.error("Batch fetch failed", error=str(e))
+            return {key: None for key in keys}
+
+    async def batch_delete(self, keys: list[str]) -> int:
+        """
+        Delete multiple cache entries in batch.
+
+        Args:
+            keys: List of cache keys
+
+        Returns:
+            Number of entries deleted
+        """
+        if not keys:
+            return 0
+
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                count = await client.delete(*keys)
+                logger.info("Batch delete completed", count=count)
+                return count
+        except Exception as e:
+            logger.error("Batch delete failed", error=str(e))
+            return 0
+
+    async def batch_exists(self, keys: list[str]) -> dict[str, bool]:
+        """
+        Check existence of multiple keys in batch.
+
+        Args:
+            keys: List of cache keys
+
+        Returns:
+            Dictionary of key -> exists status
+        """
+        if not keys:
+            return {}
+
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                async with client.pipeline() as pipe:
+                    for key in keys:
+                        pipe.exists(key)
+                    results = await pipe.execute()
+                    return {key: bool(result) for key, result in zip(keys, results)}
+        except Exception as e:
+            logger.error("Batch exists check failed", error=str(e))
+            return {key: False for key in keys}

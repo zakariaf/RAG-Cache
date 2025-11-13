@@ -182,3 +182,86 @@ class RedisCache:
         """
         key = generate_cache_key(query)
         return await self._repository.get_memory_usage(key)
+
+    async def batch_set(self, entries: list[CacheEntry]) -> int:
+        """
+        Store multiple cache entries in batch.
+
+        Args:
+            entries: List of cache entries to store
+
+        Returns:
+            Number of entries stored successfully
+        """
+        if not entries:
+            return 0
+
+        entry_dict = {entry.query_hash: entry for entry in entries}
+        count = await self._repository.batch_store(entry_dict, self._ttl)
+        logger.info("Batch set completed", count=count)
+        return count
+
+    async def batch_get(self, queries: list[str]) -> dict[str, Optional[CacheEntry]]:
+        """
+        Get multiple cache entries in batch.
+
+        Args:
+            queries: List of query texts
+
+        Returns:
+            Dictionary of query -> CacheEntry (None if not found)
+        """
+        if not queries:
+            return {}
+
+        keys = [generate_cache_key(query) for query in queries]
+        results = await self._repository.batch_fetch(keys)
+
+        # Map back to original queries
+        query_results = {}
+        for query, key in zip(queries, keys):
+            entry = results.get(key)
+            query_results[query] = entry
+            if entry:
+                log_cache_hit(query, source="exact")
+            else:
+                log_cache_miss(query)
+
+        return query_results
+
+    async def batch_delete(self, queries: list[str]) -> int:
+        """
+        Delete multiple cache entries in batch.
+
+        Args:
+            queries: List of query texts
+
+        Returns:
+            Number of entries deleted
+        """
+        if not queries:
+            return 0
+
+        keys = [generate_cache_key(query) for query in queries]
+        count = await self._repository.batch_delete(keys)
+        logger.info("Batch delete completed", count=count)
+        return count
+
+    async def batch_exists(self, queries: list[str]) -> dict[str, bool]:
+        """
+        Check existence of multiple queries in batch.
+
+        Args:
+            queries: List of query texts
+
+        Returns:
+            Dictionary of query -> exists status
+        """
+        if not queries:
+            return {}
+
+        keys = [generate_cache_key(query) for query in queries]
+        results = await self._repository.batch_exists(keys)
+
+        # Map back to original queries
+        return {query: results[key] for query, key in zip(queries, keys)}

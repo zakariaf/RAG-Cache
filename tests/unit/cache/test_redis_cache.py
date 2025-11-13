@@ -192,3 +192,61 @@ class TestRedisCache:
 
         assert result == 1024
         mock_repository.get_memory_usage.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_batch_set(self, redis_cache, mock_repository, sample_entry):
+        """Test batch setting cache entries."""
+        entries = [sample_entry]
+        mock_repository.batch_store.return_value = 1
+
+        result = await redis_cache.batch_set(entries)
+
+        assert result == 1
+        mock_repository.batch_store.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_batch_get(self, redis_cache, mock_repository, sample_entry):
+        """Test batch getting cache entries."""
+        queries = ["What is Python?", "What is Java?"]
+        mock_repository.batch_fetch.return_value = {
+            "test_hash": sample_entry,
+            "test_hash_2": None,
+        }
+
+        result = await redis_cache.batch_get(queries)
+
+        assert len(result) == 2
+        mock_repository.batch_fetch.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_batch_delete(self, redis_cache, mock_repository):
+        """Test batch deleting cache entries."""
+        queries = ["What is Python?", "What is Java?"]
+        mock_repository.batch_delete.return_value = 2
+
+        result = await redis_cache.batch_delete(queries)
+
+        assert result == 2
+        mock_repository.batch_delete.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_batch_exists(self, redis_cache, mock_repository):
+        """Test batch checking existence."""
+        queries = ["What is Python?", "What is Java?"]
+        mock_repository.batch_exists.return_value = {
+            "key1": True,
+            "key2": False,
+        }
+
+        result = await redis_cache.batch_exists(queries)
+
+        assert len(result) == 2
+        mock_repository.batch_exists.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_handle_empty_batch_operations(self, redis_cache):
+        """Test batch operations with empty lists."""
+        assert await redis_cache.batch_set([]) == 0
+        assert await redis_cache.batch_get([]) == {}
+        assert await redis_cache.batch_delete([]) == 0
+        assert await redis_cache.batch_exists([]) == {}
