@@ -116,3 +116,34 @@ class TestRedisCache:
 
         assert result is True
         mock_repository.ping.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_invalidate_by_pattern(self, redis_cache, mock_repository):
+        """Test invalidating cache by pattern."""
+        mock_repository.delete_by_pattern.return_value = 5
+
+        result = await redis_cache.invalidate_by_pattern("cache:*")
+
+        assert result == 5
+        mock_repository.delete_by_pattern.assert_called_once_with("cache:*")
+
+    @pytest.mark.asyncio
+    async def test_should_invalidate_all(self, redis_cache, mock_repository):
+        """Test invalidating all cache entries."""
+        mock_repository.clear_all.return_value = True
+
+        result = await redis_cache.invalidate_all()
+
+        assert result is True
+        mock_repository.clear_all.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_get_cached_queries(self, redis_cache, mock_repository):
+        """Test getting cached query keys."""
+        mock_keys = ["key1", "key2", "key3"]
+        mock_repository.get_keys_by_pattern.return_value = mock_keys
+
+        result = await redis_cache.get_cached_queries("*")
+
+        assert result == mock_keys
+        mock_repository.get_keys_by_pattern.assert_called_once_with("*")

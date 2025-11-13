@@ -109,3 +109,41 @@ class RedisCache:
             True if healthy, False otherwise
         """
         return await self._repository.ping()
+
+    async def invalidate_by_pattern(self, pattern: str) -> int:
+        """
+        Invalidate cache entries matching pattern.
+
+        Args:
+            pattern: Key pattern (e.g., "cache:*")
+
+        Returns:
+            Number of entries invalidated
+        """
+        count = await self._repository.delete_by_pattern(pattern)
+        logger.info("Cache invalidated by pattern", pattern=pattern, count=count)
+        return count
+
+    async def invalidate_all(self) -> bool:
+        """
+        Invalidate all cache entries.
+
+        Returns:
+            True if successful
+        """
+        success = await self._repository.clear_all()
+        if success:
+            logger.info("All cache entries invalidated")
+        return success
+
+    async def get_cached_queries(self, pattern: str = "*") -> list[str]:
+        """
+        Get list of cached query keys.
+
+        Args:
+            pattern: Key pattern to match
+
+        Returns:
+            List of cache keys
+        """
+        return await self._repository.get_keys_by_pattern(pattern)

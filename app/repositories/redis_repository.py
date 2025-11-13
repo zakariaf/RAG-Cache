@@ -145,3 +145,61 @@ class RedisRepository:
         except Exception as e:
             logger.error("Redis ping failed", error=str(e))
             return False
+
+    async def delete_by_pattern(self, pattern: str) -> int:
+        """
+        Delete keys matching pattern.
+
+        Args:
+            pattern: Key pattern (e.g., "user:*")
+
+        Returns:
+            Number of keys deleted
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                keys = []
+                async for key in client.scan_iter(match=pattern):
+                    keys.append(key)
+                if keys:
+                    return await client.delete(*keys)
+                return 0
+        except Exception as e:
+            logger.error("Pattern delete failed", pattern=pattern, error=str(e))
+            return 0
+
+    async def clear_all(self) -> bool:
+        """
+        Clear all keys in database.
+
+        Returns:
+            True if cleared successfully
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                await client.flushdb()
+                logger.info("Redis database cleared")
+                return True
+        except Exception as e:
+            logger.error("Clear all failed", error=str(e))
+            return False
+
+    async def get_keys_by_pattern(self, pattern: str) -> list[str]:
+        """
+        Get all keys matching pattern.
+
+        Args:
+            pattern: Key pattern
+
+        Returns:
+            List of matching keys
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                keys = []
+                async for key in client.scan_iter(match=pattern):
+                    keys.append(key)
+                return keys
+        except Exception as e:
+            logger.error("Pattern scan failed", pattern=pattern, error=str(e))
+            return []
