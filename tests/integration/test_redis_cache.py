@@ -6,10 +6,8 @@ These tests require a running Redis instance.
 
 import pytest
 import pytest_asyncio
-from redis.asyncio import ConnectionPool
 
 from app.cache.redis_cache import RedisCache
-from app.config import config
 from app.models.cache_entry import CacheEntry
 from app.repositories.redis_repository import RedisRepository, create_redis_pool
 

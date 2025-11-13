@@ -77,7 +77,7 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = success_count / elapsed
 
-        print(f"\n=== Single Write Performance ===")
+        print("\n=== Single Write Performance ===")
         print(f"Operations: {success_count}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
@@ -105,7 +105,7 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = hit_count / elapsed
 
-        print(f"\n=== Single Read Performance ===")
+        print("\n=== Single Read Performance ===")
         print(f"Operations: {hit_count}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
@@ -131,14 +131,13 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = total_written / elapsed
 
-        print(f"\n=== Batch Write Performance ===")
+        print("\n=== Batch Write Performance ===")
         print(f"Operations: {total_written}")
         print(f"Batch Size: {batch_size}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
-        print(
-            f"Avg Latency: {(elapsed / (total_written / batch_size)) * 1000:.2f}ms per batch"
-        )
+        latency_per_batch = (elapsed / (total_written / batch_size)) * 1000
+        print(f"Avg Latency: {latency_per_batch:.2f}ms per batch")
 
         assert total_written == 1000
         assert throughput > 500  # Batch should be faster
@@ -163,14 +162,13 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = total_read / elapsed
 
-        print(f"\n=== Batch Read Performance ===")
+        print("\n=== Batch Read Performance ===")
         print(f"Operations: {total_read}")
         print(f"Batch Size: {batch_size}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
-        print(
-            f"Avg Latency: {(elapsed / (total_read / batch_size)) * 1000:.2f}ms per batch"
-        )
+        latency_per_batch = (elapsed / (total_read / batch_size)) * 1000
+        print(f"Avg Latency: {latency_per_batch:.2f}ms per batch")
 
         assert total_read == 1000
         assert throughput > 1000  # Batch reads should be very fast
@@ -189,7 +187,7 @@ class TestRedisCachePerformance:
         success_count = sum(1 for r in results if r)
         throughput = success_count / elapsed
 
-        print(f"\n=== Concurrent Write Performance ===")
+        print("\n=== Concurrent Write Performance ===")
         print(f"Operations: {success_count}")
         print(f"Concurrency: {len(tasks)}")
         print(f"Time: {elapsed:.2f}s")
@@ -216,7 +214,7 @@ class TestRedisCachePerformance:
         hit_count = sum(1 for r in results if r is not None)
         throughput = hit_count / elapsed
 
-        print(f"\n=== Concurrent Read Performance ===")
+        print("\n=== Concurrent Read Performance ===")
         print(f"Operations: {hit_count}")
         print(f"Concurrency: {len(tasks)}")
         print(f"Time: {elapsed:.2f}s")
@@ -236,7 +234,7 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = result["success"] / elapsed
 
-        print(f"\n=== Cache Warming Performance ===")
+        print("\n=== Cache Warming Performance ===")
         print(f"Operations: {result['success']}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
@@ -265,7 +263,7 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = len(results) / elapsed
 
-        print(f"\n=== Mixed Workload Performance ===")
+        print("\n=== Mixed Workload Performance ===")
         print(f"Operations: {len(results)} (250 writes + 250 reads)")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
@@ -285,7 +283,7 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = iterations / elapsed
 
-        print(f"\n=== Memory Stats Collection Performance ===")
+        print("\n=== Memory Stats Collection Performance ===")
         print(f"Operations: {iterations}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
@@ -306,7 +304,7 @@ class TestRedisCachePerformance:
         elapsed = time.time() - start_time
         throughput = count / elapsed if count > 0 else 0
 
-        print(f"\n=== Invalidation Performance ===")
+        print("\n=== Invalidation Performance ===")
         print(f"Keys Deleted: {count}")
         print(f"Time: {elapsed:.2f}s")
         print(f"Throughput: {throughput:.2f} ops/s")
