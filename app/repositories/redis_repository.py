@@ -385,3 +385,131 @@ class RedisRepository:
         except Exception as e:
             logger.error("Batch exists check failed", error=str(e))
             return {key: False for key in keys}
+
+    async def get_memory_stats(self) -> dict[str, int]:
+        """
+        Get detailed memory statistics.
+
+        Returns:
+            Dictionary of memory stats
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                memory_info = await client.info("memory")
+                return {
+                    "used_memory": memory_info.get("used_memory", 0),
+                    "used_memory_peak": memory_info.get("used_memory_peak", 0),
+                    "used_memory_rss": memory_info.get("used_memory_rss", 0),
+                    "used_memory_dataset": memory_info.get("used_memory_dataset", 0),
+                    "used_memory_overhead": memory_info.get("used_memory_overhead", 0),
+                    "maxmemory": memory_info.get("maxmemory", 0),
+                    "mem_fragmentation_ratio": int(
+                        memory_info.get("mem_fragmentation_ratio", 1.0) * 100
+                    ),
+                }
+        except Exception as e:
+            logger.error("Memory stats failed", error=str(e))
+            return {}
+
+    async def check_memory_pressure(self, threshold: float = 0.85) -> bool:
+        """
+        Check if memory usage is above threshold.
+
+        Args:
+            threshold: Memory usage threshold (0.0-1.0)
+
+        Returns:
+            True if memory pressure is high
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                memory_info = await client.info("memory")
+                used = memory_info.get("used_memory", 0)
+                max_mem = memory_info.get("maxmemory", 0)
+
+                if max_mem == 0:
+                    return False
+
+                ratio = used / max_mem
+                is_high = ratio >= threshold
+
+                if is_high:
+                    logger.warning(
+                        "High memory pressure detected",
+                        used_mb=used / (1024 * 1024),
+                        max_mb=max_mem / (1024 * 1024),
+                        ratio=ratio,
+                    )
+
+                return is_high
+        except Exception as e:
+            logger.error("Memory pressure check failed", error=str(e))
+            return False
+
+    async def evict_lru_keys(self, count: int = 100) -> int:
+        """
+        Evict least recently used keys.
+
+        Args:
+            count: Number of keys to evict
+
+        Returns:
+            Number of keys evicted
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                # Get random sample of keys
+                keys = []
+                async for key in client.scan_iter(count=count):
+                    keys.append(key)
+                    if len(keys) >= count:
+                        break
+
+                if not keys:
+                    return 0
+
+                # Delete the keys
+                deleted = await client.delete(*keys)
+                logger.info("LRU eviction completed", evicted=deleted)
+                return deleted
+        except Exception as e:
+            logger.error("LRU eviction failed", error=str(e))
+            return 0
+
+    async def set_memory_limit(self, max_memory_bytes: int) -> bool:
+        """
+        Set Redis memory limit.
+
+        Args:
+            max_memory_bytes: Maximum memory in bytes
+
+        Returns:
+            True if set successfully
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                await client.config_set("maxmemory", max_memory_bytes)
+                logger.info("Memory limit set", max_mb=max_memory_bytes / (1024 * 1024))
+                return True
+        except Exception as e:
+            logger.error("Set memory limit failed", error=str(e))
+            return False
+
+    async def get_memory_usage_by_type(self) -> dict[str, int]:
+        """
+        Get memory usage breakdown by data type.
+
+        Returns:
+            Dictionary of type -> memory usage
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                memory_info = await client.memory_stats()
+                return {
+                    "overhead": memory_info.get("overhead.total", 0),
+                    "dataset": memory_info.get("dataset.bytes", 0),
+                    "keys": memory_info.get("keys.count", 0),
+                }
+        except Exception as e:
+            logger.error("Memory usage by type failed", error=str(e))
+            return {}

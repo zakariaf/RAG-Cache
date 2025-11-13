@@ -310,3 +310,59 @@ class TestRedisCache:
         result = await redis_cache.warm_from_queries(queries, llm_provider=None)
 
         assert result["total"] == 0
+
+    @pytest.mark.asyncio
+    async def test_should_get_memory_stats(self, redis_cache, mock_repository):
+        """Test getting memory statistics."""
+        mock_stats = {
+            "used_memory": 1024000,
+            "used_memory_peak": 2048000,
+            "maxmemory": 4096000,
+        }
+        mock_repository.get_memory_stats.return_value = mock_stats
+
+        result = await redis_cache.get_memory_stats()
+
+        assert result == mock_stats
+        mock_repository.get_memory_stats.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_check_memory_pressure(self, redis_cache, mock_repository):
+        """Test checking memory pressure."""
+        mock_repository.check_memory_pressure.return_value = True
+
+        result = await redis_cache.is_memory_pressure_high()
+
+        assert result is True
+        mock_repository.check_memory_pressure.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_evict_old_entries(self, redis_cache, mock_repository):
+        """Test evicting old cache entries."""
+        mock_repository.evict_lru_keys.return_value = 50
+
+        result = await redis_cache.evict_old_entries(count=50)
+
+        assert result == 50
+        mock_repository.evict_lru_keys.assert_called_once_with(50)
+
+    @pytest.mark.asyncio
+    async def test_should_set_max_memory(self, redis_cache, mock_repository):
+        """Test setting maximum memory limit."""
+        mock_repository.set_memory_limit.return_value = True
+
+        result = await redis_cache.set_max_memory(max_memory_mb=100)
+
+        assert result is True
+        mock_repository.set_memory_limit.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_should_get_memory_breakdown(self, redis_cache, mock_repository):
+        """Test getting memory breakdown by type."""
+        mock_breakdown = {"overhead": 1000, "dataset": 5000, "keys": 100}
+        mock_repository.get_memory_usage_by_type.return_value = mock_breakdown
+
+        result = await redis_cache.get_memory_breakdown()
+
+        assert result == mock_breakdown
+        mock_repository.get_memory_usage_by_type.assert_called_once()

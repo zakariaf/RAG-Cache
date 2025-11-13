@@ -365,3 +365,63 @@ class RedisCache:
 
         # Warm cache with generated entries
         return await self.warm_cache(entries, batch_size=batch_size)
+
+    async def get_memory_stats(self) -> dict[str, int]:
+        """
+        Get detailed memory statistics.
+
+        Returns:
+            Dictionary of memory stats
+        """
+        return await self._repository.get_memory_stats()
+
+    async def is_memory_pressure_high(self, threshold: float = 0.85) -> bool:
+        """
+        Check if memory pressure is high.
+
+        Args:
+            threshold: Memory usage threshold (0.0-1.0)
+
+        Returns:
+            True if memory usage is above threshold
+        """
+        return await self._repository.check_memory_pressure(threshold)
+
+    async def evict_old_entries(self, count: int = 100) -> int:
+        """
+        Evict old cache entries to free memory.
+
+        Args:
+            count: Number of entries to evict
+
+        Returns:
+            Number of entries evicted
+        """
+        evicted = await self._repository.evict_lru_keys(count)
+        logger.info("Cache entries evicted", count=evicted)
+        return evicted
+
+    async def set_max_memory(self, max_memory_mb: int) -> bool:
+        """
+        Set maximum memory limit for cache.
+
+        Args:
+            max_memory_mb: Maximum memory in megabytes
+
+        Returns:
+            True if set successfully
+        """
+        max_bytes = max_memory_mb * 1024 * 1024
+        success = await self._repository.set_memory_limit(max_bytes)
+        if success:
+            logger.info("Max memory set", max_mb=max_memory_mb)
+        return success
+
+    async def get_memory_breakdown(self) -> dict[str, int]:
+        """
+        Get memory usage breakdown by type.
+
+        Returns:
+            Dictionary of type -> memory usage
+        """
+        return await self._repository.get_memory_usage_by_type()
