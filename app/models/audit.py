@@ -115,6 +115,8 @@ class AuditLogEntry(BaseModel):
             provider=None,
             latency_ms=latency_ms,
             success=True,
+            error_code=None,
+            error_message=None,
         )
 
     @classmethod
@@ -134,6 +136,8 @@ class AuditLogEntry(BaseModel):
             provider=None,
             latency_ms=latency_ms,
             success=True,
+            error_code=None,
+            error_message=None,
         )
 
     @classmethod
@@ -176,6 +180,7 @@ class AuditLogEntry(BaseModel):
             latency_ms=latency_ms,
             success=False,
             error_code="RATE_LIMIT_EXCEEDED",
+            error_message=None,
         )
 
     @classmethod
@@ -208,6 +213,8 @@ class AuditLogEntry(BaseModel):
             provider=None,
             latency_ms=0.0,
             success=True,
+            error_code=None,
+            error_message=None,
         )
 
     @property
