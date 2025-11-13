@@ -9,7 +9,7 @@ Sandi Metz Principles:
 
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class CacheStatistics(BaseModel):
@@ -37,12 +37,24 @@ class CacheStatistics(BaseModel):
     tokens_saved: int = Field(..., ge=0, description="Total tokens saved by caching")
     uptime_seconds: int = Field(..., ge=0, description="Service uptime in seconds")
 
-    @field_validator("cache_hits", "exact_hits", "semantic_hits")
-    @classmethod
-    def validate_hits_not_exceed_total(cls, v: int, info) -> int:
-        """Validate that hits don't exceed total queries."""
-        # Note: Full validation happens in create() factory method
-        return v
+    @model_validator(mode="after")
+    def validate_statistics_consistency(self) -> "CacheStatistics":
+        """Validate statistics consistency across all fields."""
+        # Validate total equals hits + misses
+        if self.total_queries != self.cache_hits + self.cache_misses:
+            raise ValueError(
+                f"total_queries ({self.total_queries}) must equal cache_hits "
+                f"({self.cache_hits}) + cache_misses ({self.cache_misses})"
+            )
+
+        # Validate exact + semantic = cache_hits
+        if self.cache_hits != self.exact_hits + self.semantic_hits:
+            raise ValueError(
+                f"cache_hits ({self.cache_hits}) must equal exact_hits "
+                f"({self.exact_hits}) + semantic_hits ({self.semantic_hits})"
+            )
+
+        return self
 
     @classmethod
     def create(
@@ -77,22 +89,9 @@ class CacheStatistics(BaseModel):
             CacheStatistics instance
 
         Raises:
-            ValueError: If validation fails
+            ValueError: If validation fails (via model_validator)
         """
-        # Validate total equals hits + misses
-        if total_queries != cache_hits + cache_misses:
-            raise ValueError(
-                f"total_queries ({total_queries}) must equal cache_hits ({cache_hits}) + "
-                f"cache_misses ({cache_misses})"
-            )
-
-        # Validate exact + semantic = cache_hits
-        if cache_hits != exact_hits + semantic_hits:
-            raise ValueError(
-                f"cache_hits ({cache_hits}) must equal exact_hits ({exact_hits}) + "
-                f"semantic_hits ({semantic_hits})"
-            )
-
+        # Validation happens in model_validator
         # Calculate hit rate
         hit_rate = (cache_hits / total_queries * 100.0) if total_queries > 0 else 0.0
 

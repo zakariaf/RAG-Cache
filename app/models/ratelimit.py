@@ -10,7 +10,7 @@ Sandi Metz Principles:
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class RateLimitInfo(BaseModel):
@@ -23,12 +23,15 @@ class RateLimitInfo(BaseModel):
     limit: int = Field(..., ge=1, description="Total requests allowed per window")
     window_seconds: int = Field(..., ge=1, description="Time window in seconds")
 
-    @field_validator("requests_remaining")
-    @classmethod
-    def validate_remaining_not_exceed_limit(cls, v: int, info) -> int:
-        """Validate remaining doesn't exceed limit."""
-        # Full validation in create() factory method
-        return v
+    @model_validator(mode="after")
+    def validate_requests_remaining(self) -> "RateLimitInfo":
+        """Validate requests_remaining doesn't exceed limit."""
+        if self.requests_remaining > self.limit:
+            raise ValueError(
+                f"requests_remaining ({self.requests_remaining}) cannot exceed "
+                f"limit ({self.limit})"
+            )
+        return self
 
     @classmethod
     def create(
@@ -51,18 +54,9 @@ class RateLimitInfo(BaseModel):
             RateLimitInfo instance
 
         Raises:
-            ValueError: If validation fails
+            ValueError: If validation fails (via model_validator)
         """
-        if requests_remaining > limit:
-            raise ValueError(
-                f"requests_remaining ({requests_remaining}) cannot exceed limit ({limit})"
-            )
-
-        if requests_remaining < 0:
-            raise ValueError(
-                f"requests_remaining cannot be negative: {requests_remaining}"
-            )
-
+        # Validation happens in model_validator
         return cls(
             requests_remaining=requests_remaining,
             reset_at=reset_at,

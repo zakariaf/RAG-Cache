@@ -135,7 +135,7 @@ class TestCacheEntry:
 
     def test_should_validate_non_negative_prompt_tokens(self):
         """Test validation of prompt tokens."""
-        try:
+        with pytest.raises(ValueError):
             CacheEntry(
                 query_hash="hash123",
                 original_query="What is AI?",
@@ -145,13 +145,10 @@ class TestCacheEntry:
                 prompt_tokens=-1,  # Invalid
                 completion_tokens=20,
             )
-            assert False, "Should have raised validation error"
-        except ValueError:
-            pass
 
     def test_should_validate_non_negative_completion_tokens(self):
         """Test validation of completion tokens."""
-        try:
+        with pytest.raises(ValueError):
             CacheEntry(
                 query_hash="hash123",
                 original_query="What is AI?",
@@ -161,13 +158,10 @@ class TestCacheEntry:
                 prompt_tokens=10,
                 completion_tokens=-1,  # Invalid
             )
-            assert False, "Should have raised validation error"
-        except ValueError:
-            pass
 
     def test_should_validate_non_negative_hit_count(self):
         """Test validation of hit count."""
-        try:
+        with pytest.raises(ValueError):
             CacheEntry(
                 query_hash="hash123",
                 original_query="What is AI?",
@@ -178,9 +172,6 @@ class TestCacheEntry:
                 completion_tokens=20,
                 hit_count=-1,  # Invalid
             )
-            assert False, "Should have raised validation error"
-        except ValueError:
-            pass
 
     def test_should_accept_zero_tokens(self):
         """Test that zero tokens are valid."""
@@ -383,18 +374,12 @@ class TestSemanticMatch:
         assert valid_high.similarity_score == 1.0
 
         # Invalid: below 0.0
-        try:
+        with pytest.raises(ValueError):
             SemanticMatch(entry=entry, similarity_score=-0.1, query_hash="hash456")
-            assert False, "Should have raised validation error"
-        except ValueError:
-            pass
 
         # Invalid: above 1.0
-        try:
+        with pytest.raises(ValueError):
             SemanticMatch(entry=entry, similarity_score=1.1, query_hash="hash456")
-            assert False, "Should have raised validation error"
-        except ValueError:
-            pass
 
     def test_should_access_entry_properties(self):
         """Test accessing entry properties through match."""

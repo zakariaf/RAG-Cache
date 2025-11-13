@@ -273,20 +273,30 @@ class AuditLogSummary(BaseModel):
         Returns:
             AuditLogSummary instance
         """
+        # Consolidate into single loop for efficiency
         total = len(entries)
-        successful = sum(1 for e in entries if e.success)
+        successful = 0
+        query_events = 0
+        cache_hit_events = 0
+        cache_miss_events = 0
+        error_events = 0
+        total_latency = 0.0
+
+        for entry in entries:
+            if entry.success:
+                successful += 1
+            if entry.event_type == EventType.QUERY:
+                query_events += 1
+            elif entry.event_type == EventType.CACHE_HIT:
+                cache_hit_events += 1
+            elif entry.event_type == EventType.CACHE_MISS:
+                cache_miss_events += 1
+            elif entry.event_type == EventType.ERROR:
+                error_events += 1
+            total_latency += entry.latency_ms
+
         failed = total - successful
-
-        query_events = sum(1 for e in entries if e.event_type == EventType.QUERY)
-        cache_hit_events = sum(
-            1 for e in entries if e.event_type == EventType.CACHE_HIT
-        )
-        cache_miss_events = sum(
-            1 for e in entries if e.event_type == EventType.CACHE_MISS
-        )
-        error_events = sum(1 for e in entries if e.event_type == EventType.ERROR)
-
-        avg_latency = sum(e.latency_ms for e in entries) / total if total > 0 else 0.0
+        avg_latency = total_latency / total if total > 0 else 0.0
 
         return cls(
             total_events=total,

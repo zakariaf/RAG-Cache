@@ -10,7 +10,7 @@ Sandi Metz Principles:
 import math
 from typing import List
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class EmbeddingVector(BaseModel):
@@ -42,12 +42,24 @@ class EmbeddingVector(BaseModel):
             raise ValueError("Model name cannot be empty")
         return v.strip()
 
-    @field_validator("dimensions")
-    @classmethod
-    def validate_dimensions_match(cls, v: int, info) -> int:
-        """Validate dimensions match vector length."""
-        # Note: Full validation happens in create() factory
-        return v
+    @model_validator(mode="after")
+    def validate_vector_dimensions(self) -> "EmbeddingVector":
+        """Validate vector dimensions and values."""
+        # Check dimensions match vector length
+        if len(self.vector) != self.dimensions:
+            raise ValueError(
+                f"Vector length ({len(self.vector)}) does not match "
+                f"dimensions ({self.dimensions})"
+            )
+
+        # Validate all values are valid floats
+        for i, val in enumerate(self.vector):
+            if not isinstance(val, (int, float)):
+                raise ValueError(f"Invalid vector value at index {i}: {val}")
+            if math.isnan(val) or math.isinf(val):
+                raise ValueError(f"Vector contains NaN or Inf at index {i}")
+
+        return self
 
     @classmethod
     def create(
@@ -70,17 +82,8 @@ class EmbeddingVector(BaseModel):
         Raises:
             ValueError: If vector is empty or invalid
         """
-        if not vector:
-            raise ValueError("Embedding vector cannot be empty")
-
+        # Validation happens in model_validator
         dimensions = len(vector)
-
-        # Validate all values are valid floats
-        for i, val in enumerate(vector):
-            if not isinstance(val, (int, float)):
-                raise ValueError(f"Invalid vector value at index {i}: {val}")
-            if math.isnan(val) or math.isinf(val):
-                raise ValueError(f"Vector contains NaN or Inf at index {i}")
 
         return cls(
             vector=vector,

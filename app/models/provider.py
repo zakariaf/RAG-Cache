@@ -135,12 +135,8 @@ class ProviderRegistry(BaseModel):
         if not name or name.strip() == "":
             raise ValueError("Provider name cannot be empty")
 
-        # Create a mutable copy of providers dict
-        new_providers = dict(self.providers)
-        new_providers[name] = config
-
-        # Update the model with new dict
-        object.__setattr__(self, "providers", new_providers)
+        # Directly mutate the providers dict (Pydantic models are mutable)
+        self.providers[name] = config
 
     def get(self, name: Optional[str] = None) -> Optional[ProviderConfig]:
         """
@@ -188,7 +184,8 @@ class ProviderRegistry(BaseModel):
         """
         if name not in self.providers:
             raise ValueError(f"Cannot set default: provider not registered: {name}")
-        object.__setattr__(self, "default_provider", name)
+        # Directly mutate the field (Pydantic models are mutable)
+        self.default_provider = name
 
     def list_providers(self) -> List[str]:
         """Get list of registered provider names."""
