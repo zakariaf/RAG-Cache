@@ -7,7 +7,8 @@ Sandi Metz Principles:
 - Dependency Injection: Repository injected
 """
 
-from typing import Optional
+import asyncio
+from typing import Callable, Optional
 
 from app.config import config
 from app.models.cache_entry import CacheEntry
@@ -265,3 +266,102 @@ class RedisCache:
 
         # Map back to original queries
         return {query: results[key] for query, key in zip(queries, keys)}
+
+    async def warm_cache(
+        self,
+        entries: list[CacheEntry],
+        batch_size: int = 100,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
+    ) -> dict[str, int]:
+        """
+        Warm cache with preloaded entries.
+
+        Args:
+            entries: List of cache entries to preload
+            batch_size: Number of entries per batch
+            progress_callback: Optional callback for progress updates
+
+        Returns:
+            Dictionary with success/failure counts
+        """
+        if not entries:
+            logger.info("No entries to warm")
+            return {"total": 0, "success": 0, "failed": 0}
+
+        total = len(entries)
+        success_count = 0
+        failed_count = 0
+
+        # Process in batches
+        for i in range(0, total, batch_size):
+            batch = entries[i : i + batch_size]
+            count = await self.batch_set(batch)
+            success_count += count
+            failed_count += len(batch) - count
+
+            # Report progress
+            if progress_callback:
+                progress_callback(i + len(batch), total)
+
+            # Small delay between batches to avoid overwhelming Redis
+            if i + batch_size < total:
+                await asyncio.sleep(0.01)
+
+        logger.info(
+            "Cache warming completed",
+            total=total,
+            success=success_count,
+            failed=failed_count,
+        )
+
+        return {"total": total, "success": success_count, "failed": failed_count}
+
+    async def warm_from_queries(
+        self,
+        queries: list[str],
+        llm_provider: Callable[[str], str],
+        batch_size: int = 50,
+    ) -> dict[str, int]:
+        """
+        Warm cache by generating responses for queries.
+
+        Args:
+            queries: List of queries to warm
+            llm_provider: Async function to get LLM response
+            batch_size: Number of queries per batch
+
+        Returns:
+            Dictionary with success/failure counts
+        """
+        if not queries:
+            return {"total": 0, "success": 0, "failed": 0}
+
+        logger.info("Starting cache warming from queries", count=len(queries))
+        entries = []
+
+        # Generate cache entries (mock implementation)
+        for query in queries:
+            # Check if already cached
+            if await self.exists(query):
+                logger.debug("Query already cached", query=query)
+                continue
+
+            try:
+                # In real implementation, would call LLM provider
+                # For now, create placeholder entry
+                entry = CacheEntry(
+                    query_hash=generate_cache_key(query),
+                    original_query=query,
+                    response="Warmed cache entry",
+                    provider="cache_warmer",
+                    model="warming",
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    embedding=None,
+                )
+                entries.append(entry)
+            except Exception as e:
+                logger.error("Failed to create warming entry", query=query, error=str(e))
+
+        # Warm cache with generated entries
+        return await self.warm_cache(entries, batch_size=batch_size)

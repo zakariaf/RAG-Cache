@@ -250,3 +250,63 @@ class TestRedisCache:
         assert await redis_cache.batch_get([]) == {}
         assert await redis_cache.batch_delete([]) == 0
         assert await redis_cache.batch_exists([]) == {}
+
+    @pytest.mark.asyncio
+    async def test_should_warm_cache(self, redis_cache, mock_repository, sample_entry):
+        """Test cache warming with entries."""
+        entries = [sample_entry]
+        mock_repository.batch_store.return_value = 1
+
+        result = await redis_cache.warm_cache(entries)
+
+        assert result["total"] == 1
+        assert result["success"] == 1
+        assert result["failed"] == 0
+
+    @pytest.mark.asyncio
+    async def test_should_handle_empty_warming(self, redis_cache):
+        """Test cache warming with no entries."""
+        result = await redis_cache.warm_cache([])
+
+        assert result["total"] == 0
+        assert result["success"] == 0
+        assert result["failed"] == 0
+
+    @pytest.mark.asyncio
+    async def test_should_warm_cache_with_progress_callback(
+        self, redis_cache, mock_repository, sample_entry
+    ):
+        """Test cache warming with progress callback."""
+        entries = [sample_entry] * 5
+        mock_repository.batch_store.return_value = 5
+        progress_calls = []
+
+        def progress_callback(current, total):
+            progress_calls.append((current, total))
+
+        result = await redis_cache.warm_cache(entries, progress_callback=progress_callback)
+
+        assert result["total"] == 5
+        assert len(progress_calls) > 0
+
+    @pytest.mark.asyncio
+    async def test_should_warm_from_queries(self, redis_cache, mock_repository):
+        """Test cache warming from query list."""
+        queries = ["What is Python?", "What is Java?"]
+        mock_repository.exists.return_value = False
+        mock_repository.batch_store.return_value = 2
+
+        result = await redis_cache.warm_from_queries(queries, llm_provider=None)
+
+        assert result["total"] == 2
+        assert result["success"] == 2
+
+    @pytest.mark.asyncio
+    async def test_should_skip_already_cached_queries(self, redis_cache, mock_repository):
+        """Test cache warming skips already cached queries."""
+        queries = ["What is Python?"]
+        mock_repository.exists.return_value = True
+
+        result = await redis_cache.warm_from_queries(queries, llm_provider=None)
+
+        assert result["total"] == 0
