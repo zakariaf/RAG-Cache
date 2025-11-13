@@ -212,11 +212,6 @@ class TestLLMProvider:
 
     def test_should_require_async_complete(self):
         """Test that complete method signature is async."""
-        import inspect
-
-        # Get the complete method signature
-        complete_method = getattr(LLMProvider, "complete")
-
         # Check if it's a coroutine function (async)
         # Note: For Protocol, we check the annotation
         assert "complete" in dir(LLMProvider)

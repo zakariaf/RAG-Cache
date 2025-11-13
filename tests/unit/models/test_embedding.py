@@ -1,7 +1,5 @@
 """Test embedding vector models."""
 
-import math
-
 import pytest
 
 from app.models.embedding import EmbeddingResult, EmbeddingVector
