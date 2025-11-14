@@ -10,7 +10,6 @@ Sandi Metz Principles:
 from typing import Optional
 
 from qdrant_client import AsyncQdrantClient
-from qdrant_client.http.exceptions import UnexpectedResponse
 
 from app.config import config
 from app.utils.logger import get_logger
