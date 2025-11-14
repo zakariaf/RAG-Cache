@@ -232,15 +232,23 @@ class TestRedisCache:
     @pytest.mark.asyncio
     async def test_should_batch_exists(self, redis_cache, mock_repository):
         """Test batch checking existence."""
+        from app.utils.hasher import generate_cache_key
+
         queries = ["What is Python?", "What is Java?"]
+        # Generate actual cache keys
+        key1 = generate_cache_key(queries[0])
+        key2 = generate_cache_key(queries[1])
+
         mock_repository.batch_exists.return_value = {
-            "key1": True,
-            "key2": False,
+            key1: True,
+            key2: False,
         }
 
         result = await redis_cache.batch_exists(queries)
 
         assert len(result) == 2
+        assert result[queries[0]] is True
+        assert result[queries[1]] is False
         mock_repository.batch_exists.assert_called_once()
 
     @pytest.mark.asyncio
