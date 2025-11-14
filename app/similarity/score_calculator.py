@@ -23,10 +23,10 @@ class SimilarityLevel(str, Enum):
     Helps interpret similarity scores.
     """
 
-    EXACT = "exact"  # 0.95 - 1.0
-    VERY_HIGH = "very_high"  # 0.85 - 0.95
-    HIGH = "high"  # 0.75 - 0.85
-    MODERATE = "moderate"  # 0.60 - 0.75
+    EXACT = "exact"  # > 0.95
+    VERY_HIGH = "very_high"  # 0.90 - 0.95
+    HIGH = "high"  # 0.80 - 0.90
+    MODERATE = "moderate"  # 0.60 - 0.80
     LOW = "low"  # 0.40 - 0.60
     VERY_LOW = "very_low"  # < 0.40
 
@@ -40,8 +40,8 @@ class SimilarityScoreCalculator:
 
     # Threshold definitions
     EXACT_THRESHOLD = 0.95
-    VERY_HIGH_THRESHOLD = 0.85
-    HIGH_THRESHOLD = 0.75
+    VERY_HIGH_THRESHOLD = 0.90
+    HIGH_THRESHOLD = 0.80
     MODERATE_THRESHOLD = 0.60
     LOW_THRESHOLD = 0.40
 
@@ -159,11 +159,11 @@ class SimilarityScoreCalculator:
         Returns:
             SimilarityLevel enum
         """
-        if score >= cls.EXACT_THRESHOLD:
+        if score > cls.EXACT_THRESHOLD:
             return SimilarityLevel.EXACT
-        elif score >= cls.VERY_HIGH_THRESHOLD:
+        elif score > cls.VERY_HIGH_THRESHOLD:
             return SimilarityLevel.VERY_HIGH
-        elif score >= cls.HIGH_THRESHOLD:
+        elif score > cls.HIGH_THRESHOLD:
             return SimilarityLevel.HIGH
         elif score >= cls.MODERATE_THRESHOLD:
             return SimilarityLevel.MODERATE
