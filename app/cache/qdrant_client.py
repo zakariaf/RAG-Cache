@@ -7,7 +7,8 @@ Sandi Metz Principles:
 - Dependency Injection: Configuration injected
 """
 
-from typing import Optional
+from contextlib import asynccontextmanager
+from typing import AsyncIterator, Optional
 
 from qdrant_client import AsyncQdrantClient
 
@@ -115,3 +116,25 @@ class QdrantConnectionManager:
         except Exception as e:
             logger.error("Qdrant reconnection failed", error=str(e))
             return False
+
+
+@asynccontextmanager
+async def get_pooled_client() -> AsyncIterator[AsyncQdrantClient]:
+    """
+    Context manager for acquiring pooled connection.
+
+    Yields:
+        Qdrant client from pool
+
+    Example:
+        async with get_pooled_client() as client:
+            await client.upsert(...)
+    """
+    from app.cache.qdrant_pool import get_pool
+
+    pool = await get_pool()
+    client = await pool.acquire()
+    try:
+        yield client
+    finally:
+        await pool.release(client)
