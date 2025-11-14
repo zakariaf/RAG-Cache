@@ -1,7 +1,8 @@
 """Unit tests for similarity score calculator."""
 
-import pytest
 import math
+
+import pytest
 
 from app.similarity.score_calculator import (
     ScoreCalculator,

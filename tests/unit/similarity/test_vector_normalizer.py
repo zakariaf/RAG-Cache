@@ -1,16 +1,17 @@
 """Unit tests for vector normalizer."""
 
-import pytest
 import math
+
+import pytest
 
 from app.similarity.vector_normalizer import (
     VectorNormalizer,
     NormalizationType,
+    clip_vector,
     l1_normalize,
     l2_normalize,
     max_normalize,
     standardize_vector,
-    clip_vector,
 )
 
 

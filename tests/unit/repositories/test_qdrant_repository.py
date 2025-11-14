@@ -1,7 +1,8 @@
 """Unit tests for Qdrant repository."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 from qdrant_client.models import Distance, PointStruct, ScoredPoint
 
 from app.models.qdrant_point import QdrantPoint, SearchResult
