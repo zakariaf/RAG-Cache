@@ -119,7 +119,7 @@ class QdrantRepository:
         try:
             with ErrorContext("ping"):
                 await self._client.get_collections()
-                return True
+            return True
         except Exception as e:
             logger.error("Qdrant ping failed", error=str(e))
             return False
@@ -170,12 +170,12 @@ class QdrantRepository:
                     points=[point.to_qdrant_point()],
                 )
 
-                logger.info(
-                    "Point stored",
-                    point_id=point.id,
-                    query_hash=point.payload.get("query_hash"),
-                )
-                return True
+            logger.info(
+                "Point stored",
+                point_id=point.id,
+                query_hash=point.payload.get("query_hash"),
+            )
+            return True
 
         except Exception as e:
             mapped_error = handle_qdrant_error(e, "store_point")
@@ -301,10 +301,12 @@ class QdrantRepository:
                     point_id=str(result.id),
                     score=result.score,
                     vector=(
-                        result.vector
-                        if result.vector and isinstance(result.vector, list)
+                        result.vector  # type: ignore[arg-type]
+                        if result.vector
+                        and isinstance(result.vector, list)
+                        and all(isinstance(x, (int, float)) for x in result.vector)
                         else None
-                    ),  # type: ignore[arg-type]
+                    ),
                     payload=result.payload if result.payload else {},
                 )
                 for result in results
@@ -354,10 +356,12 @@ class QdrantRepository:
                     point_id=str(result.id),
                     score=result.score,
                     vector=(
-                        result.vector
-                        if result.vector and isinstance(result.vector, list)
+                        result.vector  # type: ignore[arg-type]
+                        if result.vector
+                        and isinstance(result.vector, list)
+                        and all(isinstance(x, (int, float)) for x in result.vector)
                         else None
-                    ),  # type: ignore[arg-type]
+                    ),
                     payload=result.payload if result.payload else {},
                 )
                 for result in results
@@ -775,7 +779,12 @@ class QdrantRepository:
             points = [
                 QdrantPoint.from_qdrant_point(
                     point_id=str(point.id),
-                    vector=point.vector if isinstance(point.vector, list) else [],
+                    vector=(
+                        point.vector  # type: ignore[arg-type]
+                        if isinstance(point.vector, list)
+                        and all(isinstance(x, (int, float)) for x in point.vector)
+                        else []
+                    ),
                     payload=point.payload if point.payload else {},
                 )
                 for point in result[0]

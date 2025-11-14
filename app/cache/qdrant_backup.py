@@ -315,12 +315,15 @@ class SnapshotManager:
                 collection_name=self._collection_name
             )
 
-            logger.info(
-                "Snapshot created",
-                collection=self._collection_name,
-                snapshot=result.name,
-            )
-            return result.name
+            if result:
+                logger.info(
+                    "Snapshot created",
+                    collection=self._collection_name,
+                    snapshot=result.name,
+                )
+                return result.name
+
+            return None
 
         except Exception as e:
             logger.error("Snapshot creation failed", error=str(e))

@@ -247,7 +247,7 @@ class ErrorContext:
         exc_type: Optional[type],
         exc_val: Optional[Exception],
         exc_tb: Any,
-    ) -> bool:
+    ) -> None:
         """
         Exit context and handle exceptions.
 
@@ -255,12 +255,8 @@ class ErrorContext:
             exc_type: Exception type
             exc_val: Exception value
             exc_tb: Exception traceback
-
-        Returns:
-            False to propagate the custom exception
         """
         if exc_val is not None:
             # Map to custom exception
             custom_error = handle_qdrant_error(exc_val, self.operation)
             raise custom_error from exc_val
-        return False
