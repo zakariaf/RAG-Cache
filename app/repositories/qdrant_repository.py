@@ -7,7 +7,7 @@ Sandi Metz Principles:
 - Dependency Injection: Client injected
 """
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, Filter, PointStruct, VectorParams
@@ -137,7 +137,11 @@ class QdrantRepository:
                 "status": info.status,
                 "config": {
                     "vector_size": self._vector_size,
-                    "distance": info.config.params.vectors.distance,
+                    "distance": (
+                        info.config.params.vectors.distance
+                        if isinstance(info.config.params.vectors, VectorParams)
+                        else None
+                    ),
                 },
             }
         except Exception as e:
@@ -239,8 +243,12 @@ class QdrantRepository:
                 return None
 
             point = points[0]
+            # Extract vector safely
+            vector = point.vector if isinstance(point.vector, list) else []
             return QdrantPoint.from_qdrant_point(
-                point_id=str(point.id), vector=point.vector, payload=point.payload
+                point_id=str(point.id),
+                vector=vector,  # type: ignore[arg-type]
+                payload=point.payload or {},
             )
 
         except Exception as e:
@@ -281,7 +289,11 @@ class QdrantRepository:
                 SearchResult(
                     point_id=str(result.id),
                     score=result.score,
-                    vector=result.vector if result.vector else None,
+                    vector=(
+                        result.vector
+                        if result.vector and isinstance(result.vector, list)
+                        else None
+                    ),  # type: ignore[arg-type]
                     payload=result.payload if result.payload else {},
                 )
                 for result in results
@@ -330,7 +342,11 @@ class QdrantRepository:
                 SearchResult(
                     point_id=str(result.id),
                     score=result.score,
-                    vector=result.vector if result.vector else None,
+                    vector=(
+                        result.vector
+                        if result.vector and isinstance(result.vector, list)
+                        else None
+                    ),  # type: ignore[arg-type]
                     payload=result.payload if result.payload else {},
                 )
                 for result in results
@@ -585,7 +601,7 @@ class QdrantRepository:
         return await self.delete_by_filter(filter_obj)
 
     async def update_point_payload(
-        self, point_id: str, payload: Dict[str, any]
+        self, point_id: str, payload: Dict[str, Any]
     ) -> bool:
         """
         Update point payload metadata.
@@ -623,7 +639,8 @@ class QdrantRepository:
             True if updated successfully
         """
         try:
-            await self._client.update_vectors(
+            # Note: update_vectors API usage - using upsert instead
+            await self._client.upsert(
                 collection_name=self._collection_name,
                 points=[PointStruct(id=point_id, vector=vector, payload={})],
             )
@@ -660,7 +677,7 @@ class QdrantRepository:
             return False
 
     async def partial_update_payload(
-        self, point_id: str, updates: Dict[str, any]
+        self, point_id: str, updates: Dict[str, Any]
     ) -> bool:
         """
         Partially update payload fields.
@@ -721,7 +738,7 @@ class QdrantRepository:
         offset: Optional[str] = None,
         filter_condition: Optional[Filter] = None,
         with_vectors: bool = False,
-    ) -> tuple[List[QdrantPoint], Optional[str]]:
+    ) -> tuple[List[QdrantPoint], Optional[Union[int, str]]]:
         """
         Scroll through points with pagination.
 
@@ -747,7 +764,7 @@ class QdrantRepository:
             points = [
                 QdrantPoint.from_qdrant_point(
                     point_id=str(point.id),
-                    vector=point.vector if point.vector else [],
+                    vector=point.vector if isinstance(point.vector, list) else [],
                     payload=point.payload if point.payload else {},
                 )
                 for point in result[0]

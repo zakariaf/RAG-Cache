@@ -16,6 +16,7 @@ from qdrant_client.models import (
     IsEmptyCondition,
     MatchAny,
     MatchValue,
+    PayloadField,
     Range,
 )
 
@@ -105,7 +106,7 @@ class QdrantFilterBuilder:
         Returns:
             Self for chaining
         """
-        condition = IsEmptyCondition(is_empty=FieldCondition(key=field))
+        condition = IsEmptyCondition(is_empty=PayloadField(key=field))
         self._must.append(condition)
         return self
 
@@ -119,7 +120,7 @@ class QdrantFilterBuilder:
         Returns:
             Self for chaining
         """
-        condition = IsEmptyCondition(is_empty=FieldCondition(key=field))
+        condition = IsEmptyCondition(is_empty=PayloadField(key=field))
         self._must_not.append(condition)
         return self
 

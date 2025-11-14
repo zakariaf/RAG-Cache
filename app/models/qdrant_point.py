@@ -8,7 +8,7 @@ Sandi Metz Principles:
 """
 
 import time
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -26,7 +26,7 @@ class QdrantPoint(BaseModel):
 
     id: str = Field(default_factory=lambda: str(uuid4()), description="Point ID")
     vector: List[float] = Field(..., description="Embedding vector")
-    payload: Dict[str, any] = Field(default_factory=dict, description="Metadata")
+    payload: Dict[str, Any] = Field(default_factory=dict, description="Metadata")
 
     @classmethod
     def from_cache_entry(
@@ -97,7 +97,7 @@ class SearchResult(BaseModel):
     point_id: str = Field(..., description="Matched point ID")
     score: float = Field(..., ge=0.0, le=1.0, description="Similarity score")
     vector: Optional[List[float]] = Field(None, description="Embedding vector")
-    payload: Dict[str, any] = Field(default_factory=dict, description="Metadata")
+    payload: Dict[str, Any] = Field(default_factory=dict, description="Metadata")
 
     @property
     def query_hash(self) -> Optional[str]:

@@ -8,7 +8,7 @@ Sandi Metz Principles:
 """
 
 from enum import Enum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from app.cache.qdrant_collection import QdrantCollectionManager
 from app.repositories.qdrant_repository import QdrantRepository
@@ -45,14 +45,14 @@ class QdrantHealthCheck:
         self._repository = repository
         self._collection_manager = collection_manager
 
-    async def check_health(self) -> Dict[str, any]:
+    async def check_health(self) -> Dict[str, Any]:
         """
         Perform comprehensive health check.
 
         Returns:
             Health check results dictionary
         """
-        results = {
+        results: Dict[str, Any] = {
             "status": HealthStatus.HEALTHY.value,
             "checks": {},
             "details": {},
@@ -60,29 +60,30 @@ class QdrantHealthCheck:
 
         # Check connection
         connection_ok = await self._check_connection()
-        results["checks"]["connection"] = connection_ok
+        results["checks"]["connection"] = connection_ok  # type: ignore[index]
 
         if not connection_ok:
             results["status"] = HealthStatus.UNHEALTHY.value
-            results["details"]["error"] = "Cannot connect to Qdrant"
+            results["details"]["error"] = "Cannot connect to Qdrant"  # type: ignore[index]
             return results
 
         # Check collection
         collection_ok = await self._check_collection()
-        results["checks"]["collection"] = collection_ok
+        results["checks"]["collection"] = collection_ok  # type: ignore[index]
 
         if not collection_ok:
             results["status"] = HealthStatus.DEGRADED.value
-            results["details"]["warning"] = "Collection not properly configured"
+            results["details"]["warning"] = "Collection not properly configured"  # type: ignore[index]
 
         # Get collection stats
         stats = await self._get_collection_stats()
-        results["details"]["statistics"] = stats
+        results["details"]["statistics"] = stats  # type: ignore[index]
 
         # Determine final status
-        if all(results["checks"].values()):
+        checks_dict: Dict[str, bool] = results["checks"]  # type: ignore[assignment]
+        if all(checks_dict.values()):
             results["status"] = HealthStatus.HEALTHY.value
-        elif any(results["checks"].values()):
+        elif any(checks_dict.values()):
             results["status"] = HealthStatus.DEGRADED.value
         else:
             results["status"] = HealthStatus.UNHEALTHY.value

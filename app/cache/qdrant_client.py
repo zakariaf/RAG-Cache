@@ -31,7 +31,7 @@ async def create_qdrant_client() -> AsyncQdrantClient:
         client = AsyncQdrantClient(
             host=config.qdrant_host,
             port=config.qdrant_port,
-            timeout=30.0,
+            timeout=30,
         )
 
         # Test connection
