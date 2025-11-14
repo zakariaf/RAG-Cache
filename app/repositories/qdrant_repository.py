@@ -15,7 +15,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.models import Distance, PointStruct, VectorParams, Filter
 
 from app.config import config
-from app.models.qdrant_point import BatchUploadResult, QdrantPoint, SearchResult
+from app.models.qdrant_point import BatchUploadResult, DeleteResult, QdrantPoint, SearchResult
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -474,3 +474,111 @@ class QdrantRepository:
         return last_result or BatchUploadResult(
             total=len(points), successful=0, failed=len(points), errors=[]
         )
+
+    async def delete_point(self, point_id: str) -> DeleteResult:
+        """
+        Delete a single point by ID.
+
+        Args:
+            point_id: Point ID to delete
+
+        Returns:
+            DeleteResult with operation status
+        """
+        try:
+            await self._client.delete(
+                collection_name=self._collection_name, points_selector=[point_id]
+            )
+
+            logger.info("Point deleted", point_id=point_id)
+            return DeleteResult(
+                deleted_count=1, success=True, message=f"Point {point_id} deleted"
+            )
+
+        except Exception as e:
+            logger.error("Point deletion failed", point_id=point_id, error=str(e))
+            return DeleteResult(
+                deleted_count=0, success=False, message=f"Deletion failed: {str(e)}"
+            )
+
+    async def delete_points(self, point_ids: List[str]) -> DeleteResult:
+        """
+        Delete multiple points by IDs.
+
+        Args:
+            point_ids: List of point IDs to delete
+
+        Returns:
+            DeleteResult with operation status
+        """
+        if not point_ids:
+            return DeleteResult(deleted_count=0, success=True, message="No points to delete")
+
+        try:
+            await self._client.delete(
+                collection_name=self._collection_name, points_selector=point_ids
+            )
+
+            logger.info("Points deleted", count=len(point_ids))
+            return DeleteResult(
+                deleted_count=len(point_ids),
+                success=True,
+                message=f"Deleted {len(point_ids)} points",
+            )
+
+        except Exception as e:
+            logger.error("Batch deletion failed", count=len(point_ids), error=str(e))
+            return DeleteResult(
+                deleted_count=0, success=False, message=f"Deletion failed: {str(e)}"
+            )
+
+    async def delete_by_filter(self, filter_condition: Filter) -> DeleteResult:
+        """
+        Delete points matching filter condition.
+
+        Args:
+            filter_condition: Filter to match points
+
+        Returns:
+            DeleteResult with operation status
+        """
+        try:
+            # Note: Qdrant doesn't return count for filter-based deletion
+            await self._client.delete(
+                collection_name=self._collection_name,
+                points_selector=filter_condition,
+            )
+
+            logger.info("Points deleted by filter")
+            return DeleteResult(
+                deleted_count=-1,  # Unknown count
+                success=True,
+                message="Points deleted by filter",
+            )
+
+        except Exception as e:
+            logger.error("Filter deletion failed", error=str(e))
+            return DeleteResult(
+                deleted_count=0, success=False, message=f"Deletion failed: {str(e)}"
+            )
+
+    async def delete_by_query_hash(self, query_hash: str) -> DeleteResult:
+        """
+        Delete points by query hash.
+
+        Args:
+            query_hash: Query hash to match
+
+        Returns:
+            DeleteResult with operation status
+        """
+        from app.cache.qdrant_filter import create_filter
+
+        filter_obj = create_filter().with_query_hash(query_hash).build()
+
+        if not filter_obj:
+            return DeleteResult(
+                deleted_count=0, success=False, message="Failed to create filter"
+            )
+
+        return await self.delete_by_filter(filter_obj)
