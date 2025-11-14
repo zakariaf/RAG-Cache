@@ -5,8 +5,8 @@ import math
 import pytest
 
 from app.similarity.vector_normalizer import (
-    VectorNormalizer,
     NormalizationType,
+    VectorNormalizer,
     clip_vector,
     l1_normalize,
     l2_normalize,
