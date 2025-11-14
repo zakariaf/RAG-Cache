@@ -582,3 +582,136 @@ class QdrantRepository:
             )
 
         return await self.delete_by_filter(filter_obj)
+
+    async def update_point_payload(
+        self, point_id: str, payload: Dict[str, any]
+    ) -> bool:
+        """
+        Update point payload metadata.
+
+        Args:
+            point_id: Point ID to update
+            payload: New payload data
+
+        Returns:
+            True if updated successfully
+        """
+        try:
+            await self._client.set_payload(
+                collection_name=self._collection_name,
+                payload=payload,
+                points=[point_id],
+            )
+
+            logger.info("Point payload updated", point_id=point_id)
+            return True
+
+        except Exception as e:
+            logger.error("Payload update failed", point_id=point_id, error=str(e))
+            return False
+
+    async def update_point_vector(
+        self, point_id: str, vector: List[float]
+    ) -> bool:
+        """
+        Update point vector.
+
+        Args:
+            point_id: Point ID to update
+            vector: New vector data
+
+        Returns:
+            True if updated successfully
+        """
+        try:
+            await self._client.update_vectors(
+                collection_name=self._collection_name,
+                points=[
+                    PointStruct(id=point_id, vector=vector, payload={})
+                ],
+            )
+
+            logger.info("Point vector updated", point_id=point_id)
+            return True
+
+        except Exception as e:
+            logger.error("Vector update failed", point_id=point_id, error=str(e))
+            return False
+
+    async def update_point(self, point: QdrantPoint) -> bool:
+        """
+        Update complete point (vector + payload).
+
+        Args:
+            point: QdrantPoint with updated data
+
+        Returns:
+            True if updated successfully
+        """
+        try:
+            # Upsert replaces the point completely
+            await self._client.upsert(
+                collection_name=self._collection_name,
+                points=[point.to_qdrant_point()],
+            )
+
+            logger.info("Point updated", point_id=point.id)
+            return True
+
+        except Exception as e:
+            logger.error("Point update failed", point_id=point.id, error=str(e))
+            return False
+
+    async def partial_update_payload(
+        self, point_id: str, updates: Dict[str, any]
+    ) -> bool:
+        """
+        Partially update payload fields.
+
+        Args:
+            point_id: Point ID to update
+            updates: Fields to update
+
+        Returns:
+            True if updated successfully
+        """
+        try:
+            await self._client.set_payload(
+                collection_name=self._collection_name,
+                payload=updates,
+                points=[point_id],
+            )
+
+            logger.info("Partial payload update", point_id=point_id, fields=list(updates.keys()))
+            return True
+
+        except Exception as e:
+            logger.error("Partial update failed", point_id=point_id, error=str(e))
+            return False
+
+    async def delete_payload_fields(
+        self, point_id: str, field_names: List[str]
+    ) -> bool:
+        """
+        Delete specific payload fields.
+
+        Args:
+            point_id: Point ID
+            field_names: Fields to delete
+
+        Returns:
+            True if deleted successfully
+        """
+        try:
+            await self._client.delete_payload(
+                collection_name=self._collection_name,
+                keys=field_names,
+                points=[point_id],
+            )
+
+            logger.info("Payload fields deleted", point_id=point_id, fields=field_names)
+            return True
+
+        except Exception as e:
+            logger.error("Field deletion failed", point_id=point_id, error=str(e))
+            return False
