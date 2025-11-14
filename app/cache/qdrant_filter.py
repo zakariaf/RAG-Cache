@@ -49,9 +49,7 @@ class QdrantFilterBuilder:
         Returns:
             Self for chaining
         """
-        condition = FieldCondition(
-            key=field, match=MatchValue(value=value)
-        )
+        condition = FieldCondition(key=field, match=MatchValue(value=value))
         self._must.append(condition)
         return self
 
@@ -66,9 +64,7 @@ class QdrantFilterBuilder:
         Returns:
             Self for chaining
         """
-        condition = FieldCondition(
-            key=field, match=MatchAny(any=values)
-        )
+        condition = FieldCondition(key=field, match=MatchAny(any=values))
         self._must.append(condition)
         return self
 

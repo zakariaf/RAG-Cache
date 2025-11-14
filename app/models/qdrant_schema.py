@@ -78,9 +78,7 @@ class CollectionConfig(BaseModel):
     distance: QdrantDistanceMetric = Field(
         default=QdrantDistanceMetric.COSINE, description="Distance metric"
     )
-    on_disk_payload: bool = Field(
-        default=False, description="Store payload on disk"
-    )
+    on_disk_payload: bool = Field(default=False, description="Store payload on disk")
     hnsw_config: Optional[Dict[str, int]] = Field(
         None, description="HNSW index configuration"
     )

@@ -30,8 +30,12 @@ class QdrantMetrics(BaseModel):
     points_deleted: int = Field(default=0, ge=0, description="Points deleted")
 
     # Performance metrics
-    avg_search_time_ms: float = Field(default=0.0, ge=0.0, description="Avg search time")
-    avg_upload_time_ms: float = Field(default=0.0, ge=0.0, description="Avg upload time")
+    avg_search_time_ms: float = Field(
+        default=0.0, ge=0.0, description="Avg search time"
+    )
+    avg_upload_time_ms: float = Field(
+        default=0.0, ge=0.0, description="Avg upload time"
+    )
 
     # Cache metrics
     semantic_hits: int = Field(default=0, ge=0, description="Semantic cache hits")
@@ -71,7 +75,9 @@ class OperationMetrics(BaseModel):
     total_count: int = Field(default=0, ge=0, description="Total executions")
     success_count: int = Field(default=0, ge=0, description="Successful executions")
     failure_count: int = Field(default=0, ge=0, description="Failed executions")
-    total_time_ms: float = Field(default=0.0, ge=0.0, description="Total execution time")
+    total_time_ms: float = Field(
+        default=0.0, ge=0.0, description="Total execution time"
+    )
     min_time_ms: float = Field(default=0.0, ge=0.0, description="Minimum time")
     max_time_ms: float = Field(default=0.0, ge=0.0, description="Maximum time")
 
@@ -98,15 +104,21 @@ class SearchMetrics(BaseModel):
     """
 
     total_searches: int = Field(default=0, ge=0, description="Total searches")
-    avg_results_per_search: float = Field(default=0.0, ge=0.0, description="Avg results")
-    avg_search_time_ms: float = Field(default=0.0, ge=0.0, description="Avg search time")
+    avg_results_per_search: float = Field(
+        default=0.0, ge=0.0, description="Avg results"
+    )
+    avg_search_time_ms: float = Field(
+        default=0.0, ge=0.0, description="Avg search time"
+    )
     avg_similarity_score: float = Field(
         default=0.0, ge=0.0, le=1.0, description="Avg similarity"
     )
 
     # Score distribution
     high_quality_matches: int = Field(default=0, ge=0, description="Score >= 0.9")
-    medium_quality_matches: int = Field(default=0, ge=0, description="0.7 <= Score < 0.9")
+    medium_quality_matches: int = Field(
+        default=0, ge=0, description="0.7 <= Score < 0.9"
+    )
     low_quality_matches: int = Field(default=0, ge=0, description="Score < 0.7")
 
     @property

@@ -88,9 +88,7 @@ class MetadataHandler:
                 provider=payload[QdrantSchema.FIELD_PROVIDER],
                 model=payload[QdrantSchema.FIELD_MODEL],
                 prompt_tokens=payload.get(QdrantSchema.FIELD_PROMPT_TOKENS, 0),
-                completion_tokens=payload.get(
-                    QdrantSchema.FIELD_COMPLETION_TOKENS, 0
-                ),
+                completion_tokens=payload.get(QdrantSchema.FIELD_COMPLETION_TOKENS, 0),
                 embedding=None,
             )
         except KeyError as e:

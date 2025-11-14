@@ -178,7 +178,9 @@ class VectorNormalizer:
             return vector
 
     @staticmethod
-    def clip(vector: List[float], min_val: float = -1.0, max_val: float = 1.0) -> List[float]:
+    def clip(
+        vector: List[float], min_val: float = -1.0, max_val: float = 1.0
+    ) -> List[float]:
         """
         Clip vector values to range.
 

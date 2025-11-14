@@ -15,7 +15,12 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.models import Distance, PointStruct, VectorParams, Filter
 
 from app.config import config
-from app.models.qdrant_point import BatchUploadResult, DeleteResult, QdrantPoint, SearchResult
+from app.models.qdrant_point import (
+    BatchUploadResult,
+    DeleteResult,
+    QdrantPoint,
+    SearchResult,
+)
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -55,9 +60,7 @@ class QdrantRepository:
             logger.error("Collection check failed", error=str(e))
             return False
 
-    async def create_collection(
-        self, distance: Distance = Distance.COSINE
-    ) -> bool:
+    async def create_collection(self, distance: Distance = Distance.COSINE) -> bool:
         """
         Create collection if not exists.
 
@@ -75,9 +78,7 @@ class QdrantRepository:
 
             await self._client.create_collection(
                 collection_name=self._collection_name,
-                vectors_config=VectorParams(
-                    size=self._vector_size, distance=distance
-                ),
+                vectors_config=VectorParams(size=self._vector_size, distance=distance),
             )
 
             logger.info(
@@ -100,9 +101,7 @@ class QdrantRepository:
             True if deleted successfully
         """
         try:
-            await self._client.delete_collection(
-                collection_name=self._collection_name
-            )
+            await self._client.delete_collection(collection_name=self._collection_name)
             logger.info("Collection deleted", name=self._collection_name)
             return True
         except Exception as e:
@@ -399,7 +398,9 @@ class QdrantRepository:
                 except Exception as batch_error:
                     # Track failure
                     failed += len(batch)
-                    error_msg = f"Batch {i // batch_size + 1} failed: {str(batch_error)}"
+                    error_msg = (
+                        f"Batch {i // batch_size + 1} failed: {str(batch_error)}"
+                    )
                     errors.append(error_msg)
                     logger.error("Batch upload failed", error=error_msg)
 
@@ -512,7 +513,9 @@ class QdrantRepository:
             DeleteResult with operation status
         """
         if not point_ids:
-            return DeleteResult(deleted_count=0, success=True, message="No points to delete")
+            return DeleteResult(
+                deleted_count=0, success=True, message="No points to delete"
+            )
 
         try:
             await self._client.delete(
@@ -610,9 +613,7 @@ class QdrantRepository:
             logger.error("Payload update failed", point_id=point_id, error=str(e))
             return False
 
-    async def update_point_vector(
-        self, point_id: str, vector: List[float]
-    ) -> bool:
+    async def update_point_vector(self, point_id: str, vector: List[float]) -> bool:
         """
         Update point vector.
 
@@ -626,9 +627,7 @@ class QdrantRepository:
         try:
             await self._client.update_vectors(
                 collection_name=self._collection_name,
-                points=[
-                    PointStruct(id=point_id, vector=vector, payload={})
-                ],
+                points=[PointStruct(id=point_id, vector=vector, payload={})],
             )
 
             logger.info("Point vector updated", point_id=point_id)
@@ -682,7 +681,9 @@ class QdrantRepository:
                 points=[point_id],
             )
 
-            logger.info("Partial payload update", point_id=point_id, fields=list(updates.keys()))
+            logger.info(
+                "Partial payload update", point_id=point_id, fields=list(updates.keys())
+            )
             return True
 
         except Exception as e:
