@@ -197,9 +197,9 @@ class RedisRepository:
         """
         try:
             async with Redis(connection_pool=self._pool) as client:
-                keys = []
+                keys: list[str] = []
                 async for key in client.scan_iter(match=pattern):
-                    keys.append(key)
+                    keys.append(str(key))
                 return keys
         except Exception as e:
             logger.error("Pattern scan failed", pattern=pattern, error=str(e))
@@ -323,7 +323,7 @@ class RedisRepository:
         try:
             async with Redis(connection_pool=self._pool) as client:
                 values = await client.mget(keys)
-                results = {}
+                results: dict[str, Optional[CacheEntry]] = {}
                 for key, value in zip(keys, values):
                     if value:
                         try:
