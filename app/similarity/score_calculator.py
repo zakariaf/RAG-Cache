@@ -221,3 +221,24 @@ class SimilarityScoreCalculator:
             "confidence": calculator.get_confidence_level(score),
             "is_cache_hit": calculator.should_cache_hit(score),
         }
+
+
+# Convenience aliases for easier imports
+ScoreCalculator = SimilarityScoreCalculator
+ScoreInterpretation = SimilarityLevel
+
+
+# Standalone functions for convenience
+def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
+    """Calculate cosine similarity between vectors."""
+    return SimilarityScoreCalculator.cosine_similarity(vec1, vec2)
+
+
+def euclidean_distance(vec1: List[float], vec2: List[float]) -> float:
+    """Calculate Euclidean distance between vectors."""
+    return SimilarityScoreCalculator.euclidean_distance(vec1, vec2)
+
+
+def interpret_cosine_score(score: float) -> SimilarityLevel:
+    """Interpret cosine similarity score."""
+    return SimilarityScoreCalculator.interpret_score(score)
