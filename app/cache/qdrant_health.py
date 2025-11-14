@@ -64,7 +64,8 @@ class QdrantHealthCheck:
 
         if not connection_ok:
             results["status"] = HealthStatus.UNHEALTHY.value
-            results["details"]["error"] = "Cannot connect to Qdrant"  # type: ignore[index]
+            # type: ignore[index]
+            results["details"]["error"] = "Cannot connect to Qdrant"
             return results
 
         # Check collection
@@ -73,7 +74,10 @@ class QdrantHealthCheck:
 
         if not collection_ok:
             results["status"] = HealthStatus.DEGRADED.value
-            results["details"]["warning"] = "Collection not properly configured"  # type: ignore[index]
+            # type: ignore[index]
+            results["details"]["warning"] = (
+                "Collection not properly configured"
+            )
 
         # Get collection stats
         stats = await self._get_collection_stats()
