@@ -15,7 +15,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.models import Distance, PointStruct, VectorParams, Filter
 
 from app.config import config
-from app.models.qdrant_point import QdrantPoint, SearchResult
+from app.models.qdrant_point import BatchUploadResult, QdrantPoint, SearchResult
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -349,3 +349,128 @@ class QdrantRepository:
         except Exception as e:
             logger.error("Similarity search with vectors failed", error=str(e))
             return []
+
+    async def batch_upload(
+        self, points: List[QdrantPoint], batch_size: int = 100
+    ) -> BatchUploadResult:
+        """
+        Upload points in batches with progress tracking.
+
+        Args:
+            points: List of QdrantPoints to upload
+            batch_size: Number of points per batch
+
+        Returns:
+            BatchUploadResult with statistics
+        """
+        if not points:
+            return BatchUploadResult(
+                total=0, successful=0, failed=0, point_ids=[], errors=[]
+            )
+
+        total = len(points)
+        successful = 0
+        failed = 0
+        uploaded_ids = []
+        errors = []
+
+        try:
+            # Process in batches
+            for i in range(0, total, batch_size):
+                batch = points[i : i + batch_size]
+
+                try:
+                    qdrant_points = [p.to_qdrant_point() for p in batch]
+                    await self._client.upsert(
+                        collection_name=self._collection_name, points=qdrant_points
+                    )
+
+                    # Track success
+                    successful += len(batch)
+                    uploaded_ids.extend([p.id for p in batch])
+
+                    logger.info(
+                        "Batch uploaded",
+                        batch_num=i // batch_size + 1,
+                        batch_size=len(batch),
+                        progress=f"{successful}/{total}",
+                    )
+
+                except Exception as batch_error:
+                    # Track failure
+                    failed += len(batch)
+                    error_msg = f"Batch {i // batch_size + 1} failed: {str(batch_error)}"
+                    errors.append(error_msg)
+                    logger.error("Batch upload failed", error=error_msg)
+
+            result = BatchUploadResult(
+                total=total,
+                successful=successful,
+                failed=failed,
+                point_ids=uploaded_ids,
+                errors=errors,
+            )
+
+            logger.info(
+                "Batch upload completed",
+                total=total,
+                successful=successful,
+                failed=failed,
+                success_rate=result.success_rate,
+            )
+
+            return result
+
+        except Exception as e:
+            logger.error("Batch upload fatal error", error=str(e))
+            return BatchUploadResult(
+                total=total,
+                successful=successful,
+                failed=total - successful,
+                point_ids=uploaded_ids,
+                errors=errors + [f"Fatal error: {str(e)}"],
+            )
+
+    async def batch_upload_with_retry(
+        self,
+        points: List[QdrantPoint],
+        batch_size: int = 100,
+        max_retries: int = 3,
+    ) -> BatchUploadResult:
+        """
+        Upload points with automatic retry on failure.
+
+        Args:
+            points: List of QdrantPoints to upload
+            batch_size: Number of points per batch
+            max_retries: Maximum retry attempts
+
+        Returns:
+            BatchUploadResult with statistics
+        """
+        retry_count = 0
+        last_result = None
+
+        while retry_count <= max_retries:
+            result = await self.batch_upload(points, batch_size)
+
+            if not result.has_failures:
+                return result
+
+            # Retry failed batches
+            if retry_count < max_retries:
+                logger.warning(
+                    "Retrying failed uploads",
+                    retry=retry_count + 1,
+                    max_retries=max_retries,
+                    failed=result.failed,
+                )
+                retry_count += 1
+                last_result = result
+            else:
+                logger.error("Max retries exceeded", failed=result.failed)
+                return result
+
+        return last_result or BatchUploadResult(
+            total=len(points), successful=0, failed=len(points), errors=[]
+        )
