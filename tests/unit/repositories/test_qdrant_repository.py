@@ -27,7 +27,7 @@ class TestQdrantRepository:
     """Tests for QdrantRepository class."""
 
     @pytest.mark.asyncio
-    async def test_collection_exists_true(self, repository, mock_client):
+    async def test_collection_exists_true(self, mock_client):
         """Test collection_exists returns True when collection exists."""
         mock_collection = MagicMock()
         mock_collection.name = "test_cache"
@@ -37,6 +37,8 @@ class TestQdrantRepository:
 
         with patch("app.repositories.qdrant_repository.config") as mock_config:
             mock_config.qdrant_collection_name = "test_cache"
+            mock_config.qdrant_vector_size = 384
+            repository = QdrantRepository(mock_client)
             result = await repository.collection_exists()
 
         assert result is True
@@ -71,7 +73,7 @@ class TestQdrantRepository:
         mock_client.create_collection.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_create_collection_already_exists(self, repository, mock_client):
+    async def test_create_collection_already_exists(self, mock_client):
         """Test collection creation when already exists."""
         mock_collection = MagicMock()
         mock_collection.name = "test_cache"
@@ -81,6 +83,8 @@ class TestQdrantRepository:
 
         with patch("app.repositories.qdrant_repository.config") as mock_config:
             mock_config.qdrant_collection_name = "test_cache"
+            mock_config.qdrant_vector_size = 384
+            repository = QdrantRepository(mock_client)
             result = await repository.create_collection()
 
         assert result is True
@@ -180,7 +184,7 @@ class TestQdrantRepository:
         assert results == []
 
     @pytest.mark.asyncio
-    async def test_get_point_by_id_success(self, repository, mock_client):
+    async def test_get_point_success(self, repository, mock_client):
         """Test successful point retrieval by ID."""
         mock_point = PointStruct(
             id="test-123",
@@ -189,18 +193,18 @@ class TestQdrantRepository:
         )
         mock_client.retrieve.return_value = [mock_point]
 
-        point = await repository.get_point_by_id("test-123")
+        point = await repository.get_point("test-123")
 
         assert point is not None
         assert point.id == "test-123"
         mock_client.retrieve.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_get_point_by_id_not_found(self, repository, mock_client):
+    async def test_get_point_not_found(self, repository, mock_client):
         """Test point retrieval when not found."""
         mock_client.retrieve.return_value = []
 
-        point = await repository.get_point_by_id("nonexistent")
+        point = await repository.get_point("nonexistent")
 
         assert point is None
 
@@ -209,7 +213,8 @@ class TestQdrantRepository:
         """Test successful point deletion."""
         result = await repository.delete_point("test-123")
 
-        assert result is True
+        assert result.success is True
+        assert result.deleted_count == 1
         mock_client.delete.assert_called_once()
 
     @pytest.mark.asyncio
@@ -219,7 +224,8 @@ class TestQdrantRepository:
 
         result = await repository.delete_points(point_ids)
 
-        assert result == 3
+        assert result.success is True
+        assert result.deleted_count == 3
         mock_client.delete.assert_called_once()
 
     @pytest.mark.asyncio

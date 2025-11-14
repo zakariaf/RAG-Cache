@@ -126,7 +126,9 @@ def handle_qdrant_error(error: Exception, operation: str) -> QdrantError:
     # Timeout errors
     if "timeout" in error_msg.lower():
         logger.error(f"Timeout during {operation}", error=error_msg)
-        return QdrantTimeoutError(f"Operation {operation} timed out", cause=error)
+        return QdrantTimeoutError(
+            f"Operation {operation} timeout exceeded", cause=error
+        )
 
     # Collection errors
     if "collection" in error_msg.lower():

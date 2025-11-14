@@ -158,7 +158,7 @@ class VectorNormalizer:
 
             if variance == 0:
                 logger.warning("Cannot standardize constant vector")
-                return vector
+                return [0.0 for _ in vector]
 
             std_dev = math.sqrt(variance)
             return [(x - mean) / std_dev for x in vector]

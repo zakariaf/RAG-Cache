@@ -55,11 +55,18 @@ class SimilarityScoreCalculator:
             vec2: Second vector
 
         Returns:
-            Cosine similarity score (0.0 to 1.0)
+            Cosine similarity score (-1.0 to 1.0)
+
+        Raises:
+            ValueError: If vectors have different dimensions
         """
         if len(vec1) != len(vec2):
-            logger.error("Vector size mismatch", v1=len(vec1), v2=len(vec2))
-            return 0.0
+            raise ValueError(
+                f"Vectors must have same dimensions: {len(vec1)} != {len(vec2)}"
+            )
+
+        if len(vec1) == 0:
+            raise ValueError("Vectors must have same dimensions: 0 != 0")
 
         try:
             dot_product = sum(a * b for a, b in zip(vec1, vec2))
@@ -70,9 +77,7 @@ class SimilarityScoreCalculator:
                 return 0.0
 
             similarity = dot_product / (magnitude1 * magnitude2)
-
-            # Clamp to [0, 1]
-            return max(0.0, min(1.0, similarity))
+            return similarity
 
         except Exception as e:
             logger.error("Cosine similarity calculation failed", error=str(e))
@@ -89,10 +94,14 @@ class SimilarityScoreCalculator:
 
         Returns:
             Euclidean distance
+
+        Raises:
+            ValueError: If vectors have different dimensions
         """
         if len(vec1) != len(vec2):
-            logger.error("Vector size mismatch", v1=len(vec1), v2=len(vec2))
-            return float("inf")
+            raise ValueError(
+                f"Vectors must have same dimensions: {len(vec1)} != {len(vec2)}"
+            )
 
         try:
             return math.sqrt(sum((a - b) ** 2 for a, b in zip(vec1, vec2)))
@@ -200,6 +209,84 @@ class SimilarityScoreCalculator:
         }
 
         return descriptions.get(level, "Unknown confidence")
+
+    @classmethod
+    def calculate(
+        cls, vec1: List[float], vec2: List[float], metric: str = "cosine"
+    ) -> float:
+        """
+        Calculate similarity using specified metric.
+
+        Args:
+            vec1: First vector
+            vec2: Second vector
+            metric: Similarity metric (cosine, euclidean)
+
+        Returns:
+            Similarity score
+
+        Raises:
+            ValueError: If unknown metric specified
+        """
+        if metric == "cosine":
+            return cls.cosine_similarity(vec1, vec2)
+        elif metric == "euclidean":
+            return cls.euclidean_distance(vec1, vec2)
+        else:
+            raise ValueError(f"Unknown metric: {metric}")
+
+    @staticmethod
+    def is_match(score: float, threshold: float = 0.85) -> bool:
+        """
+        Check if score meets threshold for cache hit.
+
+        Args:
+            score: Similarity score
+            threshold: Minimum threshold
+
+        Returns:
+            True if score meets or exceeds threshold
+        """
+        return score >= threshold
+
+    @staticmethod
+    def normalize_score(score: float, metric: str = "cosine") -> float:
+        """
+        Normalize score to 0-1 range.
+
+        Args:
+            score: Raw score
+            metric: Metric type (cosine, euclidean)
+
+        Returns:
+            Normalized score (0-1)
+        """
+        if metric == "cosine":
+            # Cosine already in [0, 1] for our use case (non-negative similarity)
+            return score
+        elif metric == "euclidean":
+            # Convert distance to similarity (0 distance = 1.0 similarity)
+            # Using inverse relationship
+            max_distance = 10.0  # Configurable max
+            if score == 0.0:
+                return 1.0
+            if score >= max_distance:
+                return 0.0
+            return 1.0 - (score / max_distance)
+        return score
+
+    @classmethod
+    def get_interpretation(cls, score: float) -> SimilarityLevel:
+        """
+        Get score interpretation.
+
+        Args:
+            score: Similarity score
+
+        Returns:
+            SimilarityLevel enum
+        """
+        return cls.interpret_score(score)
 
     @staticmethod
     def calculate_match_quality(score: float) -> dict:
