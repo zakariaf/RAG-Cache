@@ -12,10 +12,10 @@ from uuid import uuid4
 
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, PointStruct, VectorParams, Filter
 
 from app.config import config
-from app.models.qdrant_point import QdrantPoint
+from app.models.qdrant_point import QdrantPoint, SearchResult
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -249,3 +249,103 @@ class QdrantRepository:
         except Exception as e:
             logger.error("Get point failed", point_id=point_id, error=str(e))
             return None
+
+    async def search_similar(
+        self,
+        query_vector: List[float],
+        limit: int = 5,
+        score_threshold: Optional[float] = None,
+        filter_condition: Optional[Filter] = None,
+    ) -> List[SearchResult]:
+        """
+        Search for similar vectors.
+
+        Args:
+            query_vector: Query embedding vector
+            limit: Maximum number of results
+            score_threshold: Minimum similarity score
+            filter_condition: Optional filter for search
+
+        Returns:
+            List of SearchResult objects
+        """
+        try:
+            results = await self._client.search(
+                collection_name=self._collection_name,
+                query_vector=query_vector,
+                limit=limit,
+                score_threshold=score_threshold,
+                query_filter=filter_condition,
+                with_payload=True,
+                with_vectors=False,
+            )
+
+            search_results = [
+                SearchResult(
+                    point_id=str(result.id),
+                    score=result.score,
+                    vector=result.vector if result.vector else None,
+                    payload=result.payload if result.payload else {},
+                )
+                for result in results
+            ]
+
+            logger.info(
+                "Similarity search completed",
+                results_count=len(search_results),
+                threshold=score_threshold,
+            )
+
+            return search_results
+
+        except Exception as e:
+            logger.error("Similarity search failed", error=str(e))
+            return []
+
+    async def search_similar_with_vectors(
+        self,
+        query_vector: List[float],
+        limit: int = 5,
+        score_threshold: Optional[float] = None,
+    ) -> List[SearchResult]:
+        """
+        Search for similar vectors including vector data.
+
+        Args:
+            query_vector: Query embedding vector
+            limit: Maximum number of results
+            score_threshold: Minimum similarity score
+
+        Returns:
+            List of SearchResult objects with vectors
+        """
+        try:
+            results = await self._client.search(
+                collection_name=self._collection_name,
+                query_vector=query_vector,
+                limit=limit,
+                score_threshold=score_threshold,
+                with_payload=True,
+                with_vectors=True,
+            )
+
+            search_results = [
+                SearchResult(
+                    point_id=str(result.id),
+                    score=result.score,
+                    vector=result.vector if result.vector else None,
+                    payload=result.payload if result.payload else {},
+                )
+                for result in results
+            ]
+
+            logger.info(
+                "Similarity search with vectors completed",
+                results_count=len(search_results),
+            )
+
+            return search_results
+
+        except Exception as e:
+            logger.error("Similarity search with vectors failed", error=str(e))
+            return []
