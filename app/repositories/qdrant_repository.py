@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Optional, Union
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import Distance, Filter, PointStruct, VectorParams
 
+from app.cache.qdrant_errors import ErrorContext, handle_qdrant_error
+from app.cache.qdrant_retry import RetryPolicy, retry_on_error
 from app.config import config
 from app.models.qdrant_point import (
     BatchUploadResult,
@@ -106,6 +108,7 @@ class QdrantRepository:
             logger.error("Collection deletion failed", error=str(e))
             return False
 
+    @retry_on_error(config=RetryPolicy.CRITICAL)
     async def ping(self) -> bool:
         """
         Ping Qdrant server.
@@ -114,8 +117,9 @@ class QdrantRepository:
             True if connected, False otherwise
         """
         try:
-            await self._client.get_collections()
-            return True
+            with ErrorContext("ping"):
+                await self._client.get_collections()
+                return True
         except Exception as e:
             logger.error("Qdrant ping failed", error=str(e))
             return False
@@ -148,6 +152,7 @@ class QdrantRepository:
             logger.error("Get collection info failed", error=str(e))
             return None
 
+    @retry_on_error(config=RetryPolicy.STANDARD)
     async def store_point(self, point: QdrantPoint) -> bool:
         """
         Store a single vector point.
@@ -159,20 +164,26 @@ class QdrantRepository:
             True if stored successfully
         """
         try:
-            await self._client.upsert(
-                collection_name=self._collection_name,
-                points=[point.to_qdrant_point()],
-            )
+            with ErrorContext("store_point"):
+                await self._client.upsert(
+                    collection_name=self._collection_name,
+                    points=[point.to_qdrant_point()],
+                )
 
-            logger.info(
-                "Point stored",
-                point_id=point.id,
-                query_hash=point.payload.get("query_hash"),
-            )
-            return True
+                logger.info(
+                    "Point stored",
+                    point_id=point.id,
+                    query_hash=point.payload.get("query_hash"),
+                )
+                return True
 
         except Exception as e:
-            logger.error("Point store failed", point_id=point.id, error=str(e))
+            mapped_error = handle_qdrant_error(e, "store_point")
+            logger.error(
+                "Point store failed",
+                point_id=point.id,
+                error=str(mapped_error),
+            )
             return False
 
     async def store_points(self, points: List[QdrantPoint]) -> int:
