@@ -715,3 +715,119 @@ class QdrantRepository:
         except Exception as e:
             logger.error("Field deletion failed", point_id=point_id, error=str(e))
             return False
+
+    async def scroll_points(
+        self,
+        limit: int = 100,
+        offset: Optional[str] = None,
+        filter_condition: Optional[Filter] = None,
+        with_vectors: bool = False,
+    ) -> tuple[List[QdrantPoint], Optional[str]]:
+        """
+        Scroll through points with pagination.
+
+        Args:
+            limit: Number of points per page
+            offset: Offset ID for pagination
+            filter_condition: Optional filter
+            with_vectors: Include vectors in results
+
+        Returns:
+            Tuple of (points, next_offset)
+        """
+        try:
+            result = await self._client.scroll(
+                collection_name=self._collection_name,
+                limit=limit,
+                offset=offset,
+                scroll_filter=filter_condition,
+                with_payload=True,
+                with_vectors=with_vectors,
+            )
+
+            points = [
+                QdrantPoint.from_qdrant_point(
+                    point_id=str(point.id),
+                    vector=point.vector if point.vector else [],
+                    payload=point.payload if point.payload else {},
+                )
+                for point in result[0]
+            ]
+
+            next_offset = result[1]  # Next offset for pagination
+
+            logger.info(
+                "Scroll completed",
+                returned=len(points),
+                has_next=next_offset is not None,
+            )
+
+            return points, next_offset
+
+        except Exception as e:
+            logger.error("Scroll failed", error=str(e))
+            return [], None
+
+    async def count_points(self, filter_condition: Optional[Filter] = None) -> int:
+        """
+        Count points in collection.
+
+        Args:
+            filter_condition: Optional filter
+
+        Returns:
+            Number of points
+        """
+        try:
+            result = await self._client.count(
+                collection_name=self._collection_name,
+                count_filter=filter_condition,
+                exact=True,
+            )
+
+            count = result.count
+            logger.info("Point count", count=count)
+            return count
+
+        except Exception as e:
+            logger.error("Count failed", error=str(e))
+            return 0
+
+    async def get_all_points(
+        self, batch_size: int = 100, filter_condition: Optional[Filter] = None
+    ) -> List[QdrantPoint]:
+        """
+        Get all points using scroll pagination.
+
+        Args:
+            batch_size: Points per batch
+            filter_condition: Optional filter
+
+        Returns:
+            List of all points
+        """
+        all_points = []
+        offset = None
+
+        try:
+            while True:
+                points, next_offset = await self.scroll_points(
+                    limit=batch_size,
+                    offset=offset,
+                    filter_condition=filter_condition,
+                    with_vectors=False,
+                )
+
+                all_points.extend(points)
+
+                if next_offset is None:
+                    break
+
+                offset = next_offset
+
+            logger.info("Retrieved all points", total=len(all_points))
+            return all_points
+
+        except Exception as e:
+            logger.error("Get all points failed", error=str(e))
+            return all_points  # Return what we got so far
