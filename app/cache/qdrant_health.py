@@ -75,9 +75,7 @@ class QdrantHealthCheck:
         if not collection_ok:
             results["status"] = HealthStatus.DEGRADED.value
             # type: ignore[index]
-            results["details"]["warning"] = (
-                "Collection not properly configured"
-            )
+            results["details"]["warning"] = "Collection not properly configured"
 
         # Get collection stats
         stats = await self._get_collection_stats()
