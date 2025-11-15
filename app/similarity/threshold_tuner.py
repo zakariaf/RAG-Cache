@@ -9,7 +9,7 @@ Sandi Metz Principles:
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from app.utils.logger import get_logger
 
@@ -211,11 +211,20 @@ class ThresholdTuner:
         Returns:
             Tuple of (optimal_threshold, metrics)
         """
+        # Initialize with first threshold
         best_threshold = min_threshold
-        best_metrics = None
-        best_score = 0.0
+        best_metrics = cls.evaluate_threshold(scores, ground_truth, min_threshold)
 
-        current = min_threshold
+        if goal == ThresholdOptimizationGoal.PRECISION:
+            best_score = best_metrics.precision
+        elif goal == ThresholdOptimizationGoal.RECALL:
+            best_score = best_metrics.recall
+        elif goal == ThresholdOptimizationGoal.F1_SCORE:
+            best_score = best_metrics.f1_score
+        else:  # BALANCED
+            best_score = (best_metrics.precision + best_metrics.recall) / 2
+
+        current = min_threshold + step
         while current <= max_threshold:
             metrics = cls.evaluate_threshold(scores, ground_truth, current)
 
@@ -248,8 +257,8 @@ class ThresholdTuner:
     def recommend_threshold(
         cls,
         use_case: UseCase,
-        scores: List[float] = None,
-        ground_truth: List[bool] = None,
+        scores: Optional[List[float]] = None,
+        ground_truth: Optional[List[bool]] = None,
     ) -> ThresholdRecommendation:
         """
         Recommend threshold for specific use case.
