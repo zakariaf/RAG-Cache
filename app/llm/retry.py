@@ -9,19 +9,19 @@ Sandi Metz Principles:
 
 import asyncio
 from dataclasses import dataclass
-from typing import Callable, TypeVar, Any
+from typing import Any, Callable, TypeVar
 
-from openai import (
-    APITimeoutError as OpenAITimeoutError,
-    RateLimitError as OpenAIRateLimitError,
-    APIConnectionError as OpenAIConnectionError,
-    InternalServerError as OpenAIInternalServerError,
-)
 from anthropic import (
-    APITimeoutError as AnthropicTimeoutError,
-    RateLimitError as AnthropicRateLimitError,
     APIConnectionError as AnthropicConnectionError,
+    APITimeoutError as AnthropicTimeoutError,
     InternalServerError as AnthropicInternalServerError,
+    RateLimitError as AnthropicRateLimitError,
+)
+from openai import (
+    APIConnectionError as OpenAIConnectionError,
+    APITimeoutError as OpenAITimeoutError,
+    InternalServerError as OpenAIInternalServerError,
+    RateLimitError as OpenAIRateLimitError,
 )
 
 from app.utils.logger import get_logger

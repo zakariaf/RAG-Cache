@@ -5,7 +5,7 @@ Tests for LLM validators.
 import pytest
 
 from app.exceptions import ConfigurationError
-from app.llm.validators import TemperatureValidator, ModelValidator
+from app.llm.validators import ModelValidator, TemperatureValidator
 
 
 class TestTemperatureValidator:

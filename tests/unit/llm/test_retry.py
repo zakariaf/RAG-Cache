@@ -3,10 +3,10 @@ Tests for retry handler.
 """
 
 import pytest
-from openai import RateLimitError, APITimeoutError, APIConnectionError
 from anthropic import RateLimitError as AnthropicRateLimitError
+from openai import APIConnectionError, APITimeoutError, RateLimitError
 
-from app.llm.retry import RetryHandler, RetryConfig
+from app.llm.retry import RetryConfig, RetryHandler
 
 
 class TestRetryHandler:

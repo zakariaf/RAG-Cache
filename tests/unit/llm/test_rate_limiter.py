@@ -7,7 +7,7 @@ from time import time
 
 import pytest
 
-from app.llm.rate_limiter import RateLimiter, RateLimitConfig
+from app.llm.rate_limiter import RateLimitConfig, RateLimiter
 
 
 class TestRateLimiter:
