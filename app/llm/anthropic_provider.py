@@ -1,13 +1,13 @@
 """
-OpenAI LLM provider implementation.
+Anthropic LLM provider implementation.
 
 Sandi Metz Principles:
-- Single Responsibility: OpenAI API interaction
+- Single Responsibility: Anthropic API interaction
 - Small methods: Each method < 10 lines
 - Dependency Injection: API key injected
 """
 
-from openai import AsyncOpenAI, OpenAIError
+from anthropic import AnthropicError, AsyncAnthropic
 
 from app.config import config
 from app.exceptions import LLMProviderError
@@ -21,11 +21,11 @@ from app.utils.logger import get_logger, log_llm_call
 logger = get_logger(__name__)
 
 
-class OpenAIProvider(BaseLLMProvider):
+class AnthropicProvider(BaseLLMProvider):
     """
-    OpenAI implementation of LLM provider.
+    Anthropic/Claude implementation of LLM provider.
 
-    Handles communication with OpenAI API with rate limiting.
+    Handles communication with Anthropic API with rate limiting and retry.
     """
 
     def __init__(
@@ -33,19 +33,19 @@ class OpenAIProvider(BaseLLMProvider):
         api_key: str,
         rate_limiter: RateLimiter | None = None,
         retry_handler: RetryHandler | None = None,
-        requests_per_minute: int = 500,
+        requests_per_minute: int = 50,
     ):
         """
-        Initialize OpenAI provider.
+        Initialize Anthropic provider.
 
         Args:
-            api_key: OpenAI API key
+            api_key: Anthropic API key
             rate_limiter: Optional rate limiter (creates default if None)
             retry_handler: Optional retry handler (creates default if None)
-            requests_per_minute: Rate limit (default: 500 RPM for tier 1)
+            requests_per_minute: Rate limit (default: 50 RPM for tier 1)
         """
         self._api_key = api_key
-        self._client: AsyncOpenAI | None = None
+        self._client: AsyncAnthropic | None = None
         self._rate_limiter = rate_limiter or RateLimiter(
             RateLimitConfig(requests_per_minute=requests_per_minute)
         )
@@ -53,7 +53,7 @@ class OpenAIProvider(BaseLLMProvider):
 
     async def complete(self, request: QueryRequest) -> LLMResponse:
         """
-        Generate completion using OpenAI.
+        Generate completion using Anthropic.
 
         Args:
             request: Query request
@@ -70,20 +70,20 @@ class OpenAIProvider(BaseLLMProvider):
             return await self._retry_handler.execute(
                 lambda: self._make_api_call(request)
             )
-        except OpenAIError as e:
-            error_msg = self._build_error_message(e, "OpenAI API call failed")
-            logger.error("OpenAI error", error=str(e))
+        except AnthropicError as e:
+            error_msg = self._build_error_message(e, "Anthropic API call failed")
+            logger.error("Anthropic error", error=str(e))
             raise LLMProviderError(error_msg) from e
         except Exception as e:
             error_msg = self._build_error_message(
-                e, "Unexpected error in OpenAI provider"
+                e, "Unexpected error in Anthropic provider"
             )
             logger.error("Unexpected error", error=str(e))
             raise LLMProviderError(error_msg) from e
 
     async def _make_api_call(self, request: QueryRequest) -> LLMResponse:
         """
-        Make OpenAI API call.
+        Make Anthropic API call.
 
         Args:
             request: Query request
@@ -92,25 +92,28 @@ class OpenAIProvider(BaseLLMProvider):
             LLM response
         """
         client = self._get_client()
+        model = request.get_model(config.default_model)
 
-        response = await client.chat.completions.create(
-            model=request.get_model(config.default_model),
-            messages=[{"role": "user", "content": request.query}],
+        # Use Claude 3.5 Sonnet if no model specified
+        if model == config.default_model:
+            model = "claude-3-5-sonnet-20241022"
+
+        response = await client.messages.create(  # type: ignore[attr-defined]
+            model=model,
             max_tokens=request.get_max_tokens(config.default_max_tokens),
             temperature=request.get_temperature(config.default_temperature),
+            messages=[{"role": "user", "content": request.query}],
         )
 
         llm_response = LLMResponse(
-            content=response.choices[0].message.content or "",
-            prompt_tokens=response.usage.prompt_tokens if response.usage else 0,
-            completion_tokens=(
-                response.usage.completion_tokens if response.usage else 0
-            ),
+            content=response.content[0].text,
+            prompt_tokens=response.usage.input_tokens,
+            completion_tokens=response.usage.output_tokens,
             model=response.model,
         )
 
         log_llm_call(
-            provider="openai",
+            provider="anthropic",
             model=llm_response.model,
             tokens=llm_response.total_tokens,
         )
@@ -124,15 +127,15 @@ class OpenAIProvider(BaseLLMProvider):
         Returns:
             Provider name
         """
-        return "openai"
+        return "anthropic"
 
-    def _get_client(self) -> AsyncOpenAI:
+    def _get_client(self) -> AsyncAnthropic:
         """
-        Get or create OpenAI client.
+        Get or create Anthropic client.
 
         Returns:
-            OpenAI async client
+            Anthropic async client
         """
         if not self._client:
-            self._client = AsyncOpenAI(api_key=self._api_key)
+            self._client = AsyncAnthropic(api_key=self._api_key)
         return self._client
