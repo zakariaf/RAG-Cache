@@ -161,9 +161,7 @@ class TestQdrantConnectionPool:
     @pytest.mark.asyncio
     async def test_pool_initialize(self, pool_config):
         """Test pool initialization."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool = QdrantConnectionPool(pool_config)
@@ -191,9 +189,7 @@ class TestQdrantConnectionPool:
     @pytest.mark.asyncio
     async def test_pool_acquire_and_release(self, pool_config):
         """Test acquiring and releasing connection."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_client = AsyncMock()
             mock_create_client.return_value = mock_client
 
@@ -222,9 +218,7 @@ class TestQdrantConnectionPool:
         pool_config.acquire_timeout = 0.5
         pool_config.max_size = 1
 
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_client = AsyncMock()
             mock_create_client.return_value = mock_client
 
@@ -259,9 +253,7 @@ class TestQdrantConnectionPool:
         pool_config.min_size = 1
         pool_config.max_size = 2
 
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool = QdrantConnectionPool(pool_config)
@@ -282,9 +274,7 @@ class TestQdrantConnectionPool:
     @pytest.mark.asyncio
     async def test_pool_close(self, pool_config):
         """Test closing pool."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_client = AsyncMock()
             mock_create_client.return_value = mock_client
 
@@ -311,9 +301,7 @@ class TestQdrantConnectionPool:
         """Test cleanup of expired connections."""
         pool_config.max_lifetime = 0.1  # Very short lifetime
 
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_client = AsyncMock()
             mock_create_client.return_value = mock_client
 
@@ -340,9 +328,7 @@ class TestQdrantConnectionPool:
     @pytest.mark.asyncio
     async def test_pool_get_stats(self, pool_config):
         """Test getting pool statistics."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool = QdrantConnectionPool(pool_config)
@@ -376,9 +362,7 @@ class TestQdrantConnectionPool:
     @pytest.mark.asyncio
     async def test_pool_remove_connection_error_handling(self, pool_config):
         """Test connection removal handles errors gracefully."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_client = AsyncMock()
             mock_client.close.side_effect = Exception("Close failed")
             mock_create_client.return_value = mock_client
@@ -392,9 +376,7 @@ class TestQdrantConnectionPool:
     @pytest.mark.asyncio
     async def test_pool_cleanup_loop_error_handling(self, pool_config):
         """Test cleanup loop handles errors."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool = QdrantConnectionPool(pool_config)
@@ -414,9 +396,7 @@ class TestGlobalPool:
     @pytest.mark.asyncio
     async def test_get_pool_creates_instance(self):
         """Test get_pool creates and initializes pool."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool = await get_pool()
@@ -429,9 +409,7 @@ class TestGlobalPool:
     @pytest.mark.asyncio
     async def test_get_pool_returns_same_instance(self):
         """Test get_pool returns same instance on multiple calls."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool1 = await get_pool()
@@ -444,9 +422,7 @@ class TestGlobalPool:
     @pytest.mark.asyncio
     async def test_close_pool_global(self):
         """Test closing global pool."""
-        with patch(
-            "app.cache.qdrant_pool.create_qdrant_client"
-        ) as mock_create_client:
+        with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()
 
             pool = await get_pool()

@@ -244,7 +244,9 @@ class TestMetadataHandler:
     def test_merge_payloads_merges_metadata(self):
         """Test merging payloads merges metadata dicts."""
         base = {QdrantSchema.FIELD_METADATA: {"key1": "value1", "key2": "value2"}}
-        updates = {QdrantSchema.FIELD_METADATA: {"key2": "new_value2", "key3": "value3"}}
+        updates = {
+            QdrantSchema.FIELD_METADATA: {"key2": "new_value2", "key3": "value3"}
+        }
 
         merged = MetadataHandler.merge_payloads(base, updates)
 
