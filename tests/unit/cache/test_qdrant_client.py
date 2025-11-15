@@ -275,7 +275,7 @@ class TestGetPooledClient:
             mock_get_pool.return_value = mock_pool
 
             with pytest.raises(ValueError, match="Test error"):
-                async with get_pooled_client() as client:
+                async with get_pooled_client():
                     raise ValueError("Test error")
 
             mock_pool.release.assert_called_once_with(mock_client)

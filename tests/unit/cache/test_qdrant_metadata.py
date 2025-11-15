@@ -1,6 +1,5 @@
 """Unit tests for Qdrant metadata handler."""
 
-import time
 from unittest.mock import patch
 
 import pytest
@@ -263,3 +262,5 @@ class TestMetadataHandler:
 
         assert "field2" not in base
         assert "field1" not in updates
+        assert merged["field1"] == "value1"
+        assert merged["field2"] == "value2"

@@ -1,6 +1,6 @@
 """Unit tests for Qdrant collection manager."""
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 from qdrant_client.models import Distance

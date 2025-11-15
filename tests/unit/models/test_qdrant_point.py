@@ -1,6 +1,5 @@
 """Unit tests for Qdrant point models."""
 
-import time
 from datetime import datetime
 from unittest.mock import patch
 
