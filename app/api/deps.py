@@ -53,7 +53,7 @@ async def get_llm_provider(provider_name: str | None = None):
 
 
 async def get_query_service(
-    request: Request, cache: RedisCache = Depends(get_redis_cache)
+    request: Request, cache: RedisCache = Depends(get_redis_cache)  # noqa: B008
 ) -> QueryService:
     """
     Get query service with dependencies.

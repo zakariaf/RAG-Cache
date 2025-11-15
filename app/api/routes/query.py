@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 @router.post("/query", response_model=QueryResponse)
 async def process_query(
     request: QueryRequest,
-    service: QueryService = Depends(get_query_service),
+    service: QueryService = Depends(get_query_service),  # noqa: B008
 ) -> QueryResponse:
     """
     Process query with caching.
