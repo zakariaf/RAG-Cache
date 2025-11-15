@@ -11,18 +11,14 @@ import asyncio
 from dataclasses import dataclass
 from typing import Any, Callable, TypeVar
 
-from anthropic import (
-    APIConnectionError as AnthropicConnectionError,
-    APITimeoutError as AnthropicTimeoutError,
-    InternalServerError as AnthropicInternalServerError,
-    RateLimitError as AnthropicRateLimitError,
-)
-from openai import (
-    APIConnectionError as OpenAIConnectionError,
-    APITimeoutError as OpenAITimeoutError,
-    InternalServerError as OpenAIInternalServerError,
-    RateLimitError as OpenAIRateLimitError,
-)
+from anthropic import APIConnectionError as AnthropicConnectionError
+from anthropic import APITimeoutError as AnthropicTimeoutError
+from anthropic import InternalServerError as AnthropicInternalServerError
+from anthropic import RateLimitError as AnthropicRateLimitError
+from openai import APIConnectionError as OpenAIConnectionError
+from openai import APITimeoutError as OpenAITimeoutError
+from openai import InternalServerError as OpenAIInternalServerError
+from openai import RateLimitError as OpenAIRateLimitError
 
 from app.utils.logger import get_logger
 
