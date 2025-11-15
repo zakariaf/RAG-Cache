@@ -12,10 +12,16 @@ from dataclasses import dataclass
 from typing import Callable, TypeVar, Any
 
 from openai import (
-    APITimeoutError,
-    RateLimitError,
-    APIConnectionError,
-    InternalServerError,
+    APITimeoutError as OpenAITimeoutError,
+    RateLimitError as OpenAIRateLimitError,
+    APIConnectionError as OpenAIConnectionError,
+    InternalServerError as OpenAIInternalServerError,
+)
+from anthropic import (
+    APITimeoutError as AnthropicTimeoutError,
+    RateLimitError as AnthropicRateLimitError,
+    APIConnectionError as AnthropicConnectionError,
+    InternalServerError as AnthropicInternalServerError,
 )
 
 from app.utils.logger import get_logger
@@ -107,8 +113,14 @@ class RetryHandler:
             Tuple of exception types that should be retried
         """
         return (
-            RateLimitError,
-            APITimeoutError,
-            APIConnectionError,
-            InternalServerError,
+            # OpenAI errors
+            OpenAIRateLimitError,
+            OpenAITimeoutError,
+            OpenAIConnectionError,
+            OpenAIInternalServerError,
+            # Anthropic errors
+            AnthropicRateLimitError,
+            AnthropicTimeoutError,
+            AnthropicConnectionError,
+            AnthropicInternalServerError,
         )

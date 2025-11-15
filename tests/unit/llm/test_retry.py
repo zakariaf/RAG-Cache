@@ -4,6 +4,7 @@ Tests for retry handler.
 
 import pytest
 from openai import RateLimitError, APITimeoutError, APIConnectionError
+from anthropic import RateLimitError as AnthropicRateLimitError
 
 from app.llm.retry import RetryHandler, RetryConfig
 
@@ -108,9 +109,12 @@ class TestRetryHandler:
     def test_get_retryable_exceptions(self, retry_handler: RetryHandler) -> None:
         """Test retryable exceptions list."""
         exceptions = retry_handler._get_retryable_exceptions()
+        # OpenAI exceptions
         assert RateLimitError in exceptions
         assert APITimeoutError in exceptions
         assert APIConnectionError in exceptions
+        # Anthropic exceptions
+        assert AnthropicRateLimitError in exceptions
 
     @pytest.mark.asyncio
     async def test_execute_non_retryable_error_fails_immediately(
