@@ -11,7 +11,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Tuple
 
-from app.similarity.score_calculator import SimilarityScoreCalculator
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -111,9 +110,9 @@ class ThresholdRecommendation:
             f"\nThreshold Recommendation for {self.use_case.value}:",
             f"  Recommended Threshold: {self.threshold:.3f}",
             f"  Confidence: {self.confidence:.1%}",
-            f"\nReasoning:",
+            "\nReasoning:",
             f"  {self.reasoning}",
-            f"\nExpected Performance:",
+            "\nExpected Performance:",
             f"{self.metrics}",
         ]
 
@@ -328,8 +327,9 @@ class ThresholdTuner:
             )
         elif use_case == UseCase.SIMILAR_CONTENT:
             return (
-                f"For similar content detection, a moderate threshold ({threshold:.3f}) "
-                f"allows broader matching while maintaining relevance."
+                f"For similar content detection, a moderate threshold "
+                f"({threshold:.3f}) allows broader matching while "
+                f"maintaining relevance."
             )
         elif use_case == UseCase.DEDUPLICATION:
             return (

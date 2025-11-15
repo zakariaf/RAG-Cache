@@ -10,7 +10,7 @@ Sandi Metz Principles:
 import asyncio
 import time
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
 
 from app.models.qdrant_point import QdrantPoint
 from app.repositories.qdrant_repository import QdrantRepository

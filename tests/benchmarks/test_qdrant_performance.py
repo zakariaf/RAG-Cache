@@ -181,7 +181,8 @@ class TestQdrantPerformance:
         # Print comparison
         print("\n\nBatch Size Performance Comparison:")
         print(
-            f"{'Batch Size':<12} {'Batches':<12} {'Ops/sec':<12} {'Avg Latency (ms)':<20}"
+            f"{'Batch Size':<12} {'Batches':<12} {'Ops/sec':<12} "
+            f"{'Avg Latency (ms)':<20}"
         )
         print("-" * 56)
         for batch_size, metrics in results.items():
