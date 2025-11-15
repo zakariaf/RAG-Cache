@@ -152,10 +152,10 @@ class SearchResult(BaseModel):
                 )
 
             return CacheEntry(**kwargs)
-        except (KeyError, ValidationError, ValueError):
+        except (KeyError, ValidationError, ValueError, TypeError):
             # KeyError: missing required field
             # ValidationError: pydantic validation failed
-            # ValueError: invalid timestamp
+            # ValueError/TypeError: invalid timestamp
             return None
 
 
@@ -192,6 +192,8 @@ class DeleteResult(BaseModel):
     Tracks deletion status.
     """
 
-    deleted_count: int = Field(..., ge=0, description="Number deleted")
+    deleted_count: int = Field(
+        ..., ge=-1, description="Number deleted (-1 for unknown)"
+    )
     success: bool = Field(..., description="Operation success")
     message: Optional[str] = Field(None, description="Status message")
