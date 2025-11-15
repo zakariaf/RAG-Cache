@@ -192,6 +192,8 @@ class DeleteResult(BaseModel):
     Tracks deletion status.
     """
 
-    deleted_count: int = Field(..., ge=-1, description="Number deleted (-1 for unknown)")
+    deleted_count: int = Field(
+        ..., ge=-1, description="Number deleted (-1 for unknown)"
+    )
     success: bool = Field(..., description="Operation success")
     message: Optional[str] = Field(None, description="Status message")
