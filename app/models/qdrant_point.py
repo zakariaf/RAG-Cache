@@ -133,22 +133,25 @@ class SearchResult(BaseModel):
             CacheEntry if payload is valid, None otherwise
         """
         try:
-            # Convert timestamp back to datetime if present
-            created_at = None
-            if "created_at" in self.payload:
-                created_at = datetime.fromtimestamp(self.payload["created_at"])
+            # Build kwargs for CacheEntry
+            kwargs: Dict[str, Any] = {
+                "query_hash": self.payload["query_hash"],
+                "original_query": self.payload["original_query"],
+                "response": self.payload["response"],
+                "provider": self.payload["provider"],
+                "model": self.payload["model"],
+                "prompt_tokens": self.payload.get("prompt_tokens", 0),
+                "completion_tokens": self.payload.get("completion_tokens", 0),
+                "embedding": self.vector,
+            }
 
-            return CacheEntry(
-                query_hash=self.payload["query_hash"],
-                original_query=self.payload["original_query"],
-                response=self.payload["response"],
-                provider=self.payload["provider"],
-                model=self.payload["model"],
-                prompt_tokens=self.payload.get("prompt_tokens", 0),
-                completion_tokens=self.payload.get("completion_tokens", 0),
-                embedding=self.vector,
-                created_at=created_at,
-            )
+            # Convert timestamp back to datetime if present
+            if "created_at" in self.payload:
+                kwargs["created_at"] = datetime.fromtimestamp(
+                    self.payload["created_at"]
+                )
+
+            return CacheEntry(**kwargs)
         except (KeyError, ValidationError, ValueError):
             # KeyError: missing required field
             # ValidationError: pydantic validation failed
