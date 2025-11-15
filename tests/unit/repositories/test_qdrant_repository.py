@@ -332,7 +332,15 @@ class TestQdrantRepository:
         )
 
         assert results == []
-        mock_client.search.assert_called_once()
+        mock_client.search.assert_called_once_with(
+            collection_name=repository._collection_name,
+            query_vector=query_vector,
+            limit=5,
+            score_threshold=0.9,
+            query_filter=None,
+            with_payload=True,
+            with_vectors=False,
+        )
 
     @pytest.mark.asyncio
     async def test_batch_upload_success(self, repository, mock_client):
@@ -352,7 +360,7 @@ class TestQdrantRepository:
         assert result.successful == 10
         assert result.failed == 0
         assert len(result.point_ids) == 10
-        assert result.success_rate == 100.0
+        assert result.success_rate == 1.0
 
     @pytest.mark.asyncio
     async def test_batch_upload_empty(self, repository, mock_client):
@@ -606,7 +614,11 @@ class TestQdrantRepository:
         count = await repository.count_points(filter_condition=filter_obj)
 
         assert count == 5
-        mock_client.count.assert_called_once()
+        mock_client.count.assert_called_once_with(
+            collection_name=repository._collection_name,
+            count_filter=filter_obj,
+            exact=True,
+        )
 
     @pytest.mark.asyncio
     async def test_delete_point_error(self, repository, mock_client):

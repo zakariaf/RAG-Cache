@@ -318,10 +318,9 @@ class TestQdrantConnectionPool:
             # Manually trigger cleanup
             await pool._cleanup_expired()
 
-            # Connection should be removed and new one created on next acquire
+            # Connection should be removed (even if below min_size due to max_lifetime)
             stats = pool.get_stats()
-            # After cleanup, expired connections are removed
-            assert stats["total"] >= 0
+            assert stats["total"] == 0
 
             await pool.close()
 
