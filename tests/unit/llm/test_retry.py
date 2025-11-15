@@ -2,6 +2,8 @@
 Tests for retry handler.
 """
 
+from unittest.mock import Mock
+
 import pytest
 from anthropic import RateLimitError as AnthropicRateLimitError
 from openai import APIConnectionError, APITimeoutError, RateLimitError
@@ -51,7 +53,15 @@ class TestRetryHandler:
             nonlocal call_count
             call_count += 1
             if call_count < 3:
-                raise RateLimitError("Rate limit exceeded", response=None, body=None)
+                # Create a mock RateLimitError with required attributes
+                mock_response = Mock()
+                mock_response.request = Mock()
+                error = RateLimitError(
+                    message="Rate limit exceeded",
+                    response=mock_response,
+                    body=None,
+                )
+                raise error
             return "success"
 
         result = await retry_handler.execute(failing_then_success)
@@ -66,7 +76,10 @@ class TestRetryHandler:
         async def always_fails() -> str:
             nonlocal call_count
             call_count += 1
-            raise APITimeoutError("Timeout")
+            # Create mock request for APITimeoutError
+            mock_request = Mock()
+            error = APITimeoutError(request=mock_request)
+            raise error
 
         with pytest.raises(APITimeoutError):
             await retry_handler.execute(always_fails)
@@ -84,7 +97,10 @@ class TestRetryHandler:
             nonlocal call_count
             call_count += 1
             if call_count < 2:
-                raise APIConnectionError("Connection failed")
+                # Create mock request for APIConnectionError
+                mock_request = Mock()
+                error = APIConnectionError(request=mock_request)
+                raise error
             return "success"
 
         result = await retry_handler.execute(connection_error_then_success)
