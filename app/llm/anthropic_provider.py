@@ -13,7 +13,7 @@ from app.config import config
 from app.exceptions import LLMProviderError
 from app.llm.provider import BaseLLMProvider
 from app.llm.rate_limiter import RateLimitConfig, RateLimiter
-from app.llm.retry import RetryConfig, RetryHandler
+from app.llm.retry import RetryHandler
 from app.models.llm import LLMResponse
 from app.models.query import QueryRequest
 from app.utils.logger import get_logger, log_llm_call
@@ -49,7 +49,7 @@ class AnthropicProvider(BaseLLMProvider):
         self._rate_limiter = rate_limiter or RateLimiter(
             RateLimitConfig(requests_per_minute=requests_per_minute)
         )
-        self._retry_handler = retry_handler or RetryHandler(RetryConfig(max_attempts=3))
+        self._retry_handler = retry_handler or RetryHandler()
 
     async def complete(self, request: QueryRequest) -> LLMResponse:
         """
