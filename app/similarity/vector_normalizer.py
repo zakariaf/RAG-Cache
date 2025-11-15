@@ -41,19 +41,25 @@ class VectorNormalizer:
 
         Returns:
             Normalized vector with unit length
+
+        Raises:
+            ValueError: If vector is empty or normalization fails
         """
+        if not vector:
+            raise ValueError("Cannot normalize empty vector")
+
         try:
             magnitude = math.sqrt(sum(x * x for x in vector))
 
             if magnitude == 0:
-                logger.warning("Cannot normalize zero vector")
+                logger.warning("Cannot normalize zero vector, returning as-is")
                 return vector
 
             return [x / magnitude for x in vector]
 
         except Exception as e:
             logger.error("L2 normalization failed", error=str(e))
-            return vector
+            raise ValueError(f"L2 normalization failed: {e}") from e
 
     @staticmethod
     def l1_normalize(vector: List[float]) -> List[float]:
@@ -65,19 +71,25 @@ class VectorNormalizer:
 
         Returns:
             L1 normalized vector
+
+        Raises:
+            ValueError: If vector is empty or normalization fails
         """
+        if not vector:
+            raise ValueError("Cannot normalize empty vector")
+
         try:
             total = sum(abs(x) for x in vector)
 
             if total == 0:
-                logger.warning("Cannot normalize zero vector")
+                logger.warning("Cannot normalize zero vector, returning as-is")
                 return vector
 
             return [x / total for x in vector]
 
         except Exception as e:
             logger.error("L1 normalization failed", error=str(e))
-            return vector
+            raise ValueError(f"L1 normalization failed: {e}") from e
 
     @staticmethod
     def max_normalize(vector: List[float]) -> List[float]:
@@ -89,19 +101,25 @@ class VectorNormalizer:
 
         Returns:
             Max normalized vector
+
+        Raises:
+            ValueError: If vector is empty or normalization fails
         """
+        if not vector:
+            raise ValueError("Cannot normalize empty vector")
+
         try:
             max_val = max(abs(x) for x in vector)
 
             if max_val == 0:
-                logger.warning("Cannot normalize zero vector")
+                logger.warning("Cannot normalize zero vector, returning as-is")
                 return vector
 
             return [x / max_val for x in vector]
 
         except Exception as e:
             logger.error("Max normalization failed", error=str(e))
-            return vector
+            raise ValueError(f"Max normalization failed: {e}") from e
 
     @staticmethod
     def magnitude(vector: List[float]) -> float:
@@ -130,13 +148,19 @@ class VectorNormalizer:
 
         Returns:
             Zero-centered vector
+
+        Raises:
+            ValueError: If vector is empty or operation fails
         """
+        if not vector:
+            raise ValueError("Cannot center empty vector")
+
         try:
-            mean = sum(vector) / len(vector) if vector else 0.0
+            mean = sum(vector) / len(vector)
             return [x - mean for x in vector]
         except Exception as e:
             logger.error("Zero centering failed", error=str(e))
-            return vector
+            raise ValueError(f"Zero centering failed: {e}") from e
 
     @staticmethod
     def standardize(vector: List[float]) -> List[float]:
@@ -148,16 +172,21 @@ class VectorNormalizer:
 
         Returns:
             Standardized vector
-        """
-        try:
-            if not vector:
-                return vector
 
+        Raises:
+            ValueError: If vector is empty or operation fails
+        """
+        if not vector:
+            raise ValueError("Cannot standardize empty vector")
+
+        try:
             mean = sum(vector) / len(vector)
             variance = sum((x - mean) ** 2 for x in vector) / len(vector)
 
             if variance == 0:
-                logger.warning("Cannot standardize constant vector")
+                logger.warning(
+                    "Cannot standardize constant vector, returning zero vector"
+                )
                 return [0.0 for _ in vector]
 
             std_dev = math.sqrt(variance)
@@ -165,7 +194,7 @@ class VectorNormalizer:
 
         except Exception as e:
             logger.error("Standardization failed", error=str(e))
-            return vector
+            raise ValueError(f"Standardization failed: {e}") from e
 
     @staticmethod
     def clip(

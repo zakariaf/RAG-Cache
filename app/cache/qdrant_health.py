@@ -81,15 +81,6 @@ class QdrantHealthCheck:
         stats = await self._get_collection_stats()
         results["details"]["statistics"] = stats  # type: ignore[index]
 
-        # Determine final status
-        checks_dict: Dict[str, bool] = results["checks"]  # type: ignore[assignment]
-        if all(checks_dict.values()):
-            results["status"] = HealthStatus.HEALTHY.value
-        elif any(checks_dict.values()):
-            results["status"] = HealthStatus.DEGRADED.value
-        else:
-            results["status"] = HealthStatus.UNHEALTHY.value
-
         logger.info("Health check completed", status=results["status"])
         return results
 

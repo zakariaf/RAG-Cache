@@ -299,14 +299,12 @@ class SimilarityScoreCalculator:
         Returns:
             Dict with quality metrics
         """
-        calculator = SimilarityScoreCalculator
-
         return {
             "score": round(score, 4),
             "percentage": round(score * 100, 2),
-            "level": calculator.interpret_score(score).value,
-            "confidence": calculator.get_confidence_level(score),
-            "is_cache_hit": calculator.should_cache_hit(score),
+            "level": SimilarityScoreCalculator.interpret_score(score).value,
+            "confidence": SimilarityScoreCalculator.get_confidence_level(score),
+            "is_cache_hit": SimilarityScoreCalculator.should_cache_hit(score),
         }
 
 

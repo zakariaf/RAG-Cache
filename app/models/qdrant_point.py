@@ -8,10 +8,11 @@ Sandi Metz Principles:
 """
 
 import time
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from qdrant_client.models import PointStruct
 
 from app.models.cache_entry import CacheEntry
@@ -50,7 +51,7 @@ class QdrantPoint(BaseModel):
             "model": entry.model,
             "prompt_tokens": entry.prompt_tokens,
             "completion_tokens": entry.completion_tokens,
-            "created_at": time.time(),
+            "created_at": entry.created_at.timestamp(),
             "cached_at": time.time(),
         }
 
@@ -132,6 +133,11 @@ class SearchResult(BaseModel):
             CacheEntry if payload is valid, None otherwise
         """
         try:
+            # Convert timestamp back to datetime if present
+            created_at = None
+            if "created_at" in self.payload:
+                created_at = datetime.fromtimestamp(self.payload["created_at"])
+
             return CacheEntry(
                 query_hash=self.payload["query_hash"],
                 original_query=self.payload["original_query"],
@@ -141,8 +147,12 @@ class SearchResult(BaseModel):
                 prompt_tokens=self.payload.get("prompt_tokens", 0),
                 completion_tokens=self.payload.get("completion_tokens", 0),
                 embedding=self.vector,
+                created_at=created_at,
             )
-        except KeyError:
+        except (KeyError, ValidationError, ValueError):
+            # KeyError: missing required field
+            # ValidationError: pydantic validation failed
+            # ValueError: invalid timestamp
             return None
 
 
