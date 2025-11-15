@@ -6,7 +6,7 @@ pytest-mock==3.12.0
 black==23.11.0
 flake8==6.1.0
 mypy==1.7.1
-isort==5.13.2
+isort==7.0.0
 ipython==8.17.2
 pre-commit==3.5.0
 types-redis==4.6.0.20241004
