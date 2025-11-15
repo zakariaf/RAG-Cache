@@ -12,6 +12,7 @@ from openai import AsyncOpenAI, OpenAIError
 from app.config import config
 from app.exceptions import LLMProviderError
 from app.llm.provider import BaseLLMProvider
+from app.llm.rate_limiter import RateLimiter, RateLimitConfig
 from app.models.llm import LLMResponse
 from app.models.query import QueryRequest
 from app.utils.logger import get_logger, log_llm_call
@@ -23,18 +24,28 @@ class OpenAIProvider(BaseLLMProvider):
     """
     OpenAI implementation of LLM provider.
 
-    Handles communication with OpenAI API.
+    Handles communication with OpenAI API with rate limiting.
     """
 
-    def __init__(self, api_key: str):
+    def __init__(
+        self,
+        api_key: str,
+        rate_limiter: RateLimiter | None = None,
+        requests_per_minute: int = 500,
+    ):
         """
         Initialize OpenAI provider.
 
         Args:
             api_key: OpenAI API key
+            rate_limiter: Optional rate limiter (creates default if None)
+            requests_per_minute: Rate limit (default: 500 RPM for tier 1)
         """
         self._api_key = api_key
         self._client: AsyncOpenAI | None = None
+        self._rate_limiter = rate_limiter or RateLimiter(
+            RateLimitConfig(requests_per_minute=requests_per_minute)
+        )
 
     async def complete(self, request: QueryRequest) -> LLMResponse:
         """
@@ -49,6 +60,7 @@ class OpenAIProvider(BaseLLMProvider):
         Raises:
             LLMProviderError: If API call fails
         """
+        await self._rate_limiter.acquire()
         client = self._get_client()
 
         try:
