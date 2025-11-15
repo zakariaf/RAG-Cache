@@ -98,7 +98,7 @@ class AnthropicProvider(BaseLLMProvider):
         if model == config.default_model:
             model = "claude-3-5-sonnet-20241022"
 
-        response = await client.messages.create(
+        response = await client.messages.create(  # type: ignore[attr-defined]
             model=model,
             max_tokens=request.get_max_tokens(config.default_max_tokens),
             temperature=request.get_temperature(config.default_temperature),
