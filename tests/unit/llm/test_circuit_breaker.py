@@ -5,11 +5,7 @@ import asyncio
 import pytest
 
 from app.exceptions import LLMProviderError
-from app.llm.circuit_breaker import (
-    CircuitBreaker,
-    CircuitBreakerConfig,
-    CircuitState,
-)
+from app.llm.circuit_breaker import CircuitBreaker, CircuitBreakerConfig, CircuitState
 
 
 class TestCircuitBreakerConfig:
