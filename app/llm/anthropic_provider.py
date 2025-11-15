@@ -49,9 +49,7 @@ class AnthropicProvider(BaseLLMProvider):
         self._rate_limiter = rate_limiter or RateLimiter(
             RateLimitConfig(requests_per_minute=requests_per_minute)
         )
-        self._retry_handler = retry_handler or RetryHandler(
-            RetryConfig(max_attempts=3)
-        )
+        self._retry_handler = retry_handler or RetryHandler(RetryConfig(max_attempts=3))
 
     async def complete(self, request: QueryRequest) -> LLMResponse:
         """

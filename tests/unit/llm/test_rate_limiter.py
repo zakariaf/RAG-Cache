@@ -107,9 +107,7 @@ class TestRateLimiter:
         wait_time = rate_limiter._calculate_wait_time()
         assert wait_time == 0.0
 
-    def test_calculate_wait_time_with_requests(
-        self, rate_limiter: RateLimiter
-    ) -> None:
+    def test_calculate_wait_time_with_requests(self, rate_limiter: RateLimiter) -> None:
         """Test wait time calculation with existing requests."""
         # Add old request
         rate_limiter._requests.append(time() - 30)  # 30 seconds ago

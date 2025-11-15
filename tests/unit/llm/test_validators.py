@@ -71,9 +71,7 @@ class TestModelValidator:
     def test_validate_model_with_version_suffix(self) -> None:
         """Test validating model with version suffix."""
         # Should accept models with version numbers
-        assert (
-            ModelValidator.validate("gpt-4-0613", "openai") == "gpt-4-0613"
-        )
+        assert ModelValidator.validate("gpt-4-0613", "openai") == "gpt-4-0613"
 
     def test_validate_invalid_model(self) -> None:
         """Test error when model is invalid."""
@@ -94,9 +92,7 @@ class TestModelValidator:
         """Test is_valid_model returns True for valid models."""
         assert ModelValidator.is_valid_model("gpt-3.5-turbo", "openai")
         assert ModelValidator.is_valid_model("gpt-4", "openai")
-        assert ModelValidator.is_valid_model(
-            "claude-3-5-sonnet-20241022", "anthropic"
-        )
+        assert ModelValidator.is_valid_model("claude-3-5-sonnet-20241022", "anthropic")
 
     def test_is_valid_model_false(self) -> None:
         """Test is_valid_model returns False for invalid models."""
