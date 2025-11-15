@@ -75,6 +75,8 @@ class TestQdrantPoint:
             response="Response",
             provider="openai",
             model="gpt-4",
+            prompt_tokens=10,
+            completion_tokens=5,
             embedding=[0.1, 0.2],
         )
 
@@ -90,6 +92,8 @@ class TestQdrantPoint:
             response="Response",
             provider="openai",
             model="gpt-4",
+            prompt_tokens=10,
+            completion_tokens=5,
             embedding=None,
         )
 

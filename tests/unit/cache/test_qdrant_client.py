@@ -255,7 +255,7 @@ class TestGetPooledClient:
         mock_pool = AsyncMock()
         mock_pool.acquire.return_value = mock_client
 
-        with patch("app.cache.qdrant_client.get_pool") as mock_get_pool:
+        with patch("app.cache.qdrant_pool.get_pool") as mock_get_pool:
             mock_get_pool.return_value = mock_pool
 
             async with get_pooled_client() as client:
@@ -271,7 +271,7 @@ class TestGetPooledClient:
         mock_pool = AsyncMock()
         mock_pool.acquire.return_value = mock_client
 
-        with patch("app.cache.qdrant_client.get_pool") as mock_get_pool:
+        with patch("app.cache.qdrant_pool.get_pool") as mock_get_pool:
             mock_get_pool.return_value = mock_pool
 
             with pytest.raises(ValueError, match="Test error"):
@@ -288,7 +288,7 @@ class TestGetPooledClient:
         mock_pool = AsyncMock()
         mock_pool.acquire.side_effect = [mock_client1, mock_client2]
 
-        with patch("app.cache.qdrant_client.get_pool") as mock_get_pool:
+        with patch("app.cache.qdrant_pool.get_pool") as mock_get_pool:
             mock_get_pool.return_value = mock_pool
 
             async with get_pooled_client() as client1:

@@ -554,7 +554,7 @@ class TestQdrantRepository:
     @pytest.mark.asyncio
     async def test_scroll_points_no_vectors(self, repository, mock_client):
         """Test scroll without vectors."""
-        mock_point = PointStruct(id="test-123", vector=None, payload={"data": "test"})
+        mock_point = PointStruct(id="test-123", vector=[], payload={"data": "test"})
         mock_client.scroll.return_value = ([mock_point], None)
 
         points, next_offset = await repository.scroll_points(
@@ -654,7 +654,8 @@ class TestQdrantRepository:
     @pytest.mark.asyncio
     async def test_create_collection_error(self, repository, mock_client):
         """Test create collection handles errors."""
-        mock_client.get_collections.side_effect = Exception("Check failed")
+        mock_client.get_collections.return_value = MagicMock(collections=[])
+        mock_client.create_collection.side_effect = Exception("Create failed")
 
         result = await repository.create_collection()
 

@@ -247,5 +247,5 @@ class TestQdrantCollectionManager:
         status = await manager.get_status()
 
         assert status is not None
-        assert status["status"] == "error"
+        assert status["status"] == "not_initialized"
         assert "message" in status
