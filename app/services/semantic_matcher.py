@@ -13,7 +13,6 @@ from typing import List, Optional
 
 from app.config import config
 from app.embeddings.generator import EmbeddingGenerator
-from app.models.embedding import EmbeddingResult
 from app.models.qdrant_point import SearchResult
 from app.repositories.qdrant_repository import QdrantRepository
 from app.utils.logger import get_logger

@@ -11,7 +11,6 @@ Sandi Metz Principles:
 
 from typing import Callable, List, Optional
 
-from app.models.query import QueryRequest
 from app.processing.context_manager import RequestContextManager
 from app.processing.normalizer import QueryNormalizer
 from app.processing.preprocessor import PreprocessedQuery, QueryPreprocessor

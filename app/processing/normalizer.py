@@ -11,7 +11,6 @@ Sandi Metz Principles:
 
 import re
 import unicodedata
-from typing import Optional
 
 from app.utils.logger import get_logger
 

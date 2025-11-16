@@ -15,7 +15,7 @@ from typing import List, Optional
 from sentence_transformers import SentenceTransformer
 
 from app.config import config
-from app.models.embedding import EmbeddingResult, EmbeddingVector
+from app.models.embedding import EmbeddingResult
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)

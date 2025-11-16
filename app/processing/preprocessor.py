@@ -108,7 +108,8 @@ class QueryPreprocessor:
 
         Raises:
             PreprocessingError: If preprocessing fails
-            QueryValidationError: If validation fails (when raise_on_validation_error=True)
+            QueryValidationError: If validation fails and
+                raise_on_validation_error=True
         """
         if query is None:
             raise PreprocessingError("Query cannot be None")
@@ -182,7 +183,8 @@ class QueryPreprocessor:
 
         Raises:
             PreprocessingError: If preprocessing fails
-            QueryValidationError: If validation fails (when raise_on_validation_error=True)
+            QueryValidationError: If validation fails and
+                raise_on_validation_error=True
         """
         if queries is None:
             raise PreprocessingError("Queries list cannot be None")

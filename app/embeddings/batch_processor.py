@@ -10,7 +10,7 @@ Sandi Metz Principles:
 """
 
 import asyncio
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from app.embeddings.cache import EmbeddingCache
 from app.embeddings.generator import EmbeddingGenerator
