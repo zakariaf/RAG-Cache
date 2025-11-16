@@ -1,5 +1,13 @@
 """Query processing module."""
 
+from app.processing.context_manager import (
+    RequestContext,
+    RequestContextManager,
+    get_request_context,
+    get_request_id,
+    get_request_metadata,
+    set_request_metadata,
+)
 from app.processing.normalizer import (
     QueryNormalizer,
     StrictQueryNormalizer,
@@ -29,9 +37,15 @@ __all__ = [
     "QueryPreprocessor",
     "QueryValidationError",
     "QueryValidator",
+    "RequestContext",
+    "RequestContextManager",
     "StrictQueryNormalizer",
     "StrictQueryPreprocessor",
+    "get_request_context",
+    "get_request_id",
+    "get_request_metadata",
     "normalize_query",
     "preprocess_query",
+    "set_request_metadata",
     "validate_query",
 ]
