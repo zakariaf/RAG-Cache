@@ -2,8 +2,8 @@
 
 from app.services.semantic_matcher import (
     SemanticMatch,
-    SemanticMatchError,
     SemanticMatcher,
+    SemanticMatchError,
 )
 
 __all__ = [
