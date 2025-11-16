@@ -7,7 +7,6 @@ Provides common fixtures for testing.
 import sys
 from unittest.mock import AsyncMock, MagicMock, Mock
 
-import numpy as np
 import pytest
 
 # Mock sentence-transformers to avoid heavy PyTorch dependency in tests
@@ -16,7 +15,7 @@ mock_sentence_transformer = MagicMock()
 mock_sentence_transformer.SentenceTransformer = Mock
 sys.modules["sentence_transformers"] = mock_sentence_transformer
 
-from app.config import AppConfig
+from app.config import AppConfig  # noqa: E402
 
 
 @pytest.fixture
