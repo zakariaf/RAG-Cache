@@ -174,12 +174,12 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          # Run LLM integration tests (Epic 5) without coverage requirement
+          # Run LLM integration tests (Epic 5) without coverage failure threshold
           pytest tests/integration/test_llm_providers.py -v -m integration \
             --cov=app/llm \
             --cov-report=term-missing \
             --cov-report=html \
-            --no-cov-on-fail
+            --cov-fail-under=0
 
           # Run other integration tests but don't fail the build
           # (these have pre-existing issues unrelated to Epic 5)
