@@ -217,9 +217,7 @@ class EmbeddingModelLoader:
         """
         logger.info("Force reloading embedding model")
         cls.clear_cache()
-        return cls.load(
-            model_name=model_name, device=device, cache_folder=cache_folder
-        )
+        return cls.load(model_name=model_name, device=device, cache_folder=cache_folder)
 
     @classmethod
     def preload(cls) -> None:

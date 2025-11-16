@@ -58,8 +58,7 @@ class SemanticMatch:
     def __repr__(self) -> str:
         """Representation."""
         return (
-            f"SemanticMatch(query='{self.query[:50]}...', "
-            f"score={self.score:.4f})"
+            f"SemanticMatch(query='{self.query[:50]}...', " f"score={self.score:.4f})"
         )
 
     def to_dict(self) -> dict:
@@ -159,7 +158,9 @@ class SemanticMatcher:
 
         except Exception as e:
             logger.error("Semantic matching failed", error=str(e), query=query[:100])
-            raise SemanticMatchError(f"Failed to find semantic matches: {str(e)}") from e
+            raise SemanticMatchError(
+                f"Failed to find semantic matches: {str(e)}"
+            ) from e
 
     async def find_best_match(
         self,

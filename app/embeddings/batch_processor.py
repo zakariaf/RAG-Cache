@@ -255,9 +255,7 @@ class EmbeddingBatchProcessor:
                         return await self._cache.get_or_generate(text, normalize)
 
                 # Process all texts concurrently with semaphore limit
-                results = await asyncio.gather(
-                    *[process_one(text) for text in texts]
-                )
+                results = await asyncio.gather(*[process_one(text) for text in texts])
 
                 return list(results)
 

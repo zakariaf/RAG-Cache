@@ -90,9 +90,7 @@ class QueryValidator:
 
         # Check whitespace-only
         if not self._allow_whitespace_only and len(query.strip()) == 0:
-            raise QueryValidationError(
-                "Query cannot be whitespace-only", field="query"
-            )
+            raise QueryValidationError("Query cannot be whitespace-only", field="query")
 
         # Check minimum length
         if len(query) < self._min_length:
