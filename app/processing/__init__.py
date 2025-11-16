@@ -13,6 +13,13 @@ from app.processing.normalizer import (
     StrictQueryNormalizer,
     normalize_query,
 )
+from app.processing.pipeline import (
+    PipelineError,
+    PipelineResult,
+    QueryPipeline,
+    QueryPipelineBuilder,
+    process_with_pipeline,
+)
 from app.processing.preprocessor import (
     LenientQueryPreprocessor,
     PreprocessedQuery,
@@ -31,9 +38,13 @@ from app.processing.validator import (
 __all__ = [
     "LLMQueryValidator",
     "LenientQueryPreprocessor",
+    "PipelineError",
+    "PipelineResult",
     "PreprocessedQuery",
     "PreprocessingError",
     "QueryNormalizer",
+    "QueryPipeline",
+    "QueryPipelineBuilder",
     "QueryPreprocessor",
     "QueryValidationError",
     "QueryValidator",
@@ -46,6 +57,7 @@ __all__ = [
     "get_request_metadata",
     "normalize_query",
     "preprocess_query",
+    "process_with_pipeline",
     "set_request_metadata",
     "validate_query",
 ]
