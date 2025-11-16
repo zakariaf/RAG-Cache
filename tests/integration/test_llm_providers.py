@@ -21,6 +21,7 @@ from tests.mocks.llm_mocks import (
 )
 
 
+@pytest.mark.integration
 class TestLLMProviderIntegration:
     """Integration tests for LLM provider components."""
 
