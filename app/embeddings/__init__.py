@@ -1,5 +1,9 @@
 """Embedding generation module."""
 
+from app.embeddings.batch_processor import (
+    BatchProcessingError,
+    EmbeddingBatchProcessor,
+)
 from app.embeddings.cache import EmbeddingCache
 from app.embeddings.generator import EmbeddingGenerator, EmbeddingGeneratorError
 from app.embeddings.model_loader import (
@@ -9,6 +13,8 @@ from app.embeddings.model_loader import (
 )
 
 __all__ = [
+    "BatchProcessingError",
+    "EmbeddingBatchProcessor",
     "EmbeddingCache",
     "EmbeddingGenerator",
     "EmbeddingGeneratorError",
