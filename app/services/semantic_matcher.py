@@ -327,14 +327,14 @@ class SemanticMatcher:
             True if deleted successfully
         """
         try:
-            success = await self._qdrant.delete_point(point_id)
+            result = await self._qdrant.delete_point(point_id)
 
-            if success:
+            if result.success:
                 logger.info("Query embedding deleted", point_id=point_id)
             else:
                 logger.warning("Failed to delete query embedding", point_id=point_id)
 
-            return success
+            return result.success
 
         except Exception as e:
             logger.error("Embedding deletion failed", error=str(e), point_id=point_id)

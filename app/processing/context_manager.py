@@ -22,7 +22,9 @@ logger = get_logger(__name__)
 # Context variables for async request tracking
 _request_id_var: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
 _start_time_var: ContextVar[Optional[float]] = ContextVar("start_time", default=None)
-_metadata_var: ContextVar[Dict[str, Any]] = ContextVar("metadata", default_factory=dict)
+_metadata_var: ContextVar[Optional[Dict[str, Any]]] = ContextVar(
+    "metadata", default=None
+)
 
 
 class RequestContext:

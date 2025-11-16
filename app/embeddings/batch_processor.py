@@ -10,7 +10,7 @@ Sandi Metz Principles:
 """
 
 import asyncio
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 from app.embeddings.cache import EmbeddingCache
 from app.embeddings.generator import EmbeddingGenerator
@@ -123,12 +123,13 @@ class EmbeddingBatchProcessor:
         uncached_indices: List[int] = []
 
         for i, text in enumerate(texts):
-            cached = self._cache.peek(text, normalize)
-            if cached:
-                cached_results[text] = cached
-            else:
-                uncached_texts.append(text)
-                uncached_indices.append(i)
+            if self._cache:
+                cached = self._cache.peek(text, normalize)
+                if cached:
+                    cached_results[text] = cached
+                    continue
+            uncached_texts.append(text)
+            uncached_indices.append(i)
 
         logger.info(
             "Cache check complete",
@@ -249,10 +250,11 @@ class EmbeddingBatchProcessor:
             # If cache is available, use it
             if self._cache:
                 semaphore = asyncio.Semaphore(max_concurrent)
+                cache = self._cache  # Capture for closure
 
                 async def process_one(text: str) -> EmbeddingResult:
                     async with semaphore:
-                        return await self._cache.get_or_generate(text, normalize)
+                        return await cache.get_or_generate(text, normalize)
 
                 # Process all texts concurrently with semaphore limit
                 results = await asyncio.gather(*[process_one(text) for text in texts])
@@ -293,7 +295,7 @@ class EmbeddingBatchProcessor:
         texts: List[str],
         normalize: bool = True,
         batch_size: Optional[int] = None,
-        progress_callback: Optional[callable] = None,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
     ) -> List[EmbeddingResult]:
         """
         Process batch with progress tracking.
