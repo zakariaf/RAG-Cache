@@ -8,6 +8,17 @@ from app.processing.context_manager import (
     get_request_metadata,
     set_request_metadata,
 )
+from app.processing.error_recovery import (
+    ErrorRecoveryManager,
+    ErrorRecoveryStrategy,
+    FallbackStrategy,
+    RecoveryAction,
+    RetryStrategy,
+    SkipStrategy,
+    create_fallback_strategy,
+    create_retry_strategy,
+    create_skip_strategy,
+)
 from app.processing.normalizer import (
     QueryNormalizer,
     StrictQueryNormalizer,
@@ -36,6 +47,9 @@ from app.processing.validator import (
 )
 
 __all__ = [
+    "ErrorRecoveryManager",
+    "ErrorRecoveryStrategy",
+    "FallbackStrategy",
     "LLMQueryValidator",
     "LenientQueryPreprocessor",
     "PipelineError",
@@ -48,10 +62,16 @@ __all__ = [
     "QueryPreprocessor",
     "QueryValidationError",
     "QueryValidator",
+    "RecoveryAction",
     "RequestContext",
     "RequestContextManager",
+    "RetryStrategy",
+    "SkipStrategy",
     "StrictQueryNormalizer",
     "StrictQueryPreprocessor",
+    "create_fallback_strategy",
+    "create_retry_strategy",
+    "create_skip_strategy",
     "get_request_context",
     "get_request_id",
     "get_request_metadata",
