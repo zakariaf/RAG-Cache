@@ -1,5 +1,6 @@
 """Embedding generation module."""
 
+from app.embeddings.cache import EmbeddingCache
 from app.embeddings.generator import EmbeddingGenerator, EmbeddingGeneratorError
 from app.embeddings.model_loader import (
     EmbeddingModelLoader,
@@ -8,6 +9,7 @@ from app.embeddings.model_loader import (
 )
 
 __all__ = [
+    "EmbeddingCache",
     "EmbeddingGenerator",
     "EmbeddingGeneratorError",
     "EmbeddingModelLoader",
