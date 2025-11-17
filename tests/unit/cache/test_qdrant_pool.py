@@ -15,6 +15,13 @@ from app.cache.qdrant_pool import (
 )
 
 
+@pytest.fixture
+def mock_sleep():
+    """Mock asyncio.sleep to make tests instant."""
+    with patch("asyncio.sleep", new=AsyncMock()) as mock:
+        yield mock
+
+
 class TestPoolConfig:
     """Tests for PoolConfig class."""
 
@@ -297,7 +304,7 @@ class TestQdrantConnectionPool:
             await pool.close()  # Should not raise error
 
     @pytest.mark.asyncio
-    async def test_pool_cleanup_expired_connections(self, pool_config):
+    async def test_pool_cleanup_expired_connections(self, pool_config, mock_sleep):
         """Test cleanup of expired connections."""
         pool_config.max_lifetime = 0.1  # Very short lifetime
 
@@ -373,7 +380,7 @@ class TestQdrantConnectionPool:
             await pool.close()
 
     @pytest.mark.asyncio
-    async def test_pool_cleanup_loop_error_handling(self, pool_config):
+    async def test_pool_cleanup_loop_error_handling(self, pool_config, mock_sleep):
         """Test cleanup loop handles errors."""
         with patch("app.cache.qdrant_pool.create_qdrant_client") as mock_create_client:
             mock_create_client.return_value = AsyncMock()

@@ -4,11 +4,18 @@ Pytest configuration and fixtures.
 Provides common fixtures for testing.
 """
 
-from unittest.mock import AsyncMock, MagicMock
+import sys
+from unittest.mock import AsyncMock, MagicMock, Mock
 
 import pytest
 
-from app.config import AppConfig
+# Mock sentence-transformers to avoid heavy PyTorch dependency in tests
+# This allows tests to run quickly without downloading/installing torch
+mock_sentence_transformer = MagicMock()
+mock_sentence_transformer.SentenceTransformer = Mock
+sys.modules["sentence_transformers"] = mock_sentence_transformer
+
+from app.config import AppConfig  # noqa: E402
 
 
 @pytest.fixture
