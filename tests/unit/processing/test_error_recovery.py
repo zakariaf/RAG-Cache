@@ -1,5 +1,7 @@
 """Test pipeline error recovery."""
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
 
 from app.processing.error_recovery import (
@@ -13,6 +15,13 @@ from app.processing.error_recovery import (
     create_retry_strategy,
     create_skip_strategy,
 )
+
+
+@pytest.fixture
+def mock_sleep():
+    """Mock asyncio.sleep to make tests instant."""
+    with patch("asyncio.sleep", new=AsyncMock()) as mock:
+        yield mock
 
 
 class TestRecoveryAction:
@@ -221,7 +230,7 @@ class TestErrorRecoveryManager:
         assert manager.get_error_count("test_op") == 0
 
     @pytest.mark.asyncio
-    async def test_execute_with_retry(self):
+    async def test_execute_with_retry(self, mock_sleep):
         """Test execution with retry strategy."""
         strategy = RetryStrategy(max_retries=3, base_delay=0.01)
         manager = ErrorRecoveryManager(strategy=strategy)
@@ -243,7 +252,7 @@ class TestErrorRecoveryManager:
         assert len(call_count) == 3
 
     @pytest.mark.asyncio
-    async def test_execute_retry_exhausted(self):
+    async def test_execute_retry_exhausted(self, mock_sleep):
         """Test execution fails after retry exhaustion."""
         strategy = RetryStrategy(max_retries=2, base_delay=0.01)
         manager = ErrorRecoveryManager(strategy=strategy)
@@ -290,7 +299,7 @@ class TestErrorRecoveryManager:
         assert result is None
 
     @pytest.mark.asyncio
-    async def test_error_count_tracking(self):
+    async def test_error_count_tracking(self, mock_sleep):
         """Test error count is tracked."""
         strategy = RetryStrategy(max_retries=2, base_delay=0.01)
         manager = ErrorRecoveryManager(strategy=strategy)
@@ -306,7 +315,7 @@ class TestErrorRecoveryManager:
         assert manager.get_error_count("test_op") == 0
 
     @pytest.mark.asyncio
-    async def test_reset_error_count(self):
+    async def test_reset_error_count(self, mock_sleep):
         """Test resetting error count."""
         strategy = RetryStrategy(max_retries=5, base_delay=0.01)
         manager = ErrorRecoveryManager(strategy=strategy)
@@ -345,7 +354,7 @@ class TestErrorRecoveryManager:
         assert "op2" in stats["error_counts"]
 
     @pytest.mark.asyncio
-    async def test_max_attempts_safety_limit(self):
+    async def test_max_attempts_safety_limit(self, mock_sleep):
         """Test safety limit on max attempts."""
         # Strategy that always retries
         strategy = RetryStrategy(max_retries=999, base_delay=0.001)
