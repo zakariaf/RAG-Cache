@@ -298,13 +298,16 @@ class TestEmbeddingBatchProcessor:
         """Test that large batches are chunked properly."""
         # Create 100 texts
         texts = [f"text{i}" for i in range(100)]
-        mock_generator.generate_batch.return_value = [
-            sample_embedding for _ in range(32)
-        ]
+
+        # Mock should return correct number of embeddings for each batch
+        def generate_batch_side_effect(batch_texts, normalize=True):
+            return [sample_embedding for _ in range(len(batch_texts))]
+
+        mock_generator.generate_batch.side_effect = generate_batch_side_effect
 
         # Process with default batch size of 32
         results = await processor_without_cache.process_batch(texts)
 
-        # Should be called multiple times for chunks
-        assert mock_generator.generate_batch.call_count >= 3
+        # Should be called 4 times (32+32+32+4 = 100)
+        assert mock_generator.generate_batch.call_count == 4
         assert len(results) == 100
