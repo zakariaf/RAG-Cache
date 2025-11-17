@@ -1,11 +1,19 @@
 """Tests for LLM timeout handler."""
 
 import asyncio
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from app.exceptions import LLMProviderError
 from app.llm.timeout_handler import TimeoutConfig, TimeoutHandler
+
+
+@pytest.fixture
+def mock_sleep():
+    """Mock asyncio.sleep to make tests instant."""
+    with patch("asyncio.sleep", new=AsyncMock()) as mock:
+        yield mock
 
 
 class TestTimeoutConfig:
@@ -42,7 +50,7 @@ class TestTimeoutHandler:
     """Test timeout handler."""
 
     @pytest.mark.asyncio
-    async def test_execute_successful_operation(self):
+    async def test_execute_successful_operation(self, mock_sleep):
         """Test executing operation that completes in time."""
         handler = TimeoutHandler()
 
@@ -55,7 +63,7 @@ class TestTimeoutHandler:
         assert result == "success"
 
     @pytest.mark.asyncio
-    async def test_execute_with_timeout_raises_error(self):
+    async def test_execute_with_timeout_raises_error(self, mock_sleep):
         """Test timeout raises error when configured."""
         config = TimeoutConfig(timeout_seconds=0.1, raise_on_timeout=True)
         handler = TimeoutHandler(config)
@@ -70,7 +78,7 @@ class TestTimeoutHandler:
         assert "timed out" in str(exc_info.value).lower()
 
     @pytest.mark.asyncio
-    async def test_execute_with_timeout_returns_none(self):
+    async def test_execute_with_timeout_returns_none(self, mock_sleep):
         """Test timeout returns None when not raising."""
         config = TimeoutConfig(timeout_seconds=0.1, raise_on_timeout=False)
         handler = TimeoutHandler(config)
@@ -84,7 +92,7 @@ class TestTimeoutHandler:
         assert result is None
 
     @pytest.mark.asyncio
-    async def test_execute_with_custom_timeout(self):
+    async def test_execute_with_custom_timeout(self, mock_sleep):
         """Test execute with custom timeout override."""
         config = TimeoutConfig(timeout_seconds=1.0)
         handler = TimeoutHandler(config)
@@ -98,7 +106,7 @@ class TestTimeoutHandler:
             await handler.execute(medium_operation, timeout_seconds=0.1)
 
     @pytest.mark.asyncio
-    async def test_execute_custom_timeout_success(self):
+    async def test_execute_custom_timeout_success(self, mock_sleep):
         """Test execute with custom timeout that succeeds."""
         config = TimeoutConfig(timeout_seconds=0.1)
         handler = TimeoutHandler(config)
@@ -162,7 +170,7 @@ class TestTimeoutHandler:
         assert handler.get_timeout() == 60.0
 
     @pytest.mark.asyncio
-    async def test_updated_timeout_takes_effect(self):
+    async def test_updated_timeout_takes_effect(self, mock_sleep):
         """Test that updated timeout is used in execution."""
         config = TimeoutConfig(timeout_seconds=0.1, raise_on_timeout=True)
         handler = TimeoutHandler(config)
@@ -211,7 +219,7 @@ class TestTimeoutHandler:
         assert result2 == "second"
 
     @pytest.mark.asyncio
-    async def test_timeout_error_message_includes_duration(self):
+    async def test_timeout_error_message_includes_duration(self, mock_sleep):
         """Test timeout error message includes timeout duration."""
         config = TimeoutConfig(timeout_seconds=0.5, raise_on_timeout=True)
         handler = TimeoutHandler(config)

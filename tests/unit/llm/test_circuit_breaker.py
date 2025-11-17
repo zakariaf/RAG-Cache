@@ -1,6 +1,7 @@
 """Tests for LLM circuit breaker."""
 
 import asyncio
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -10,6 +11,13 @@ from app.llm.circuit_breaker import (
     CircuitBreakerConfig,
     CircuitState,
 )
+
+
+@pytest.fixture
+def mock_sleep():
+    """Mock asyncio.sleep to make tests instant."""
+    with patch("asyncio.sleep", new=AsyncMock()) as mock:
+        yield mock
 
 
 class TestCircuitBreakerConfig:
@@ -102,7 +110,7 @@ class TestCircuitBreaker:
         assert "OPEN" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_circuit_transitions_to_half_open(self):
+    async def test_circuit_transitions_to_half_open(self, mock_sleep):
         """Test circuit transitions to half-open after timeout."""
         config = CircuitBreakerConfig(
             failure_threshold=2, recovery_timeout=0.1  # Short timeout for testing
@@ -134,7 +142,7 @@ class TestCircuitBreaker:
         assert breaker.get_state() == CircuitState.OPEN
 
     @pytest.mark.asyncio
-    async def test_half_open_success_closes_circuit(self):
+    async def test_half_open_success_closes_circuit(self, mock_sleep):
         """Test successful operations in half-open close circuit."""
         config = CircuitBreakerConfig(
             failure_threshold=2, recovery_timeout=0.1, success_threshold=2
@@ -169,7 +177,7 @@ class TestCircuitBreaker:
         assert breaker.get_state() == CircuitState.CLOSED
 
     @pytest.mark.asyncio
-    async def test_half_open_failure_reopens_circuit(self):
+    async def test_half_open_failure_reopens_circuit(self, mock_sleep):
         """Test failure in half-open reopens circuit."""
         config = CircuitBreakerConfig(failure_threshold=2, recovery_timeout=0.1)
         breaker = CircuitBreaker(config)
@@ -299,7 +307,7 @@ class TestCircuitBreaker:
         assert breaker.get_state() == CircuitState.OPEN
 
     @pytest.mark.asyncio
-    async def test_recovery_timeout_calculation(self):
+    async def test_recovery_timeout_calculation(self, mock_sleep):
         """Test recovery timeout is properly calculated."""
         config = CircuitBreakerConfig(failure_threshold=1, recovery_timeout=1.0)
         breaker = CircuitBreaker(config)
@@ -325,7 +333,7 @@ class TestCircuitBreaker:
             await breaker.execute(failing_operation)
 
     @pytest.mark.asyncio
-    async def test_state_transitions_logged(self):
+    async def test_state_transitions_logged(self, mock_sleep):
         """Test that state transitions occur correctly."""
         config = CircuitBreakerConfig(
             failure_threshold=1, recovery_timeout=0.1, success_threshold=1
