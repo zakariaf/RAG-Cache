@@ -1,37 +1,45 @@
 """
 Custom exceptions for the application.
-
-Sandi Metz Principles:
-- Single Responsibility: Each exception type is specific
-- Clear naming: Exception names describe the error
 """
 
 
-class RAGCacheException(Exception):
-    """Base exception for RAGCache application."""
+class AppError(Exception):
+    """Base exception for application errors."""
 
     pass
 
 
-class LLMProviderError(RAGCacheException):
-    """Error occurred in LLM provider."""
+class LLMProviderError(AppError):
+    """Raised when LLM provider fails."""
 
     pass
 
 
-class CacheError(RAGCacheException):
-    """Error occurred in cache operations."""
+class EmbeddingError(AppError):
+    """Raised when embedding generation fails."""
 
     pass
 
 
-class EmbeddingError(RAGCacheException):
-    """Error occurred in embedding generation."""
+class ValidationError(AppError):
+    """Raised when validation fails."""
 
     pass
 
 
-class ConfigurationError(RAGCacheException):
-    """Error in configuration."""
+class CacheError(AppError):
+    """Raised when cache operations fail."""
+
+    pass
+
+
+class SemanticMatchError(AppError):
+    """Raised when semantic matching fails."""
+
+    pass
+
+
+class ConfigurationError(AppError):
+    """Raised when configuration is invalid."""
 
     pass
