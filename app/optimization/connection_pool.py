@@ -26,16 +26,16 @@ class PoolConfig:
     # Pool size
     min_size: int = 5
     max_size: int = 20
-    
+
     # Timeouts
     acquire_timeout_seconds: float = 5.0
     idle_timeout_seconds: float = 300.0  # 5 minutes
     max_lifetime_seconds: float = 3600.0  # 1 hour
-    
+
     # Health checking
     health_check_interval_seconds: float = 30.0
     enable_health_check: bool = True
-    
+
     # Behavior
     overflow_allowed: bool = True
     max_overflow: int = 10
@@ -111,7 +111,7 @@ class ConnectionPoolManager(Generic[T]):
         self._close_fn = close_fn or (lambda c: None)
         self._health_check_fn = health_check_fn or (lambda c: True)
         self._config = config or PoolConfig()
-        
+
         self._pool: list[PooledConnection[T]] = []
         self._overflow_pool: list[PooledConnection[T]] = []
         self._lock = asyncio.Lock()
@@ -178,13 +178,13 @@ class ConnectionPoolManager(Generic[T]):
                     try:
                         pooled = await self._create_connection()
                         pooled.mark_used()
-                        
+
                         if len(self._pool) < self._config.max_size:
                             self._pool.append(pooled)
                         else:
                             self._overflow_pool.append(pooled)
                             self._stats.overflow_connections += 1
-                        
+
                         self._stats.total_acquires += 1
                         self._update_stats()
                         return pooled.connection
@@ -195,7 +195,7 @@ class ConnectionPoolManager(Generic[T]):
                 # Wait for a connection to be released
                 elapsed = time.time() - start_time
                 remaining = timeout - elapsed
-                
+
                 if remaining <= 0:
                     self._stats.failed_acquires += 1
                     raise TimeoutError(
@@ -233,10 +233,10 @@ class ConnectionPoolManager(Generic[T]):
         """Check if we can create a new connection."""
         total = len(self._pool) + len(self._overflow_pool)
         max_allowed = self._config.max_size
-        
+
         if self._config.overflow_allowed:
             max_allowed += self._config.max_overflow
-        
+
         return total < max_allowed
 
     def _recycle_connection(self, pooled: PooledConnection[T]) -> None:
@@ -245,12 +245,12 @@ class ConnectionPoolManager(Generic[T]):
             self._close_fn(pooled.connection)
         except Exception as e:
             logger.warning("Error closing connection", error=str(e))
-        
+
         if pooled in self._pool:
             self._pool.remove(pooled)
         elif pooled in self._overflow_pool:
             self._overflow_pool.remove(pooled)
-        
+
         self._stats.connections_recycled += 1
 
     async def release(self, conn: T) -> None:
@@ -263,17 +263,17 @@ class ConnectionPoolManager(Generic[T]):
         async with self._available:
             # Find the pooled connection
             pooled = self._find_pooled_connection(conn)
-            
+
             if pooled:
                 pooled.mark_released()
-                
+
                 # Remove from overflow if idle connection
                 if pooled in self._overflow_pool:
                     self._recycle_connection(pooled)
-                
+
                 self._stats.total_releases += 1
                 self._update_stats()
-            
+
             # Notify waiting acquires
             self._available.notify()
 
@@ -288,7 +288,7 @@ class ConnectionPoolManager(Generic[T]):
         """Update pool statistics."""
         active = sum(1 for p in self._pool if p.in_use)
         active += sum(1 for p in self._overflow_pool if p.in_use)
-        
+
         self._stats.active_connections = active
         self._stats.idle_connections = len(self._pool) - active
 
@@ -303,11 +303,11 @@ class ConnectionPoolManager(Generic[T]):
                     self._close_fn(pooled.connection)
                 except Exception as e:
                     logger.warning("Error closing connection", error=str(e))
-            
+
             self._pool.clear()
             self._overflow_pool.clear()
             self._closed = True
-            
+
             logger.info("Connection pool closed")
 
     def get_stats(self) -> Dict[str, Any]:

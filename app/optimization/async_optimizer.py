@@ -27,10 +27,10 @@ class ConcurrencyConfig:
     # Limits
     max_concurrent_tasks: int = 100
     max_concurrent_per_operation: int = 10
-    
+
     # Timeouts
     default_timeout_seconds: float = 30.0
-    
+
     # Batching
     enable_auto_batching: bool = True
     batch_size: int = 10

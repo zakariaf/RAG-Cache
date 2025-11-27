@@ -28,14 +28,14 @@ class BatchConfig:
     batch_size: int = 100
     min_batch_size: int = 1
     max_batch_size: int = 1000
-    
+
     # Timing
     max_wait_ms: int = 100
     processing_timeout_seconds: float = 60.0
-    
+
     # Concurrency
     max_concurrent_batches: int = 4
-    
+
     # Error handling
     continue_on_error: bool = True
     max_retries: int = 3

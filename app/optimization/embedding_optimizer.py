@@ -26,11 +26,11 @@ class EmbeddingConfig:
     # Batching
     batch_size: int = 32
     max_batch_wait_ms: int = 50
-    
+
     # Caching
     enable_embedding_cache: bool = True
     cache_ttl_seconds: int = 3600
-    
+
     # Performance
     max_concurrent_batches: int = 4
     timeout_seconds: float = 30.0

@@ -27,16 +27,16 @@ class MemoryConfig:
     # Thresholds (in MB)
     warning_threshold_mb: int = 512
     critical_threshold_mb: int = 1024
-    
+
     # GC settings
     enable_gc_optimization: bool = True
     gc_threshold_mb: int = 256
     gc_interval_operations: int = 1000
-    
+
     # Cache settings
     max_cache_items: int = 10000
     cache_item_max_size_kb: int = 100
-    
+
     # Object pooling
     enable_object_pooling: bool = True
     pool_max_size: int = 100

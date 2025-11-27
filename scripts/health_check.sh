@@ -19,14 +19,14 @@ check_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
 # Check API health
 check_api() {
     echo "Checking API health..."
-    
+
     RESPONSE=$(curl -sf "$BASE_URL/health" 2>/dev/null) || {
         check_failed "API is not responding"
         return 1
     }
-    
+
     STATUS=$(echo "$RESPONSE" | jq -r '.status' 2>/dev/null || echo "unknown")
-    
+
     if [ "$STATUS" == "healthy" ]; then
         check_passed "API is healthy"
     elif [ "$STATUS" == "degraded" ]; then
@@ -40,10 +40,10 @@ check_api() {
 # Check Redis connection
 check_redis() {
     echo "Checking Redis..."
-    
+
     RESPONSE=$(curl -sf "$BASE_URL/health" 2>/dev/null) || return 1
     REDIS_STATUS=$(echo "$RESPONSE" | jq -r '.redis // .services.redis // "unknown"' 2>/dev/null)
-    
+
     if [ "$REDIS_STATUS" == "connected" ] || [ "$REDIS_STATUS" == "healthy" ]; then
         check_passed "Redis is connected"
     else
@@ -55,10 +55,10 @@ check_redis() {
 # Check Qdrant connection
 check_qdrant() {
     echo "Checking Qdrant..."
-    
+
     RESPONSE=$(curl -sf "$BASE_URL/health" 2>/dev/null) || return 1
     QDRANT_STATUS=$(echo "$RESPONSE" | jq -r '.qdrant // .services.qdrant // "unknown"' 2>/dev/null)
-    
+
     if [ "$QDRANT_STATUS" == "connected" ] || [ "$QDRANT_STATUS" == "healthy" ]; then
         check_passed "Qdrant is connected"
     else
@@ -70,7 +70,7 @@ check_qdrant() {
 # Check metrics endpoint
 check_metrics() {
     echo "Checking metrics..."
-    
+
     if curl -sf "$BASE_URL/metrics" > /dev/null 2>&1; then
         check_passed "Metrics endpoint is available"
     else
@@ -81,14 +81,14 @@ check_metrics() {
 # Check cache stats
 check_cache() {
     echo "Checking cache..."
-    
+
     RESPONSE=$(curl -sf "$BASE_URL/api/v1/cache/stats" 2>/dev/null) || {
         check_warning "Cache stats not available"
         return 0
     }
-    
+
     HIT_RATE=$(echo "$RESPONSE" | jq -r '.hit_rate // 0' 2>/dev/null)
-    
+
     if (( $(echo "$HIT_RATE > 0.3" | bc -l 2>/dev/null || echo "0") )); then
         check_passed "Cache hit rate: ${HIT_RATE}%"
     elif (( $(echo "$HIT_RATE > 0" | bc -l 2>/dev/null || echo "0") )); then
@@ -104,18 +104,18 @@ main() {
     echo "RAG Cache Health Check"
     echo "================================"
     echo ""
-    
+
     ERRORS=0
-    
+
     check_api || ((ERRORS++))
     check_redis || ((ERRORS++))
     check_qdrant || ((ERRORS++))
     check_metrics
     check_cache
-    
+
     echo ""
     echo "================================"
-    
+
     if [ $ERRORS -eq 0 ]; then
         check_passed "All critical checks passed"
         exit 0
