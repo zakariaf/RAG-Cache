@@ -14,8 +14,8 @@ RAG Cache sits between your application and LLM providers (OpenAI, Anthropic) to
 
 ```
 User Query → Exact Match (Redis) → Semantic Match (Qdrant) → LLM (if needed)
-                   ↓                       ↓
-              ~2ms hit               ~50ms hit              ~10,000ms
+                   ↓                       ↓                      ↓
+              ~1ms hit              ~450ms hit              ~8,500ms
 ```
 
 ## 🚀 Quick Start
@@ -99,7 +99,7 @@ curl -X POST http://localhost:8000/api/v1/query \
 }
 ```
 
-**Second Request (Cache Hit):**
+**Second Request (Exact Cache Hit - Redis):**
 ```json
 {
   "response": "Machine learning is a subset of AI...",
@@ -107,7 +107,25 @@ curl -X POST http://localhost:8000/api/v1/query \
     "cache_hit": true,
     "cache_type": "exact"
   },
-  "latency_ms": 2.03
+  "latency_ms": 1.11
+}
+```
+
+**Similar Query (Semantic Cache Hit - Qdrant):**
+```bash
+curl -X POST http://localhost:8000/api/v1/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Can you explain machine learning?", "use_cache": true}'
+```
+```json
+{
+  "response": "Machine learning is a subset of AI...",
+  "cache_info": {
+    "cache_hit": true,
+    "cache_type": "semantic",
+    "similarity_score": 0.8563
+  },
+  "latency_ms": 457.89
 }
 ```
 
@@ -127,29 +145,33 @@ Tests performed on November 27, 2025:
 
 ### Cache Hit Performance
 
-| Test | Latency | Improvement |
-|------|---------|-------------|
-| First Query (Cache Miss) | 10,090ms | - |
-| Second Query (Cache Hit) | 2.03ms | **4,970x faster** |
-| Cached Query Avg (5 runs) | 2.11ms | **4,782x faster** |
+| Test | Cache Type | Latency | Speedup |
+|------|------------|---------|---------|
+| First Query (Cache Miss) | LLM Call | 8,573ms | baseline |
+| Same Query (Exact Match) | **Redis** | 1.11ms | **7,723x faster** |
+| Similar Query (Semantic Match) | **Qdrant** | 457ms | **18.7x faster** |
+| Different Query (Cache Miss) | LLM Call | 8,154ms | - |
 
-### Batch Performance (5 Cached Queries)
+### Semantic Cache Example
 
+```bash
+# Original cached query
+"What is deep learning?"
+
+# Similar query (semantic match)
+"Can you explain deep learning to me?"
+# → Similarity Score: 0.856
+# → Latency: 457ms (instead of ~8,500ms)
+# → Saved: 811 tokens
 ```
-Query 1: 1.06ms
-Query 2: 1.64ms
-Query 3: 2.63ms
-Query 4: 3.62ms
-Query 5: 1.62ms
-Average: 2.11ms
-```
 
-### Cache Bypass Test
+### Cache Types Explained
 
-| Mode | Latency |
-|------|---------|
-| With Cache (hit) | 0.71ms |
-| Without Cache (bypass) | 7,870ms |
+| Cache | Storage | Latency | Use Case |
+|-------|---------|---------|----------|
+| **Exact** | Redis | ~1ms | Identical queries |
+| **Semantic** | Qdrant | ~450ms | Similar questions |
+| **Miss** | LLM API | ~8,500ms | New unique queries |
 
 ## 📈 Metrics
 
@@ -353,4 +375,4 @@ MIT License - See [LICENSE](LICENSE) file.
 
 ---
 
-**Built with ❤️ following Sandi Metz's POOD principles**
+**Built with ❤️**
