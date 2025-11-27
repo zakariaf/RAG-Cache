@@ -101,13 +101,13 @@ class TestAPIKeyAuthenticator:
         """Create a mock request with proper method mocking."""
         request = MagicMock()
         request.url.path = path
-        
+
         _headers = headers or {}
         _query_params = query_params or {}
-        
+
         request.headers.get = lambda k, default=None: _headers.get(k, default)
         request.query_params.get = lambda k, default=None: _query_params.get(k, default)
-        
+
         return request
 
     @pytest.mark.asyncio
@@ -174,13 +174,13 @@ class TestAuthMiddleware:
         """Create a mock request."""
         request = MagicMock()
         request.url.path = path
-        
+
         _headers = headers or {}
         _query_params = query_params or {}
-        
+
         request.headers.get = lambda k, default=None: _headers.get(k, default)
         request.query_params.get = lambda k, default=None: _query_params.get(k, default)
-        
+
         return request
 
     @pytest.mark.asyncio
@@ -188,7 +188,7 @@ class TestAuthMiddleware:
         """Test middleware passes authenticated requests."""
         mock_app = MagicMock()
         request = self._create_mock_request(headers={"X-API-Key": "valid-key"})
-        
+
         async def call_next(req):
             return MagicMock()
 
@@ -203,7 +203,7 @@ class TestAuthMiddleware:
         """Test middleware blocks unauthenticated requests."""
         mock_app = MagicMock()
         request = self._create_mock_request()
-        
+
         async def call_next(req):
             return MagicMock()
 

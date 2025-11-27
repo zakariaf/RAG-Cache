@@ -45,10 +45,10 @@ class TestRequestLoggingMiddleware:
         request.url.path = path
         request.query_params = {}
         request.client.host = "127.0.0.1"
-        
+
         _headers = {"User-Agent": "test-agent"}
         request.headers.get = lambda k, default="": _headers.get(k, default)
-        
+
         return request
 
     async def _call_next(self, request):

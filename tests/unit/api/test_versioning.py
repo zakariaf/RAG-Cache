@@ -75,28 +75,28 @@ class TestVersionedAPIRouter:
     def test_get_router_creates_on_demand(self):
         """Test get_router creates router on demand."""
         versioned = VersionedAPIRouter()
-        
+
         v1_router = versioned.get_router(APIVersion.V1)
-        
+
         assert v1_router is not None
         assert APIVersion.V1 in versioned._routers
 
     def test_get_router_returns_same_instance(self):
         """Test get_router returns same instance."""
         versioned = VersionedAPIRouter()
-        
+
         router1 = versioned.get_router(APIVersion.V1)
         router2 = versioned.get_router(APIVersion.V1)
-        
+
         assert router1 is router2
 
     def test_routers_property(self):
         """Test routers property returns all routers."""
         versioned = VersionedAPIRouter()
         versioned.get_router(APIVersion.V1)
-        
+
         routers = versioned.routers
-        
+
         assert len(routers) == 1
 
 
@@ -112,7 +112,7 @@ class TestValidateVersion:
         """Test validating an invalid version."""
         with pytest.raises(HTTPException) as exc_info:
             validate_version("v99")
-        
+
         assert exc_info.value.status_code == 400
         assert "Unsupported API version" in exc_info.value.detail
 
@@ -123,7 +123,7 @@ class TestGetVersionInfo:
     def test_current_version_info(self):
         """Test getting info for current version."""
         info = get_version_info(APIVersion.V1)
-        
+
         assert info.version == "v1"
         assert info.status == "current"
 
