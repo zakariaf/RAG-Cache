@@ -8,7 +8,8 @@ Sandi Metz Principles:
 """
 
 import asyncio
-from typing import Callable, Optional
+import json
+from typing import Any, Callable, Dict, Optional
 
 from app.config import config
 from app.models.cache_entry import CacheEntry
@@ -427,3 +428,77 @@ class RedisCache:
             Dictionary of type -> memory usage
         """
         return await self._repository.get_memory_usage_by_type()
+
+    # Raw key-value operations for non-CacheEntry data (embeddings, etc.)
+
+    async def get_raw(self, key: str) -> Optional[Dict[str, Any]]:
+        """
+        Get raw JSON data by key.
+
+        Args:
+            key: Cache key
+
+        Returns:
+            Parsed JSON data or None
+        """
+        try:
+            data = await self._repository.get_raw_value(key)
+            if data:
+                return json.loads(data)
+            return None
+        except Exception as e:
+            logger.error("Raw get failed", key=key, error=str(e))
+            return None
+
+    async def set_raw(
+        self, key: str, value: Dict[str, Any], ttl: Optional[int] = None
+    ) -> bool:
+        """
+        Set raw JSON data by key.
+
+        Args:
+            key: Cache key
+            value: Data to store (will be JSON serialized)
+            ttl: Time-to-live in seconds
+
+        Returns:
+            True if stored successfully
+        """
+        try:
+            data = json.dumps(value)
+            return await self._repository.set_raw_value(key, data, ttl or self._ttl)
+        except Exception as e:
+            logger.error("Raw set failed", key=key, error=str(e))
+            return False
+
+    async def delete_raw(self, key: str) -> bool:
+        """
+        Delete raw data by key.
+
+        Args:
+            key: Cache key
+
+        Returns:
+            True if deleted
+        """
+        try:
+            return await self._repository.delete(key)
+        except Exception as e:
+            logger.error("Raw delete failed", key=key, error=str(e))
+            return False
+
+    async def exists_raw(self, key: str) -> bool:
+        """
+        Check if raw key exists.
+
+        Args:
+            key: Cache key
+
+        Returns:
+            True if exists
+        """
+        try:
+            return await self._repository.exists(key)
+        except Exception as e:
+            logger.error("Raw exists check failed", key=key, error=str(e))
+            return False

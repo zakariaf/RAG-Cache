@@ -513,3 +513,47 @@ class RedisRepository:
         except Exception as e:
             logger.error("Memory usage by type failed", error=str(e))
             return {}
+
+    # Raw value operations for non-CacheEntry data
+
+    async def get_raw_value(self, key: str) -> Optional[str]:
+        """
+        Get raw string value by key.
+
+        Args:
+            key: Cache key
+
+        Returns:
+            Raw string value or None
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                return await client.get(key)
+        except Exception as e:
+            logger.error("Raw get failed", key=key, error=str(e))
+            return None
+
+    async def set_raw_value(
+        self, key: str, value: str, ttl_seconds: Optional[int] = None
+    ) -> bool:
+        """
+        Set raw string value by key.
+
+        Args:
+            key: Cache key
+            value: String value to store
+            ttl_seconds: Time-to-live in seconds
+
+        Returns:
+            True if stored successfully
+        """
+        try:
+            async with Redis(connection_pool=self._pool) as client:
+                if ttl_seconds:
+                    await client.setex(key, ttl_seconds, value)
+                else:
+                    await client.set(key, value)
+                return True
+        except Exception as e:
+            logger.error("Raw set failed", key=key, error=str(e))
+            return False
