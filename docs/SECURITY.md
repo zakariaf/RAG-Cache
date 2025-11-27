@@ -145,7 +145,7 @@ server {
 
 ```python
 # Don't log sensitive data
-logger.info("Query processed", 
+logger.info("Query processed",
     query_hash=hash(query),  # Hash, not raw query
     user_id=user.id
 )
@@ -176,7 +176,7 @@ networks:
   internal:
     driver: bridge
     internal: true  # No external access
-  
+
   external:
     driver: bridge
 
@@ -185,11 +185,11 @@ services:
     networks:
       - external
       - internal
-  
+
   redis:
     networks:
       - internal  # Only internal access
-  
+
   qdrant:
     networks:
       - internal  # Only internal access
@@ -330,7 +330,7 @@ alerts:
   - name: high_auth_failures
     condition: auth_failures_5m > 100
     severity: critical
-    
+
   - name: unusual_traffic
     condition: requests_per_minute > normal_baseline * 10
     severity: warning

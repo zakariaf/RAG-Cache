@@ -260,7 +260,7 @@ rate(ragcache_requests_total[5m])
 ragcache_cache_hit_rate
 
 # Request latency p95
-histogram_quantile(0.95, 
+histogram_quantile(0.95,
   rate(ragcache_request_duration_seconds_bucket[5m])
 )
 
@@ -328,12 +328,12 @@ class TestPerformance:
     def test_cache_hit_under_50ms(self, client):
         # Warm cache
         client.post("/api/v1/query", json={"query": "test"})
-        
+
         # Benchmark cache hit
         start = time.time()
         response = client.post("/api/v1/query", json={"query": "test"})
         duration = (time.time() - start) * 1000
-        
+
         assert duration < 50, f"Cache hit took {duration}ms"
 ```
 

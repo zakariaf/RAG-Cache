@@ -200,14 +200,14 @@ We follow PEP 8 with these specifics:
 # Use type hints everywhere
 def process_query(query: str, threshold: float = 0.85) -> QueryResponse:
     """Process a query with semantic matching.
-    
+
     Args:
         query: The query text to process
         threshold: Similarity threshold (0.0-1.0)
-        
+
     Returns:
         QueryResponse with result and metadata
-        
+
     Raises:
         ValidationError: If query is invalid
     """
@@ -266,7 +266,7 @@ from app.utils.logger import get_logger
 logger = get_logger(__name__)
 
 # Good
-logger.info("Query processed", 
+logger.info("Query processed",
     query_hash=hash,
     cache_hit=True,
     latency_ms=45
@@ -364,20 +364,20 @@ def example():
 ```python
 def function_name(param1: str, param2: int = 10) -> dict:
     """Short description of function.
-    
+
     Longer description if needed. Explain what the function
     does, not how it does it.
-    
+
     Args:
         param1: Description of param1
         param2: Description of param2 with default
-        
+
     Returns:
         Description of return value
-        
+
     Raises:
         ValueError: When param1 is empty
-        
+
     Example:
         >>> result = function_name("test")
         >>> print(result)

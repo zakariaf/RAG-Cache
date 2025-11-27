@@ -413,13 +413,13 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       redis:
         image: redis:7.2-alpine
         ports:
           - 6379:6379
-      
+
       qdrant:
         image: qdrant/qdrant:v1.6.1
         ports:
@@ -427,20 +427,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements-dev.txt
-      
+
       - name: Run tests
         run: |
           pytest --cov=app --cov-report=xml tests/
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:

@@ -101,31 +101,31 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """Application settings with validation."""
-    
+
     # Application
     app_name: str = "RAG-Cache"
     app_version: str = "1.0.0"
     app_env: str = "development"
     debug: bool = False
-    
+
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
     workers: int = 1
-    
+
     # Redis
     redis_host: str = "localhost"
     redis_port: int = 6379
     redis_password: str = ""
-    
+
     # Qdrant
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
-    
+
     # LLM
     openai_api_key: str
     default_model: str = "gpt-3.5-turbo"
-    
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
