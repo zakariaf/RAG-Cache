@@ -286,30 +286,40 @@ class QdrantRepository:
             List of SearchResult objects
         """
         try:
-            results = await self._client.search(
-                collection_name=self._collection_name,
-                query_vector=query_vector,
-                limit=limit,
-                score_threshold=score_threshold,
-                query_filter=filter_condition,
-                with_payload=True,
-                with_vectors=False,
-            )
+            # Use HTTP search for compatibility with older Qdrant versions
+            import httpx
+
+            payload: Dict[str, Any] = {
+                "vector": query_vector,
+                "limit": limit,
+                "with_payload": True,
+                "with_vector": False,
+            }
+
+            if score_threshold is not None:
+                payload["score_threshold"] = score_threshold
+
+            if filter_condition is not None:
+                payload["filter"] = filter_condition.model_dump()
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"http://{config.qdrant_host}:{config.qdrant_port}"
+                    f"/collections/{self._collection_name}/points/search",
+                    json=payload,
+                    timeout=30.0,
+                )
+                response.raise_for_status()
+                data = response.json()
 
             search_results = [
                 SearchResult(
-                    point_id=str(result.id),
-                    score=result.score,
-                    vector=(
-                        result.vector  # type: ignore[arg-type]
-                        if result.vector
-                        and isinstance(result.vector, list)
-                        and all(isinstance(x, (int, float)) for x in result.vector)
-                        else None
-                    ),
-                    payload=result.payload if result.payload else {},
+                    point_id=str(result["id"]),
+                    score=result["score"],
+                    vector=None,
+                    payload=result.get("payload", {}),
                 )
-                for result in results
+                for result in data.get("result", [])
             ]
 
             logger.info(
@@ -342,29 +352,37 @@ class QdrantRepository:
             List of SearchResult objects with vectors
         """
         try:
-            results = await self._client.search(
-                collection_name=self._collection_name,
-                query_vector=query_vector,
-                limit=limit,
-                score_threshold=score_threshold,
-                with_payload=True,
-                with_vectors=True,
-            )
+            # Use HTTP search for compatibility with older Qdrant versions
+            import httpx
+
+            payload: Dict[str, Any] = {
+                "vector": query_vector,
+                "limit": limit,
+                "with_payload": True,
+                "with_vector": True,
+            }
+
+            if score_threshold is not None:
+                payload["score_threshold"] = score_threshold
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"http://{config.qdrant_host}:{config.qdrant_port}"
+                    f"/collections/{self._collection_name}/points/search",
+                    json=payload,
+                    timeout=30.0,
+                )
+                response.raise_for_status()
+                data = response.json()
 
             search_results = [
                 SearchResult(
-                    point_id=str(result.id),
-                    score=result.score,
-                    vector=(
-                        result.vector  # type: ignore[arg-type]
-                        if result.vector
-                        and isinstance(result.vector, list)
-                        and all(isinstance(x, (int, float)) for x in result.vector)
-                        else None
-                    ),
-                    payload=result.payload if result.payload else {},
+                    point_id=str(result["id"]),
+                    score=result["score"],
+                    vector=result.get("vector"),
+                    payload=result.get("payload", {}),
                 )
-                for result in results
+                for result in data.get("result", [])
             ]
 
             logger.info(
