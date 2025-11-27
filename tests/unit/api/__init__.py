@@ -1,1 +1,1 @@
-"""API tests."""
+"""Unit tests for API module."""
