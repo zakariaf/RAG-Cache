@@ -1,12 +1,13 @@
 """Unit tests for Performance Monitor."""
 
-import pytest
 import asyncio
+
+import pytest
 
 from app.pipeline.performance_monitor import (
     OperationMetrics,
-    PipelineMetrics,
     PerformanceMonitor,
+    PipelineMetrics,
     get_monitor,
     track_operation,
 )

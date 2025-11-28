@@ -3,10 +3,10 @@
 import pytest
 
 from app.optimization.batch_processor import (
-    BatchProcessor,
-    BatchConfig,
-    BatchResult,
     AdaptiveBatchProcessor,
+    BatchConfig,
+    BatchProcessor,
+    BatchResult,
 )
 
 

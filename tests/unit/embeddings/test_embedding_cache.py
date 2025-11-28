@@ -1,7 +1,8 @@
 """Unit tests for Embedding Cache."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from app.embeddings.embedding_cache import EmbeddingCache
 

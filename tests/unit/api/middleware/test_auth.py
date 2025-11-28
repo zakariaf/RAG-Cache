@@ -1,7 +1,8 @@
 """Unit tests for Authentication Middleware."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from app.api.middleware.auth import (
     APIKeyAuthenticator,

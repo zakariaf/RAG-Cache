@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 
-from app.models.response import QueryResponse, CacheInfo, UsageMetrics
+from app.models.response import CacheInfo, QueryResponse, UsageMetrics
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)

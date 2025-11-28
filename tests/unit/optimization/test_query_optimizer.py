@@ -1,12 +1,13 @@
 """Tests for query optimizer."""
 
 import asyncio
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
+
 from app.optimization.query_optimizer import (
-    QueryOptimizer,
     OptimizationConfig,
+    QueryOptimizer,
     QueryTimer,
 )
 

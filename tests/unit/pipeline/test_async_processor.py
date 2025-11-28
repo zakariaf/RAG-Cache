@@ -1,8 +1,9 @@
 """Unit tests for Async Query Processor."""
 
-import pytest
 import asyncio
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from app.models.query import QueryRequest
 from app.pipeline.async_processor import (

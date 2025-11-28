@@ -1,11 +1,12 @@
 """Unit tests for Pipeline Builder."""
 
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
+
 from app.pipeline.pipeline_builder import (
-    PipelineConfig,
     PipelineComponents,
+    PipelineConfig,
     QueryPipeline,
     QueryPipelineBuilder,
 )

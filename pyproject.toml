@@ -23,7 +23,7 @@ extend-exclude = '''
 profile = "black"
 line_length = 88
 known_first_party = ["app"]
-skip_gitignore = true
+skip_gitignore = false
 
 [tool.pytest.ini_options]
 minversion = "7.0"

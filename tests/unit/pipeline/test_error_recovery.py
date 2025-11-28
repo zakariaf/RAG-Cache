@@ -1,14 +1,15 @@
 """Unit tests for Error Recovery."""
 
-import pytest
 from unittest.mock import AsyncMock
 
-from app.exceptions import CacheError, LLMProviderError, EmbeddingError
+import pytest
+
+from app.exceptions import CacheError, EmbeddingError, LLMProviderError
 from app.pipeline.error_recovery import (
     CacheErrorRecovery,
-    LLMErrorRecovery,
     EmbeddingErrorRecovery,
     ErrorRecoveryStrategy,
+    LLMErrorRecovery,
     PipelineErrorHandler,
     RecoveryAction,
     RecoveryResult,

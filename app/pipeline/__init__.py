@@ -19,8 +19,8 @@ Contains query processing components:
 from app.pipeline.async_processor import AsyncQueryProcessor, AsyncResult
 from app.pipeline.deduplication import (
     DeduplicatingProcessor,
-    QueryDeduplicator,
     DeduplicationStats,
+    QueryDeduplicator,
 )
 from app.pipeline.error_recovery import (
     PipelineErrorHandler,
@@ -42,8 +42,8 @@ from app.pipeline.performance_monitor import (
     track_operation,
 )
 from app.pipeline.pipeline_builder import (
-    PipelineConfig,
     PipelineComponents,
+    PipelineConfig,
     QueryPipeline,
     QueryPipelineBuilder,
 )

@@ -1,13 +1,14 @@
 """Unit tests for Query Deduplication."""
 
-import pytest
 import asyncio
 from unittest.mock import AsyncMock, MagicMock
 
-from app.models.response import QueryResponse, CacheInfo, UsageMetrics
+import pytest
+
+from app.models.response import CacheInfo, QueryResponse, UsageMetrics
 from app.pipeline.deduplication import (
-    DeduplicationStats,
     DeduplicatingProcessor,
+    DeduplicationStats,
     PendingQuery,
     QueryDeduplicator,
 )

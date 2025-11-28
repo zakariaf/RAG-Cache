@@ -3,8 +3,8 @@
 import pytest
 
 from app.optimization.cache_optimizer import (
-    CacheOptimizer,
     CacheConfig,
+    CacheOptimizer,
     CacheStats,
     CacheStrategy,
 )

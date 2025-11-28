@@ -1,16 +1,17 @@
 """Integration tests for multi-provider LLM flow."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.llm.factory import LLMProviderFactory
-from app.llm.openai_provider import OpenAIProvider
-from app.llm.anthropic_provider import AnthropicProvider
-from app.llm.fallback_strategy import LLMFallbackStrategy
-from app.llm.provider_selector import LLMProviderSelector
-from app.models.query import QueryRequest
-from app.models.llm import LLMResponse
+import pytest
+
 from app.exceptions import LLMProviderError
+from app.llm.anthropic_provider import AnthropicProvider
+from app.llm.factory import LLMProviderFactory
+from app.llm.fallback_strategy import LLMFallbackStrategy
+from app.llm.openai_provider import OpenAIProvider
+from app.llm.provider_selector import LLMProviderSelector
+from app.models.llm import LLMResponse
+from app.models.query import QueryRequest
 
 
 class TestMultiProviderFlow:

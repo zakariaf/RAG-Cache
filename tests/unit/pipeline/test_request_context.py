@@ -1,15 +1,16 @@
 """Unit tests for Request Context Manager."""
 
-import pytest
 import time
+
+import pytest
 
 from app.pipeline.request_context import (
     RequestContext,
     RequestContextManager,
-    start_request,
-    get_current_context,
     end_request,
+    get_current_context,
     get_request_id,
+    start_request,
 )
 
 

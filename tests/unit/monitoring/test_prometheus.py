@@ -1,13 +1,14 @@
 """Tests for Prometheus metrics."""
 
-import pytest
 import time
 
+import pytest
+
 from app.monitoring.prometheus import (
-    PrometheusMetrics,
-    MetricsMiddleware,
-    get_metrics,
     HistogramValue,
+    MetricsMiddleware,
+    PrometheusMetrics,
+    get_metrics,
 )
 
 
@@ -182,7 +183,8 @@ class TestMetricsMiddleware:
     @pytest.fixture
     def mock_app(self):
         """Create mock app."""
-        from unittest.mock import MagicMock, AsyncMock
+        from unittest.mock import AsyncMock, MagicMock
+
         from starlette.requests import Request
         from starlette.responses import Response
 

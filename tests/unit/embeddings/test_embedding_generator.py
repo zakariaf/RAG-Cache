@@ -1,9 +1,11 @@
 """
 Unit tests for Embedding Generator Service.
 """
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import numpy as np
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+
 from app.embeddings.embedding_generator import EmbeddingGenerator
 from app.exceptions import EmbeddingError
 

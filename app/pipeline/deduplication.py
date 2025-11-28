@@ -14,7 +14,7 @@ import hashlib
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 from app.models.response import QueryResponse
 from app.utils.logger import get_logger

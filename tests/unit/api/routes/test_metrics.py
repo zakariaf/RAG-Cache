@@ -1,12 +1,12 @@
 """Unit tests for Metrics endpoints."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from fastapi.testclient import TestClient
+import pytest
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
-from app.api.routes.metrics import router, get_metrics
+from app.api.routes.metrics import get_metrics, router
 
 
 @pytest.fixture

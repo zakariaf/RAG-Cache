@@ -1,7 +1,8 @@
 """Unit tests for Semantic Matcher Service."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from app.exceptions import SemanticMatchError
 from app.models.qdrant_point import SearchResult

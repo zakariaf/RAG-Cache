@@ -3,9 +3,9 @@
 import pytest
 
 from app.monitoring.collectors import (
-    RequestMetrics,
     CacheMetrics,
     LLMMetrics,
+    RequestMetrics,
     SystemMetrics,
 )
 

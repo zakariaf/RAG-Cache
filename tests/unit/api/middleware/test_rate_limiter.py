@@ -1,7 +1,8 @@
 """Unit tests for Rate Limiting Middleware."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from app.api.middleware.rate_limiter import (
     InMemoryRateLimiter,

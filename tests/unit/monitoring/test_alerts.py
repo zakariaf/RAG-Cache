@@ -1,14 +1,15 @@
 """Tests for alert management."""
 
-import pytest
 import time
 from unittest.mock import MagicMock
 
+import pytest
+
 from app.monitoring.alerts import (
-    AlertRule,
     Alert,
-    AlertManager,
     AlertLevel,
+    AlertManager,
+    AlertRule,
     AlertState,
     create_default_alerts,
 )

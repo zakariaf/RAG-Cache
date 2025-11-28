@@ -2,11 +2,12 @@
 Tests for Anthropic LLM provider.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.llm.anthropic_provider import AnthropicProvider
+import pytest
+
 from app.exceptions import LLMProviderError
+from app.llm.anthropic_provider import AnthropicProvider
 from app.models.query import QueryRequest
 
 

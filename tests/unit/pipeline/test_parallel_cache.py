@@ -1,7 +1,8 @@
 """Unit tests for Parallel Cache Checking."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 from app.models.cache_entry import CacheEntry
 from app.pipeline.parallel_cache import (

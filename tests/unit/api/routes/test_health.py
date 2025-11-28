@@ -1,17 +1,17 @@
 """Unit tests for Health Check endpoints."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from fastapi.testclient import TestClient
+import pytest
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from app.api.routes.health import (
-    router,
-    check_redis_health,
-    check_qdrant_health,
     ComponentHealth,
     DetailedHealthResponse,
+    check_qdrant_health,
+    check_redis_health,
+    router,
 )
 
 

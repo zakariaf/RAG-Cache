@@ -7,12 +7,13 @@ Tests the full query processing flow including:
 - LLM calls
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from app.models.cache_entry import CacheEntry
-from app.models.query import QueryRequest
 from app.models.qdrant_point import SearchResult
+from app.models.query import QueryRequest
 from app.pipeline.semantic_matcher import SemanticMatcher
 from app.services.query_service import QueryService
 
@@ -202,8 +203,8 @@ class TestQueryPreprocessingIntegration:
     @pytest.mark.asyncio
     async def test_validation_blocks_invalid_queries(self):
         """Test validation blocks invalid queries."""
-        from app.pipeline.query_validator import QueryValidator
         from app.exceptions import ValidationError
+        from app.pipeline.query_validator import QueryValidator
 
         validator = QueryValidator()
 
@@ -290,9 +291,9 @@ class TestRequestContextIntegration:
     async def test_context_tracks_cache_operations(self):
         """Test request context tracks cache operations."""
         from app.pipeline.request_context import (
-            start_request,
-            get_current_context,
             end_request,
+            get_current_context,
+            start_request,
         )
 
         ctx = start_request("Test query")
@@ -315,9 +316,9 @@ class TestRequestContextIntegration:
     async def test_context_isolated_per_request(self):
         """Test contexts are isolated per request."""
         from app.pipeline.request_context import (
-            start_request,
-            get_current_context,
             end_request,
+            get_current_context,
+            start_request,
         )
 
         # First request

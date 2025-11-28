@@ -19,7 +19,7 @@ from app.api.middleware import (
     default_logging_config,
 )
 from app.api.routes import health, metrics, query
-from app.api.routes.docs import TAGS_METADATA, API_DESCRIPTION
+from app.api.routes.docs import API_DESCRIPTION, TAGS_METADATA
 from app.config import config
 from app.repositories.redis_repository import create_redis_pool
 from app.utils.logger import get_logger, setup_logging

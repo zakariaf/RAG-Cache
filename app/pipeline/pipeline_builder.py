@@ -10,7 +10,7 @@ Sandi Metz Principles:
 """
 
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, Any
+from typing import Any, Callable, List, Optional
 
 from app.cache.redis_cache import RedisCache
 from app.embeddings.embedding_generator import EmbeddingGenerator

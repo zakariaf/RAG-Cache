@@ -3,12 +3,12 @@
 import pytest
 
 from app.exceptions import ValidationError
+from app.pipeline.query_normalizer import QueryNormalizer
 from app.pipeline.query_preprocessor import (
     PreprocessResult,
     QueryPreprocessor,
     preprocess_query,
 )
-from app.pipeline.query_normalizer import QueryNormalizer
 from app.pipeline.query_validator import QueryValidator
 
 
