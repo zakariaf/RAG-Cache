@@ -90,53 +90,38 @@ async def get_prometheus_metrics(request: Request) -> str:
     lines = []
 
     # Application info
-    lines.append(
-        f'# HELP ragcache_info Application information'
-    )
-    lines.append(
-        f'# TYPE ragcache_info gauge'
-    )
-    lines.append(
-        f'ragcache_info{{version="0.1.0",environment="{config.app_env}"}} 1'
-    )
+    lines.append(f"# HELP ragcache_info Application information")
+    lines.append(f"# TYPE ragcache_info gauge")
+    lines.append(f'ragcache_info{{version="0.1.0",environment="{config.app_env}"}} 1')
 
     # Pipeline metrics
     pipeline = metrics.get("pipeline", {})
     if pipeline:
-        lines.append(f'# HELP ragcache_requests_total Total requests processed')
-        lines.append(f'# TYPE ragcache_requests_total counter')
-        lines.append(
-            f'ragcache_requests_total {pipeline.get("total_requests", 0)}'
-        )
+        lines.append(f"# HELP ragcache_requests_total Total requests processed")
+        lines.append(f"# TYPE ragcache_requests_total counter")
+        lines.append(f'ragcache_requests_total {pipeline.get("total_requests", 0)}')
 
-        lines.append(f'# HELP ragcache_cache_hits_total Total cache hits')
-        lines.append(f'# TYPE ragcache_cache_hits_total counter')
+        lines.append(f"# HELP ragcache_cache_hits_total Total cache hits")
+        lines.append(f"# TYPE ragcache_cache_hits_total counter")
         lines.append(f'ragcache_cache_hits_total {pipeline.get("cache_hits", 0)}')
 
-        lines.append(f'# HELP ragcache_cache_hit_rate Cache hit rate')
-        lines.append(f'# TYPE ragcache_cache_hit_rate gauge')
-        lines.append(
-            f'ragcache_cache_hit_rate {pipeline.get("cache_hit_rate", 0)}'
-        )
+        lines.append(f"# HELP ragcache_cache_hit_rate Cache hit rate")
+        lines.append(f"# TYPE ragcache_cache_hit_rate gauge")
+        lines.append(f'ragcache_cache_hit_rate {pipeline.get("cache_hit_rate", 0)}')
 
-        lines.append(f'# HELP ragcache_avg_latency_ms Average latency in ms')
-        lines.append(f'# TYPE ragcache_avg_latency_ms gauge')
-        lines.append(
-            f'ragcache_avg_latency_ms {pipeline.get("avg_latency_ms", 0)}'
-        )
+        lines.append(f"# HELP ragcache_avg_latency_ms Average latency in ms")
+        lines.append(f"# TYPE ragcache_avg_latency_ms gauge")
+        lines.append(f'ragcache_avg_latency_ms {pipeline.get("avg_latency_ms", 0)}')
 
     # Redis metrics
     cache = metrics.get("cache", {})
     if cache:
-        lines.append(f'# HELP ragcache_redis_keys Total Redis keys')
-        lines.append(f'# TYPE ragcache_redis_keys gauge')
+        lines.append(f"# HELP ragcache_redis_keys Total Redis keys")
+        lines.append(f"# TYPE ragcache_redis_keys gauge")
         lines.append(f'ragcache_redis_keys {cache.get("total_keys", 0)}')
 
-        lines.append(f'# HELP ragcache_redis_memory_bytes Redis memory usage')
-        lines.append(f'# TYPE ragcache_redis_memory_bytes gauge')
-        lines.append(
-            f'ragcache_redis_memory_bytes {cache.get("memory_used_bytes", 0)}'
-        )
+        lines.append(f"# HELP ragcache_redis_memory_bytes Redis memory usage")
+        lines.append(f"# TYPE ragcache_redis_memory_bytes gauge")
+        lines.append(f'ragcache_redis_memory_bytes {cache.get("memory_used_bytes", 0)}')
 
     return "\n".join(lines)
-

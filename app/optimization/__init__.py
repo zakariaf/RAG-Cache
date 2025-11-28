@@ -57,4 +57,3 @@ __all__ = [
     "BatchProcessor",
     "BatchConfig",
 ]
-

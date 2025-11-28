@@ -85,11 +85,7 @@ class TestQueryPipelineBuilder:
     def test_build_fails_without_llm(self, mock_redis_cache):
         """Test build fails without LLM provider."""
         with pytest.raises(ValueError, match="LLM provider is required"):
-            (
-                QueryPipelineBuilder()
-                .with_redis_cache(mock_redis_cache)
-                .build()
-            )
+            (QueryPipelineBuilder().with_redis_cache(mock_redis_cache).build())
 
     def test_build_fails_without_cache_when_enabled(self, mock_llm_provider):
         """Test build fails without cache when exact cache is enabled."""
@@ -114,9 +110,7 @@ class TestQueryPipelineBuilder:
         result = builder.with_similarity_threshold(0.9)
         assert result is builder
 
-    def test_custom_similarity_threshold(
-        self, mock_llm_provider, mock_redis_cache
-    ):
+    def test_custom_similarity_threshold(self, mock_llm_provider, mock_redis_cache):
         """Test custom similarity threshold."""
         pipeline = (
             QueryPipelineBuilder()
@@ -147,4 +141,3 @@ class TestQueryPipeline:
 
         service = pipeline.get_query_service()
         assert service is not None
-

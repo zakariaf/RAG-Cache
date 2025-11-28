@@ -172,9 +172,7 @@ class TestRateLimitMiddleware:
         assert "X-RateLimit-Reset" in response.headers
 
     @pytest.mark.asyncio
-    async def test_skips_health_endpoints(
-        self, mock_app, mock_request, mock_call_next
-    ):
+    async def test_skips_health_endpoints(self, mock_app, mock_request, mock_call_next):
         """Test middleware skips health check endpoints."""
         mock_request.url.path = "/health"
         config = RateLimitConfig(requests_per_minute=1)
@@ -198,4 +196,3 @@ class TestRateLimitMiddleware:
         # Second request fails
         with pytest.raises(RateLimitExceeded):
             await middleware.dispatch(mock_request, mock_call_next)
-

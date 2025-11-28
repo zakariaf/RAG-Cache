@@ -106,9 +106,7 @@ class AsyncOptimizer:
             config: Concurrency configuration
         """
         self._config = config or ConcurrencyConfig()
-        self._global_limiter = ConcurrencyLimiter(
-            self._config.max_concurrent_tasks
-        )
+        self._global_limiter = ConcurrencyLimiter(self._config.max_concurrent_tasks)
         self._operation_limiters: Dict[str, ConcurrencyLimiter] = {}
         self._stats = {
             "total_operations": 0,
@@ -138,7 +136,7 @@ class AsyncOptimizer:
         self,
         coro: Callable[[], T],
         operation: str = "default",
-        timeout: Optional[float] = None
+        timeout: Optional[float] = None,
     ) -> T:
         """
         Execute coroutine with concurrency limiting.
@@ -184,7 +182,7 @@ class AsyncOptimizer:
         coros: List[Callable[[], T]],
         operation: str = "default",
         timeout: Optional[float] = None,
-        return_exceptions: bool = False
+        return_exceptions: bool = False,
     ) -> List[T]:
         """
         Execute multiple coroutines with limiting.
@@ -198,10 +196,7 @@ class AsyncOptimizer:
         Returns:
             List of results
         """
-        tasks = [
-            self.execute_with_limit(coro, operation, timeout)
-            for coro in coros
-        ]
+        tasks = [self.execute_with_limit(coro, operation, timeout) for coro in coros]
 
         return await asyncio.gather(*tasks, return_exceptions=return_exceptions)
 
@@ -209,7 +204,7 @@ class AsyncOptimizer:
         self,
         items: List[Any],
         process_fn: Callable[[List[Any]], T],
-        batch_size: Optional[int] = None
+        batch_size: Optional[int] = None,
     ) -> List[T]:
         """
         Process items in batches.
@@ -226,7 +221,7 @@ class AsyncOptimizer:
         results = []
 
         for i in range(0, len(items), batch_size):
-            batch = items[i:i + batch_size]
+            batch = items[i : i + batch_size]
             result = await process_fn(batch)
             results.append(result)
             self._stats["batched_operations"] += 1
@@ -249,10 +244,7 @@ class AsyncOptimizer:
         }
 
 
-def with_concurrency_limit(
-    max_concurrent: int = 10,
-    timeout: Optional[float] = None
-):
+def with_concurrency_limit(max_concurrent: int = 10, timeout: Optional[float] = None):
     """
     Decorator to limit concurrent executions of a function.
 
@@ -271,8 +263,7 @@ def with_concurrency_limit(
             async with semaphore:
                 if timeout:
                     return await asyncio.wait_for(
-                        func(*args, **kwargs),
-                        timeout=timeout
+                        func(*args, **kwargs), timeout=timeout
                     )
                 return await func(*args, **kwargs)
 
@@ -291,12 +282,12 @@ def with_timeout(timeout_seconds: float):
     Returns:
         Decorated function
     """
+
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @functools.wraps(func)
         async def wrapper(*args, **kwargs) -> T:
             return await asyncio.wait_for(
-                func(*args, **kwargs),
-                timeout=timeout_seconds
+                func(*args, **kwargs), timeout=timeout_seconds
             )
 
         return wrapper
@@ -308,7 +299,7 @@ def with_retry(
     max_retries: int = 3,
     delay_seconds: float = 1.0,
     backoff_multiplier: float = 2.0,
-    exceptions: tuple = (Exception,)
+    exceptions: tuple = (Exception,),
 ):
     """
     Decorator to add retry logic to async function.
@@ -322,6 +313,7 @@ def with_retry(
     Returns:
         Decorated function
     """
+
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @functools.wraps(func)
         async def wrapper(*args, **kwargs) -> T:
@@ -342,4 +334,3 @@ def with_retry(
         return wrapper
 
     return decorator
-

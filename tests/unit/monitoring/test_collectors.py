@@ -233,6 +233,7 @@ class TestSystemMetrics:
     def test_uptime(self, metrics):
         """Test uptime calculation."""
         import time
+
         time.sleep(0.1)
 
         uptime = metrics.uptime_seconds
@@ -267,4 +268,3 @@ class TestSystemMetrics:
         assert "uptime_seconds" in result
         assert "active_requests" in result
         assert "redis_connections" in result
-

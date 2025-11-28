@@ -145,4 +145,3 @@ QUERY_RESPONSE_EXAMPLE = {
     },
     "latency_ms": 45.2,
 }
-

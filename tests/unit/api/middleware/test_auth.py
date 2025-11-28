@@ -97,7 +97,9 @@ class TestAPIKeyAuthenticator:
     def authenticator(self, config):
         return APIKeyAuthenticator(config)
 
-    def _create_mock_request(self, path="/api/v1/query", headers=None, query_params=None):
+    def _create_mock_request(
+        self, path="/api/v1/query", headers=None, query_params=None
+    ):
         """Create a mock request with proper method mocking."""
         request = MagicMock()
         request.url.path = path
@@ -113,9 +115,7 @@ class TestAPIKeyAuthenticator:
     @pytest.mark.asyncio
     async def test_valid_key_in_header(self, authenticator):
         """Test authentication with valid key in header."""
-        request = self._create_mock_request(
-            headers={"X-API-Key": "valid-key-1"}
-        )
+        request = self._create_mock_request(headers={"X-API-Key": "valid-key-1"})
 
         result = await authenticator.authenticate(request)
         assert result is True
@@ -123,9 +123,7 @@ class TestAPIKeyAuthenticator:
     @pytest.mark.asyncio
     async def test_valid_key_in_query_param(self, authenticator):
         """Test authentication with valid key in query param."""
-        request = self._create_mock_request(
-            query_params={"api_key": "valid-key-1"}
-        )
+        request = self._create_mock_request(query_params={"api_key": "valid-key-1"})
 
         result = await authenticator.authenticate(request)
         assert result is True
@@ -141,9 +139,7 @@ class TestAPIKeyAuthenticator:
     @pytest.mark.asyncio
     async def test_invalid_key(self, authenticator):
         """Test authentication fails with invalid key."""
-        request = self._create_mock_request(
-            headers={"X-API-Key": "invalid-key"}
-        )
+        request = self._create_mock_request(headers={"X-API-Key": "invalid-key"})
 
         with pytest.raises(AuthenticationError):
             await authenticator.authenticate(request)
@@ -170,7 +166,9 @@ class TestAPIKeyAuthenticator:
 class TestAuthMiddleware:
     """Tests for AuthMiddleware."""
 
-    def _create_mock_request(self, path="/api/v1/query", headers=None, query_params=None):
+    def _create_mock_request(
+        self, path="/api/v1/query", headers=None, query_params=None
+    ):
         """Create a mock request."""
         request = MagicMock()
         request.url.path = path
@@ -212,4 +210,3 @@ class TestAuthMiddleware:
 
         with pytest.raises(AuthenticationError):
             await middleware.dispatch(request, call_next)
-

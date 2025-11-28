@@ -20,8 +20,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 def track_request(
-    method: str = "POST",
-    path: str = "/api/v1/query"
+    method: str = "POST", path: str = "/api/v1/query"
 ) -> Callable[[F], F]:
     """
     Decorator to track HTTP request metrics.
@@ -33,6 +32,7 @@ def track_request(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -74,8 +74,7 @@ def track_request(
 
 
 def track_cache_operation(
-    operation: str = "query",
-    cache_type: str = "exact"
+    operation: str = "query", cache_type: str = "exact"
 ) -> Callable[[F], F]:
     """
     Decorator to track cache operation metrics.
@@ -87,6 +86,7 @@ def track_cache_operation(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -108,7 +108,7 @@ def track_cache_operation(
             except Exception as e:
                 metrics.inc_counter(
                     "ragcache_cache_errors_total",
-                    labels={"operation": operation, "type": cache_type}
+                    labels={"operation": operation, "type": cache_type},
                 )
                 raise
 
@@ -131,7 +131,7 @@ def track_cache_operation(
             except Exception as e:
                 metrics.inc_counter(
                     "ragcache_cache_errors_total",
-                    labels={"operation": operation, "type": cache_type}
+                    labels={"operation": operation, "type": cache_type},
                 )
                 raise
 
@@ -143,8 +143,7 @@ def track_cache_operation(
 
 
 def track_llm_call(
-    provider: str = "openai",
-    model: str = "gpt-3.5-turbo"
+    provider: str = "openai", model: str = "gpt-3.5-turbo"
 ) -> Callable[[F], F]:
     """
     Decorator to track LLM API call metrics.
@@ -156,6 +155,7 @@ def track_llm_call(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -242,10 +242,7 @@ def track_llm_call(
     return decorator
 
 
-def track_latency(
-    metric_name: str,
-    labels: Optional[dict] = None
-) -> Callable[[F], F]:
+def track_latency(metric_name: str, labels: Optional[dict] = None) -> Callable[[F], F]:
     """
     Generic decorator to track operation latency.
 
@@ -256,6 +253,7 @@ def track_latency(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):
@@ -291,6 +289,7 @@ def track_latency(
 def asyncio_iscoroutinefunction(func: Callable) -> bool:
     """Check if function is async."""
     import asyncio
+
     return asyncio.iscoroutinefunction(func)
 
 
@@ -308,7 +307,7 @@ class MetricsContext:
         self,
         operation_name: str,
         labels: Optional[dict] = None,
-        track_errors: bool = True
+        track_errors: bool = True,
     ):
         """
         Initialize context.
@@ -332,8 +331,7 @@ class MetricsContext:
         """Enter context."""
         self._start_time = time.time()
         self._metrics.inc_gauge(
-            f"ragcache_{self._operation}_in_progress",
-            labels=self._labels
+            f"ragcache_{self._operation}_in_progress", labels=self._labels
         )
         return self
 
@@ -342,25 +340,21 @@ class MetricsContext:
         duration = time.time() - self._start_time
 
         self._metrics.dec_gauge(
-            f"ragcache_{self._operation}_in_progress",
-            labels=self._labels
+            f"ragcache_{self._operation}_in_progress", labels=self._labels
         )
 
         self._metrics.observe_histogram(
-            f"ragcache_{self._operation}_duration_seconds",
-            duration,
-            self._labels
+            f"ragcache_{self._operation}_duration_seconds", duration, self._labels
         )
 
         self._metrics.inc_counter(
-            f"ragcache_{self._operation}_total",
-            labels=self._labels
+            f"ragcache_{self._operation}_total", labels=self._labels
         )
 
         if exc_type is not None and self._track_errors:
             self._metrics.inc_counter(
                 f"ragcache_{self._operation}_errors_total",
-                labels={**self._labels, "error_type": exc_type.__name__}
+                labels={**self._labels, "error_type": exc_type.__name__},
             )
 
     async def __aenter__(self) -> "MetricsContext":
@@ -370,4 +364,3 @@ class MetricsContext:
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async exit context."""
         self.__exit__(exc_type, exc_val, exc_tb)
-

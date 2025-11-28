@@ -117,9 +117,7 @@ class TestSemanticMatcher:
         mock_embedding_generator.generate.assert_called_once_with("test query")
 
     @pytest.mark.asyncio
-    async def test_find_matches_multiple(
-        self, matcher, mock_qdrant_repository
-    ):
+    async def test_find_matches_multiple(self, matcher, mock_qdrant_repository):
         """Test find_matches returns multiple results."""
         search_results = [
             SearchResult(
@@ -177,9 +175,7 @@ class TestSemanticMatcher:
         assert point.payload["model"] == "gpt-4"
 
     @pytest.mark.asyncio
-    async def test_store_for_matching_failure(
-        self, matcher, mock_qdrant_repository
-    ):
+    async def test_store_for_matching_failure(self, matcher, mock_qdrant_repository):
         """Test store_for_matching handles failure."""
         mock_qdrant_repository.store_point = AsyncMock(return_value=False)
 
@@ -215,9 +211,7 @@ class TestSemanticMatcher:
             matcher.set_threshold(1.5)
 
     @pytest.mark.asyncio
-    async def test_find_match_error_handling(
-        self, matcher, mock_embedding_generator
-    ):
+    async def test_find_match_error_handling(self, matcher, mock_embedding_generator):
         """Test find_match error handling."""
         mock_embedding_generator.generate = AsyncMock(
             side_effect=Exception("Embedding error")
@@ -225,4 +219,3 @@ class TestSemanticMatcher:
 
         with pytest.raises(SemanticMatchError):
             await matcher.find_match("test query")
-

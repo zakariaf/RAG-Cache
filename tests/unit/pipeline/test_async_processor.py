@@ -39,9 +39,7 @@ class TestAsyncQueryProcessor:
     def mock_query_service(self):
         """Create mock query service."""
         mock = MagicMock()
-        mock.process = AsyncMock(
-            return_value=MagicMock(response="test response")
-        )
+        mock.process = AsyncMock(return_value=MagicMock(response="test response"))
         return mock
 
     @pytest.fixture
@@ -67,6 +65,7 @@ class TestAsyncQueryProcessor:
     @pytest.mark.asyncio
     async def test_process_single_timeout(self, processor, mock_query_service):
         """Test processing with timeout."""
+
         async def slow_process(*args):
             await asyncio.sleep(20)
             return MagicMock()
@@ -83,9 +82,7 @@ class TestAsyncQueryProcessor:
     @pytest.mark.asyncio
     async def test_process_single_error(self, processor, mock_query_service):
         """Test processing with error."""
-        mock_query_service.process = AsyncMock(
-            side_effect=ValueError("test error")
-        )
+        mock_query_service.process = AsyncMock(side_effect=ValueError("test error"))
 
         request = QueryRequest(query="test")
         result = await processor.process_single(request)
@@ -96,9 +93,7 @@ class TestAsyncQueryProcessor:
     @pytest.mark.asyncio
     async def test_process_batch(self, processor):
         """Test batch processing."""
-        requests = [
-            QueryRequest(query=f"query {i}") for i in range(3)
-        ]
+        requests = [QueryRequest(query=f"query {i}") for i in range(3)]
 
         results = await processor.process_batch(requests)
 
@@ -134,6 +129,7 @@ class TestRunAsync:
     @pytest.mark.asyncio
     async def test_run_async_success(self):
         """Test successful async execution."""
+
         async def func():
             return "result"
 
@@ -143,6 +139,7 @@ class TestRunAsync:
     @pytest.mark.asyncio
     async def test_run_async_timeout(self):
         """Test async execution with timeout."""
+
         async def slow_func():
             await asyncio.sleep(10)
             return "result"
@@ -157,6 +154,7 @@ class TestRunWithFallback:
     @pytest.mark.asyncio
     async def test_primary_succeeds(self):
         """Test when primary succeeds."""
+
         async def primary():
             return "primary result"
 
@@ -169,6 +167,7 @@ class TestRunWithFallback:
     @pytest.mark.asyncio
     async def test_fallback_on_error(self):
         """Test fallback when primary fails."""
+
         async def primary():
             raise ValueError("primary failed")
 
@@ -181,6 +180,7 @@ class TestRunWithFallback:
     @pytest.mark.asyncio
     async def test_fallback_on_timeout(self):
         """Test fallback when primary times out."""
+
         async def primary():
             await asyncio.sleep(10)
             return "primary result"
@@ -190,4 +190,3 @@ class TestRunWithFallback:
 
         result = await run_with_fallback(primary, fallback, timeout=0.1)
         assert result == "fallback result"
-

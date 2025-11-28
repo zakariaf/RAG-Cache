@@ -239,4 +239,3 @@ def end_request() -> Optional[RequestContext]:
 def get_request_id() -> Optional[str]:
     """Get current request ID."""
     return RequestContextManager.get_request_id()
-

@@ -103,9 +103,7 @@ class AsyncQueryProcessor:
                 logger.error("Query failed", query=request.query[:50], error=str(e))
                 return AsyncResult.fail(e, duration)
 
-    async def process_batch(
-        self, requests: List[QueryRequest]
-    ) -> List[AsyncResult]:
+    async def process_batch(self, requests: List[QueryRequest]) -> List[AsyncResult]:
         """
         Process multiple queries concurrently.
 
@@ -201,4 +199,3 @@ async def run_with_fallback(
     except (asyncio.TimeoutError, Exception) as e:
         logger.warning("Primary failed, using fallback", error=str(e))
         return await fallback()
-

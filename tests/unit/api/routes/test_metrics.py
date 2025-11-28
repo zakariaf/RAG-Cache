@@ -98,9 +98,7 @@ class TestGetMetrics:
         mock_request = MagicMock()
         mock_request.app.state = MagicMock(spec=[])
 
-        with patch(
-            "app.pipeline.performance_monitor.get_monitor"
-        ) as mock_get_monitor:
+        with patch("app.pipeline.performance_monitor.get_monitor") as mock_get_monitor:
             mock_monitor = MagicMock()
             mock_monitor.get_summary.return_value = {
                 "total_requests": 100,
@@ -114,4 +112,3 @@ class TestGetMetrics:
         # Pipeline metrics might be empty dict if import fails
         # Just check the key exists
         assert isinstance(metrics["pipeline"], dict)
-

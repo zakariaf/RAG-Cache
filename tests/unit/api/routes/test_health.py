@@ -188,4 +188,3 @@ class TestCheckQdrantHealth:
         health = await check_qdrant_health(mock_request)
 
         assert health.status == "degraded"
-

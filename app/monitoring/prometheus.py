@@ -60,7 +60,19 @@ class PrometheusMetrics:
 
         # Default histogram buckets (in seconds for latency)
         self._default_buckets = [
-            0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 10.0
+            0.005,
+            0.01,
+            0.025,
+            0.05,
+            0.075,
+            0.1,
+            0.25,
+            0.5,
+            0.75,
+            1.0,
+            2.5,
+            5.0,
+            10.0,
         ]
 
         # Initialize core metrics
@@ -70,55 +82,38 @@ class PrometheusMetrics:
         """Initialize core application metrics."""
         # Request metrics
         self._register_counter(
-            "ragcache_requests_total",
-            "Total number of requests processed"
+            "ragcache_requests_total", "Total number of requests processed"
         )
         self._register_counter(
-            "ragcache_requests_errors_total",
-            "Total number of request errors"
+            "ragcache_requests_errors_total", "Total number of request errors"
         )
         self._register_histogram(
-            "ragcache_request_duration_seconds",
-            "Request duration in seconds"
+            "ragcache_request_duration_seconds", "Request duration in seconds"
         )
 
         # Cache metrics
         self._register_counter(
-            "ragcache_cache_hits_total",
-            "Total number of cache hits"
+            "ragcache_cache_hits_total", "Total number of cache hits"
         )
         self._register_counter(
-            "ragcache_cache_misses_total",
-            "Total number of cache misses"
+            "ragcache_cache_misses_total", "Total number of cache misses"
         )
-        self._register_gauge(
-            "ragcache_cache_hit_rate",
-            "Current cache hit rate"
-        )
+        self._register_gauge("ragcache_cache_hit_rate", "Current cache hit rate")
 
         # LLM metrics
         self._register_counter(
-            "ragcache_llm_requests_total",
-            "Total number of LLM API requests"
+            "ragcache_llm_requests_total", "Total number of LLM API requests"
         )
         self._register_counter(
-            "ragcache_llm_tokens_total",
-            "Total tokens processed by LLM"
+            "ragcache_llm_tokens_total", "Total tokens processed by LLM"
         )
-        self._register_gauge(
-            "ragcache_llm_cost_total",
-            "Total cost of LLM API calls"
-        )
+        self._register_gauge("ragcache_llm_cost_total", "Total cost of LLM API calls")
         self._register_histogram(
-            "ragcache_llm_latency_seconds",
-            "LLM API call latency in seconds"
+            "ragcache_llm_latency_seconds", "LLM API call latency in seconds"
         )
 
         # System metrics
-        self._register_gauge(
-            "ragcache_uptime_seconds",
-            "Service uptime in seconds"
-        )
+        self._register_gauge("ragcache_uptime_seconds", "Service uptime in seconds")
 
     def _register_counter(self, name: str, help_text: str) -> None:
         """Register a counter metric."""
@@ -144,10 +139,7 @@ class PrometheusMetrics:
 
     # Counter operations
     def inc_counter(
-        self,
-        name: str,
-        value: float = 1.0,
-        labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Increment a counter."""
         labels = labels or {}
@@ -161,10 +153,7 @@ class PrometheusMetrics:
 
     # Gauge operations
     def set_gauge(
-        self,
-        name: str,
-        value: float,
-        labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float, labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Set a gauge value."""
         labels = labels or {}
@@ -177,10 +166,7 @@ class PrometheusMetrics:
         self._gauges[name][full_key] = value
 
     def inc_gauge(
-        self,
-        name: str,
-        value: float = 1.0,
-        labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Increment a gauge."""
         labels = labels or {}
@@ -193,10 +179,7 @@ class PrometheusMetrics:
         self._gauges[name][full_key] = self._gauges[name].get(full_key, 0) + value
 
     def dec_gauge(
-        self,
-        name: str,
-        value: float = 1.0,
-        labels: Optional[Dict[str, str]] = None
+        self, name: str, value: float = 1.0, labels: Optional[Dict[str, str]] = None
     ) -> None:
         """Decrement a gauge."""
         self.inc_gauge(name, -value, labels)
@@ -207,7 +190,7 @@ class PrometheusMetrics:
         name: str,
         value: float,
         labels: Optional[Dict[str, str]] = None,
-        buckets: Optional[List[float]] = None
+        buckets: Optional[List[float]] = None,
     ) -> None:
         """Observe a value for histogram."""
         labels = labels or {}
@@ -239,17 +222,15 @@ class PrometheusMetrics:
 
     # Convenience methods for common metrics
     def track_request(
-        self,
-        method: str,
-        path: str,
-        status_code: int,
-        duration_seconds: float
+        self, method: str, path: str, status_code: int, duration_seconds: float
     ) -> None:
         """Track an HTTP request."""
         labels = {"method": method, "path": path, "status": str(status_code)}
 
         self.inc_counter("ragcache_requests_total", labels=labels)
-        self.observe_histogram("ragcache_request_duration_seconds", duration_seconds, labels)
+        self.observe_histogram(
+            "ragcache_request_duration_seconds", duration_seconds, labels
+        )
 
         if status_code >= 400:
             self.inc_counter("ragcache_requests_errors_total", labels=labels)
@@ -267,11 +248,13 @@ class PrometheusMetrics:
     def _update_hit_rate(self) -> None:
         """Update the cache hit rate gauge."""
         hits = sum(
-            v for k, v in self._counters.get("ragcache_cache_hits_total", {}).items()
+            v
+            for k, v in self._counters.get("ragcache_cache_hits_total", {}).items()
             if not k.startswith("_")
         )
         misses = sum(
-            v for k, v in self._counters.get("ragcache_cache_misses_total", {}).items()
+            v
+            for k, v in self._counters.get("ragcache_cache_misses_total", {}).items()
             if not k.startswith("_")
         )
         total = hits + misses
@@ -285,7 +268,7 @@ class PrometheusMetrics:
         tokens: int,
         cost: float,
         latency_seconds: float,
-        success: bool = True
+        success: bool = True,
     ) -> None:
         """Track an LLM API call."""
         labels = {"provider": provider, "model": model}
@@ -295,14 +278,12 @@ class PrometheusMetrics:
             "ragcache_llm_tokens_total", value=float(tokens), labels=labels
         )
         self.inc_gauge("ragcache_llm_cost_total", value=cost, labels=labels)
-        self.observe_histogram(
-            "ragcache_llm_latency_seconds", latency_seconds, labels
-        )
+        self.observe_histogram("ragcache_llm_latency_seconds", latency_seconds, labels)
 
         if not success:
             self.inc_counter(
                 "ragcache_llm_errors_total",
-                labels={"provider": provider, "model": model}
+                labels={"provider": provider, "model": model},
             )
 
     def get_uptime_seconds(self) -> float:
@@ -471,4 +452,3 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 def metrics_middleware(app):
     """Add metrics middleware to app."""
     return MetricsMiddleware(app)
-

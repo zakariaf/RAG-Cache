@@ -188,9 +188,7 @@ class MetricsAggregator:
         return self._request_metrics.total_requests / uptime
 
     def get_time_series(
-        self,
-        metric_path: str,
-        duration_seconds: int = 3600
+        self, metric_path: str, duration_seconds: int = 3600
     ) -> List[tuple]:
         """
         Get time series data for a specific metric.
@@ -263,4 +261,3 @@ def get_aggregator() -> MetricsAggregator:
     if _aggregator is None:
         _aggregator = MetricsAggregator()
     return _aggregator
-

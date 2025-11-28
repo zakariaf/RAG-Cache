@@ -151,9 +151,7 @@ class QueryOptimizer:
             return None, "timeout"
 
     def should_skip_semantic_search(
-        self,
-        exact_result: Optional[Any],
-        confidence: float = 1.0
+        self, exact_result: Optional[Any], confidence: float = 1.0
     ) -> bool:
         """
         Determine if semantic search should be skipped.
@@ -219,7 +217,8 @@ class QueryOptimizer:
 
         return {
             "avg_under_target": avg_latency < self._config.target_total_latency_ms,
-            "p95_under_target": p95_latency < self._config.target_total_latency_ms * 1.5,
+            "p95_under_target": p95_latency
+            < self._config.target_total_latency_ms * 1.5,
         }
 
     def get_optimization_suggestions(self) -> List[str]:
@@ -289,4 +288,3 @@ class QueryTimer:
         self._end_time = time.perf_counter()
         if self._optimizer:
             self._optimizer.record_timing(self.elapsed_ms)
-

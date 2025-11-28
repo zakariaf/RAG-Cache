@@ -164,4 +164,3 @@ class TestConvenienceFunctions:
         assert req_id == ctx.request_id
 
         end_request()
-

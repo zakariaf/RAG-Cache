@@ -77,9 +77,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             return text
         return text[:max_length] + "...[truncated]"
 
-    async def dispatch(
-        self, request: Request, call_next: Callable
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """
         Process request with logging.
 
@@ -159,4 +157,3 @@ default_logging_config = LoggingConfig(
     log_response_body=False,
     slow_request_threshold_ms=1000.0,
 )
-

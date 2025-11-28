@@ -175,4 +175,3 @@ class TestWithRecovery:
 
         assert result.success is False
         assert result.action_taken == RecoveryAction.FAIL
-

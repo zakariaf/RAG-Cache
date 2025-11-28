@@ -30,7 +30,9 @@ class GrafanaPanel:
     panel_type: str = "stat"  # stat, graph, gauge, table, heatmap
     datasource: str = "Prometheus"
     targets: List[Dict[str, Any]] = field(default_factory=list)
-    grid_pos: Dict[str, int] = field(default_factory=lambda: {"x": 0, "y": 0, "w": 6, "h": 4})
+    grid_pos: Dict[str, int] = field(
+        default_factory=lambda: {"x": 0, "y": 0, "w": 6, "h": 4}
+    )
     options: Dict[str, Any] = field(default_factory=dict)
     field_config: Dict[str, Any] = field(default_factory=dict)
 
@@ -81,10 +83,7 @@ class GrafanaDashboard:
                     "from": self.time_from,
                     "to": self.time_to,
                 },
-                "panels": [
-                    panel.to_dict(i + 1)
-                    for i, panel in enumerate(self.panels)
-                ],
+                "panels": [panel.to_dict(i + 1) for i, panel in enumerate(self.panels)],
                 "schemaVersion": 38,
                 "version": 1,
             },
@@ -106,263 +105,316 @@ def create_ragcache_dashboard() -> GrafanaDashboard:
     dashboard = GrafanaDashboard()
 
     # Row 1: Overview Stats
-    dashboard.add_panel(GrafanaPanel(
-        title="Total Requests",
-        panel_type="stat",
-        targets=[{
-            "expr": 'sum(ragcache_requests_total)',
-            "legendFormat": "Total Requests",
-        }],
-        grid_pos={"x": 0, "y": 0, "w": 4, "h": 4},
-        options={
-            "colorMode": "value",
-            "graphMode": "none",
-            "textMode": "auto",
-        },
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Total Requests",
+            panel_type="stat",
+            targets=[
+                {
+                    "expr": "sum(ragcache_requests_total)",
+                    "legendFormat": "Total Requests",
+                }
+            ],
+            grid_pos={"x": 0, "y": 0, "w": 4, "h": 4},
+            options={
+                "colorMode": "value",
+                "graphMode": "none",
+                "textMode": "auto",
+            },
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Cache Hit Rate",
-        panel_type="gauge",
-        targets=[{
-            "expr": 'ragcache_cache_hit_rate',
-            "legendFormat": "Hit Rate",
-        }],
-        grid_pos={"x": 4, "y": 0, "w": 4, "h": 4},
-        options={
-            "showThresholdLabels": False,
-            "showThresholdMarkers": True,
-        },
-        field_config={
-            "defaults": {
-                "unit": "percentunit",
-                "min": 0,
-                "max": 1,
-                "thresholds": {
-                    "mode": "percentage",
-                    "steps": [
-                        {"color": "red", "value": None},
-                        {"color": "yellow", "value": 50},
-                        {"color": "green", "value": 80},
-                    ],
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Cache Hit Rate",
+            panel_type="gauge",
+            targets=[
+                {
+                    "expr": "ragcache_cache_hit_rate",
+                    "legendFormat": "Hit Rate",
+                }
+            ],
+            grid_pos={"x": 4, "y": 0, "w": 4, "h": 4},
+            options={
+                "showThresholdLabels": False,
+                "showThresholdMarkers": True,
+            },
+            field_config={
+                "defaults": {
+                    "unit": "percentunit",
+                    "min": 0,
+                    "max": 1,
+                    "thresholds": {
+                        "mode": "percentage",
+                        "steps": [
+                            {"color": "red", "value": None},
+                            {"color": "yellow", "value": 50},
+                            {"color": "green", "value": 80},
+                        ],
+                    },
                 },
             },
-        },
-    ))
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="LLM Cost",
-        panel_type="stat",
-        targets=[{
-            "expr": 'sum(ragcache_llm_cost_total)',
-            "legendFormat": "Total Cost",
-        }],
-        grid_pos={"x": 8, "y": 0, "w": 4, "h": 4},
-        options={
-            "colorMode": "value",
-            "graphMode": "none",
-        },
-        field_config={
-            "defaults": {
-                "unit": "currencyUSD",
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="LLM Cost",
+            panel_type="stat",
+            targets=[
+                {
+                    "expr": "sum(ragcache_llm_cost_total)",
+                    "legendFormat": "Total Cost",
+                }
+            ],
+            grid_pos={"x": 8, "y": 0, "w": 4, "h": 4},
+            options={
+                "colorMode": "value",
+                "graphMode": "none",
             },
-        },
-    ))
-
-    dashboard.add_panel(GrafanaPanel(
-        title="Error Rate",
-        panel_type="stat",
-        targets=[{
-            "expr": 'sum(rate(ragcache_requests_errors_total[5m])) / sum(rate(ragcache_requests_total[5m]))',
-            "legendFormat": "Error Rate",
-        }],
-        grid_pos={"x": 12, "y": 0, "w": 4, "h": 4},
-        options={
-            "colorMode": "value",
-        },
-        field_config={
-            "defaults": {
-                "unit": "percentunit",
-                "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                        {"color": "green", "value": None},
-                        {"color": "yellow", "value": 0.01},
-                        {"color": "red", "value": 0.05},
-                    ],
+            field_config={
+                "defaults": {
+                    "unit": "currencyUSD",
                 },
             },
-        },
-    ))
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Uptime",
-        panel_type="stat",
-        targets=[{
-            "expr": 'ragcache_uptime_seconds',
-            "legendFormat": "Uptime",
-        }],
-        grid_pos={"x": 16, "y": 0, "w": 4, "h": 4},
-        field_config={
-            "defaults": {
-                "unit": "s",
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Error Rate",
+            panel_type="stat",
+            targets=[
+                {
+                    "expr": "sum(rate(ragcache_requests_errors_total[5m])) / sum(rate(ragcache_requests_total[5m]))",
+                    "legendFormat": "Error Rate",
+                }
+            ],
+            grid_pos={"x": 12, "y": 0, "w": 4, "h": 4},
+            options={
+                "colorMode": "value",
             },
-        },
-    ))
+            field_config={
+                "defaults": {
+                    "unit": "percentunit",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {"color": "green", "value": None},
+                            {"color": "yellow", "value": 0.01},
+                            {"color": "red", "value": 0.05},
+                        ],
+                    },
+                },
+            },
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Tokens Saved",
-        panel_type="stat",
-        targets=[{
-            "expr": 'sum(ragcache_tokens_saved_total)',
-            "legendFormat": "Tokens Saved",
-        }],
-        grid_pos={"x": 20, "y": 0, "w": 4, "h": 4},
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Uptime",
+            panel_type="stat",
+            targets=[
+                {
+                    "expr": "ragcache_uptime_seconds",
+                    "legendFormat": "Uptime",
+                }
+            ],
+            grid_pos={"x": 16, "y": 0, "w": 4, "h": 4},
+            field_config={
+                "defaults": {
+                    "unit": "s",
+                },
+            },
+        )
+    )
+
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Tokens Saved",
+            panel_type="stat",
+            targets=[
+                {
+                    "expr": "sum(ragcache_tokens_saved_total)",
+                    "legendFormat": "Tokens Saved",
+                }
+            ],
+            grid_pos={"x": 20, "y": 0, "w": 4, "h": 4},
+        )
+    )
 
     # Row 2: Request Metrics
-    dashboard.add_panel(GrafanaPanel(
-        title="Request Rate",
-        panel_type="timeseries",
-        targets=[{
-            "expr": 'sum(rate(ragcache_requests_total[1m])) by (method)',
-            "legendFormat": "{{method}}",
-        }],
-        grid_pos={"x": 0, "y": 4, "w": 12, "h": 6},
-        options={
-            "tooltip": {"mode": "multi"},
-            "legend": {"displayMode": "table", "placement": "right"},
-        },
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Request Rate",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "sum(rate(ragcache_requests_total[1m])) by (method)",
+                    "legendFormat": "{{method}}",
+                }
+            ],
+            grid_pos={"x": 0, "y": 4, "w": 12, "h": 6},
+            options={
+                "tooltip": {"mode": "multi"},
+                "legend": {"displayMode": "table", "placement": "right"},
+            },
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Request Latency",
-        panel_type="timeseries",
-        targets=[
-            {
-                "expr": 'histogram_quantile(0.50, sum(rate(ragcache_request_duration_seconds_bucket[5m])) by (le))',
-                "legendFormat": "p50",
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Request Latency",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "histogram_quantile(0.50, sum(rate(ragcache_request_duration_seconds_bucket[5m])) by (le))",
+                    "legendFormat": "p50",
+                },
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(ragcache_request_duration_seconds_bucket[5m])) by (le))",
+                    "legendFormat": "p95",
+                },
+                {
+                    "expr": "histogram_quantile(0.99, sum(rate(ragcache_request_duration_seconds_bucket[5m])) by (le))",
+                    "legendFormat": "p99",
+                },
+            ],
+            grid_pos={"x": 12, "y": 4, "w": 12, "h": 6},
+            field_config={
+                "defaults": {
+                    "unit": "s",
+                },
             },
-            {
-                "expr": 'histogram_quantile(0.95, sum(rate(ragcache_request_duration_seconds_bucket[5m])) by (le))',
-                "legendFormat": "p95",
-            },
-            {
-                "expr": 'histogram_quantile(0.99, sum(rate(ragcache_request_duration_seconds_bucket[5m])) by (le))',
-                "legendFormat": "p99",
-            },
-        ],
-        grid_pos={"x": 12, "y": 4, "w": 12, "h": 6},
-        field_config={
-            "defaults": {
-                "unit": "s",
-            },
-        },
-    ))
+        )
+    )
 
     # Row 3: Cache Metrics
-    dashboard.add_panel(GrafanaPanel(
-        title="Cache Operations",
-        panel_type="timeseries",
-        targets=[
-            {
-                "expr": 'sum(rate(ragcache_cache_hits_total[1m])) by (type)',
-                "legendFormat": "Hits ({{type}})",
-            },
-            {
-                "expr": 'sum(rate(ragcache_cache_misses_total[1m]))',
-                "legendFormat": "Misses",
-            },
-        ],
-        grid_pos={"x": 0, "y": 10, "w": 12, "h": 6},
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Cache Operations",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "sum(rate(ragcache_cache_hits_total[1m])) by (type)",
+                    "legendFormat": "Hits ({{type}})",
+                },
+                {
+                    "expr": "sum(rate(ragcache_cache_misses_total[1m]))",
+                    "legendFormat": "Misses",
+                },
+            ],
+            grid_pos={"x": 0, "y": 10, "w": 12, "h": 6},
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Cache Hit Rate Over Time",
-        panel_type="timeseries",
-        targets=[{
-            "expr": 'ragcache_cache_hit_rate',
-            "legendFormat": "Hit Rate",
-        }],
-        grid_pos={"x": 12, "y": 10, "w": 12, "h": 6},
-        field_config={
-            "defaults": {
-                "unit": "percentunit",
-                "min": 0,
-                "max": 1,
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Cache Hit Rate Over Time",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "ragcache_cache_hit_rate",
+                    "legendFormat": "Hit Rate",
+                }
+            ],
+            grid_pos={"x": 12, "y": 10, "w": 12, "h": 6},
+            field_config={
+                "defaults": {
+                    "unit": "percentunit",
+                    "min": 0,
+                    "max": 1,
+                },
             },
-        },
-    ))
+        )
+    )
 
     # Row 4: LLM Metrics
-    dashboard.add_panel(GrafanaPanel(
-        title="LLM Requests by Provider",
-        panel_type="timeseries",
-        targets=[{
-            "expr": 'sum(rate(ragcache_llm_requests_total[1m])) by (provider)',
-            "legendFormat": "{{provider}}",
-        }],
-        grid_pos={"x": 0, "y": 16, "w": 8, "h": 6},
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="LLM Requests by Provider",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "sum(rate(ragcache_llm_requests_total[1m])) by (provider)",
+                    "legendFormat": "{{provider}}",
+                }
+            ],
+            grid_pos={"x": 0, "y": 16, "w": 8, "h": 6},
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="LLM Latency by Provider",
-        panel_type="timeseries",
-        targets=[{
-            "expr": 'histogram_quantile(0.95, sum(rate(ragcache_llm_latency_seconds_bucket[5m])) by (le, provider))',
-            "legendFormat": "{{provider}} p95",
-        }],
-        grid_pos={"x": 8, "y": 16, "w": 8, "h": 6},
-        field_config={
-            "defaults": {
-                "unit": "s",
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="LLM Latency by Provider",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(ragcache_llm_latency_seconds_bucket[5m])) by (le, provider))",
+                    "legendFormat": "{{provider}} p95",
+                }
+            ],
+            grid_pos={"x": 8, "y": 16, "w": 8, "h": 6},
+            field_config={
+                "defaults": {
+                    "unit": "s",
+                },
             },
-        },
-    ))
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Token Usage",
-        panel_type="timeseries",
-        targets=[{
-            "expr": 'sum(rate(ragcache_llm_tokens_total[5m])) by (provider)',
-            "legendFormat": "{{provider}}",
-        }],
-        grid_pos={"x": 16, "y": 16, "w": 8, "h": 6},
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Token Usage",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "sum(rate(ragcache_llm_tokens_total[5m])) by (provider)",
+                    "legendFormat": "{{provider}}",
+                }
+            ],
+            grid_pos={"x": 16, "y": 16, "w": 8, "h": 6},
+        )
+    )
 
     # Row 5: Cost Analysis
-    dashboard.add_panel(GrafanaPanel(
-        title="Cost by Provider",
-        panel_type="piechart",
-        targets=[{
-            "expr": 'sum(ragcache_llm_cost_total) by (provider)',
-            "legendFormat": "{{provider}}",
-        }],
-        grid_pos={"x": 0, "y": 22, "w": 8, "h": 6},
-    ))
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Cost by Provider",
+            panel_type="piechart",
+            targets=[
+                {
+                    "expr": "sum(ragcache_llm_cost_total) by (provider)",
+                    "legendFormat": "{{provider}}",
+                }
+            ],
+            grid_pos={"x": 0, "y": 22, "w": 8, "h": 6},
+        )
+    )
 
-    dashboard.add_panel(GrafanaPanel(
-        title="Cost Over Time",
-        panel_type="timeseries",
-        targets=[{
-            "expr": 'sum(increase(ragcache_llm_cost_total[1h])) by (provider)',
-            "legendFormat": "{{provider}}",
-        }],
-        grid_pos={"x": 8, "y": 22, "w": 16, "h": 6},
-        field_config={
-            "defaults": {
-                "unit": "currencyUSD",
+    dashboard.add_panel(
+        GrafanaPanel(
+            title="Cost Over Time",
+            panel_type="timeseries",
+            targets=[
+                {
+                    "expr": "sum(increase(ragcache_llm_cost_total[1h])) by (provider)",
+                    "legendFormat": "{{provider}}",
+                }
+            ],
+            grid_pos={"x": 8, "y": 22, "w": 16, "h": 6},
+            field_config={
+                "defaults": {
+                    "unit": "currencyUSD",
+                },
             },
-        },
-    ))
+        )
+    )
 
     return dashboard
 
 
-def export_dashboard_to_file(
-    dashboard: GrafanaDashboard,
-    filepath: str
-) -> None:
+def export_dashboard_to_file(dashboard: GrafanaDashboard, filepath: str) -> None:
     """
     Export dashboard to JSON file.
 
@@ -374,4 +426,3 @@ def export_dashboard_to_file(
         f.write(dashboard.to_json())
 
     logger.info("Dashboard exported", filepath=filepath)
-

@@ -164,4 +164,3 @@ def normalize_query(query: str) -> str:
         Normalized query string
     """
     return default_normalizer.normalize(query)
-

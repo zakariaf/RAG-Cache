@@ -132,4 +132,3 @@ class TestGetVersionInfo:
         # Currently no deprecated versions, but test the function
         info = get_version_info(APIVersion.V1)
         assert info is not None
-

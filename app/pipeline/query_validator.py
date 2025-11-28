@@ -226,4 +226,3 @@ def validate_query(query: str) -> ValidationResult:
         ValidationResult
     """
     return default_validator.validate(query)
-

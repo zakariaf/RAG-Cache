@@ -78,7 +78,9 @@ class TestQueryPipelineFlow:
         )
 
     @pytest.mark.asyncio
-    async def test_exact_cache_hit(self, query_service, mock_redis_cache, mock_llm_provider):
+    async def test_exact_cache_hit(
+        self, query_service, mock_redis_cache, mock_llm_provider
+    ):
         """Test exact cache hit returns cached response."""
         cached_entry = CacheEntry(
             query_hash="hash123",
@@ -330,4 +332,3 @@ class TestRequestContextIntegration:
 
         # IDs should be different
         assert id1 != id2
-

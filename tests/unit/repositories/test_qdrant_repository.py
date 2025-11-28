@@ -6,7 +6,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from qdrant_client.models import Distance, VectorParams
 
 from app.repositories.qdrant_repository import QdrantRepository
-from app.models.qdrant_point import QdrantPoint, SearchResult, BatchUploadResult, DeleteResult
+from app.models.qdrant_point import (
+    QdrantPoint,
+    SearchResult,
+    BatchUploadResult,
+    DeleteResult,
+)
 
 
 @pytest.fixture
@@ -97,7 +102,9 @@ class TestQdrantRepositoryCollection:
         mock_qdrant_client.create_collection.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_create_collection_already_exists(self, repository, mock_qdrant_client):
+    async def test_create_collection_already_exists(
+        self, repository, mock_qdrant_client
+    ):
         """Test create_collection returns True if collection exists."""
         mock_collection = MagicMock()
         mock_collection.name = repository._collection_name
@@ -179,7 +186,9 @@ class TestQdrantRepositoryStorePoint:
         assert result is False
 
     @pytest.mark.asyncio
-    async def test_store_points_batch(self, repository, mock_qdrant_client, sample_point):
+    async def test_store_points_batch(
+        self, repository, mock_qdrant_client, sample_point
+    ):
         """Test store_points stores multiple points."""
         mock_qdrant_client.upsert.return_value = None
         points = [sample_point, sample_point]
@@ -474,7 +483,9 @@ class TestQdrantRepositoryGetCollectionInfo:
         mock_info.vectors_count = 100
         mock_info.points_count = 100
         mock_info.status = "green"
-        mock_info.config.params.vectors = VectorParams(size=384, distance=Distance.COSINE)
+        mock_info.config.params.vectors = VectorParams(
+            size=384, distance=Distance.COSINE
+        )
         mock_qdrant_client.get_collection.return_value = mock_info
 
         info = await repository.get_collection_info()

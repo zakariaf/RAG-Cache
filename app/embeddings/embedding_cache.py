@@ -179,4 +179,3 @@ class EmbeddingCache:
         """Update TTL for new entries."""
         self._ttl = seconds
         logger.info("Embedding cache TTL updated", ttl=seconds)
-

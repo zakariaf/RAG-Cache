@@ -72,9 +72,7 @@ class QueryDeduplicator:
         self._lock = asyncio.Lock()
         self._stats = DeduplicationStats()
 
-    async def get_or_create(
-        self, query: str
-    ) -> tuple[bool, asyncio.Future]:
+    async def get_or_create(self, query: str) -> tuple[bool, asyncio.Future]:
         """
         Get existing pending query or create new.
 
@@ -117,7 +115,10 @@ class QueryDeduplicator:
             return (False, future)
 
     async def complete(
-        self, query: str, result: Optional[QueryResponse] = None, error: Optional[Exception] = None
+        self,
+        query: str,
+        result: Optional[QueryResponse] = None,
+        error: Optional[Exception] = None,
     ):
         """
         Complete a pending query.
@@ -227,4 +228,3 @@ class DeduplicatingProcessor:
     def stats(self) -> DeduplicationStats:
         """Get deduplication stats."""
         return self._dedup.stats
-

@@ -318,8 +318,7 @@ class QueryPipeline:
     def has_exact_cache(self) -> bool:
         """Check if exact cache is enabled."""
         return (
-            self._config.enable_exact_cache
-            and self._components.redis_cache is not None
+            self._config.enable_exact_cache and self._components.redis_cache is not None
         )
 
     @property
@@ -352,4 +351,3 @@ class QueryPipeline:
             llm_provider=self._components.llm_provider,
             semantic_matcher=self._components.semantic_matcher,
         )
-

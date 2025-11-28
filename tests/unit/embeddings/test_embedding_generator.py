@@ -20,7 +20,9 @@ def embedding_generator(mock_sentence_transformer):
 
 
 @pytest.mark.asyncio
-async def test_generate_embedding_success(embedding_generator, mock_sentence_transformer):
+async def test_generate_embedding_success(
+    embedding_generator, mock_sentence_transformer
+):
     """Test successful embedding generation."""
     mock_model = mock_sentence_transformer.return_value
     # Use numpy array since the real model returns numpy arrays

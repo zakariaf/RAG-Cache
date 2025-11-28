@@ -107,4 +107,3 @@ class TestQueryPreprocessor:
         result = preprocess_query("  Hello WORLD  ")
         assert result.is_valid is True
         assert result.normalized_query == "hello world"
-

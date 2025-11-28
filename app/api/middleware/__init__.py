@@ -63,4 +63,3 @@ __all__ = [
     "create_gzip_middleware",
     "default_compression_config",
 ]
-

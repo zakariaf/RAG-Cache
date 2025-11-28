@@ -134,4 +134,3 @@ class TestQueryTimer:
             await asyncio.sleep(0.01)
 
         assert len(optimizer._timing_history) == 1
-

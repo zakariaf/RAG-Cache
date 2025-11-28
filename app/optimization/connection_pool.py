@@ -96,7 +96,7 @@ class ConnectionPoolManager(Generic[T]):
         factory: Callable[[], T],
         close_fn: Optional[Callable[[T], None]] = None,
         health_check_fn: Optional[Callable[[T], bool]] = None,
-        config: Optional[PoolConfig] = None
+        config: Optional[PoolConfig] = None,
     ):
         """
         Initialize pool manager.
@@ -131,10 +131,7 @@ class ConnectionPoolManager(Generic[T]):
                 self._pool.append(conn)
 
             self._initialized = True
-            logger.info(
-                "Connection pool initialized",
-                min_size=self._config.min_size
-            )
+            logger.info("Connection pool initialized", min_size=self._config.min_size)
 
     async def _create_connection(self) -> PooledConnection[T]:
         """Create a new pooled connection."""
@@ -203,10 +200,7 @@ class ConnectionPoolManager(Generic[T]):
                     )
 
                 try:
-                    await asyncio.wait_for(
-                        self._available.wait(),
-                        timeout=remaining
-                    )
+                    await asyncio.wait_for(self._available.wait(), timeout=remaining)
                 except asyncio.TimeoutError:
                     self._stats.failed_acquires += 1
                     raise TimeoutError(
@@ -349,4 +343,3 @@ class PoolContextManager(Generic[T]):
         """Release connection."""
         if self._conn:
             await self._pool.release(self._conn)
-

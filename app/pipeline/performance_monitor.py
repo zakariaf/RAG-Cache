@@ -64,7 +64,9 @@ class PipelineMetrics:
     max_latency_ms: float = 0.0
 
     # Per-operation timings
-    operation_timings: Dict[str, List[float]] = field(default_factory=lambda: defaultdict(list))
+    operation_timings: Dict[str, List[float]] = field(
+        default_factory=lambda: defaultdict(list)
+    )
 
     @property
     def avg_latency_ms(self) -> float:
@@ -126,7 +128,9 @@ class PipelineMetrics:
             "semantic_hit_rate": round(self.semantic_hit_rate, 4),
             "llm_calls": self.llm_calls,
             "avg_latency_ms": round(self.avg_latency_ms, 2),
-            "min_latency_ms": round(self.min_latency_ms, 2) if self.min_latency_ms != float("inf") else 0,
+            "min_latency_ms": round(self.min_latency_ms, 2)
+            if self.min_latency_ms != float("inf")
+            else 0,
             "max_latency_ms": round(self.max_latency_ms, 2),
             "operation_avgs": {
                 name: round(self.get_operation_avg(name), 2)
@@ -292,4 +296,3 @@ def track_operation(name: str):
         return wrapper
 
     return decorator
-

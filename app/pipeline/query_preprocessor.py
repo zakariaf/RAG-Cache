@@ -82,7 +82,9 @@ class QueryPreprocessor:
         else:
             # Validate then normalize
             validation = self._validator.validate(query)
-            normalized = self._normalizer.normalize(query) if validation.is_valid else query
+            normalized = (
+                self._normalizer.normalize(query) if validation.is_valid else query
+            )
 
         result = PreprocessResult(
             original_query=original,
@@ -160,4 +162,3 @@ def preprocess_query(query: str) -> PreprocessResult:
         PreprocessResult
     """
     return default_preprocessor.process(query)
-

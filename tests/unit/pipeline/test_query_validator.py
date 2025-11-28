@@ -113,9 +113,7 @@ class TestQueryValidator:
 
     def test_custom_constraints(self):
         """Test custom constraint configuration."""
-        validator = QueryValidator(
-            min_length=5, max_length=50, block_empty=False
-        )
+        validator = QueryValidator(min_length=5, max_length=50, block_empty=False)
         constraints = validator.get_constraints()
         assert constraints["min_length"] == 5
         assert constraints["max_length"] == 50
@@ -125,4 +123,3 @@ class TestQueryValidator:
         """Test convenience function."""
         result = validate_query("What is AI?")
         assert result.is_valid is True
-

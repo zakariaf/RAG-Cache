@@ -78,4 +78,3 @@ class TestQueryNormalizer:
         """Test convenience function."""
         result = normalize_query("  Hello WORLD  ")
         assert result == "hello world"
-

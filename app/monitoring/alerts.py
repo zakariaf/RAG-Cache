@@ -68,11 +68,7 @@ class AlertRule:
         try:
             condition_met = self.condition()
         except Exception as e:
-            logger.error(
-                "Alert evaluation failed",
-                alert=self.name,
-                error=str(e)
-            )
+            logger.error("Alert evaluation failed", alert=self.name, error=str(e))
             return self._state
 
         now = time.time()
@@ -90,9 +86,7 @@ class AlertRule:
                     self._state = AlertState.FIRING
                     self._last_triggered = now
                     logger.warning(
-                        "Alert firing",
-                        alert=self.name,
-                        level=self.level.value
+                        "Alert firing", alert=self.name, level=self.level.value
                     )
 
             elif self._state == AlertState.FIRING:
@@ -243,7 +237,10 @@ class AlertManager:
             current_state = rule.evaluate()
 
             # Check for state changes
-            if current_state == AlertState.FIRING and previous_state != AlertState.FIRING:
+            if (
+                current_state == AlertState.FIRING
+                and previous_state != AlertState.FIRING
+            ):
                 # New alert
                 alert = Alert(
                     rule_name=name,
@@ -280,9 +277,7 @@ class AlertManager:
                 handler(alert)
             except Exception as e:
                 logger.error(
-                    "Alert handler failed",
-                    handler=handler.__name__,
-                    error=str(e)
+                    "Alert handler failed", handler=handler.__name__, error=str(e)
                 )
 
     def get_active_alerts(self) -> List[Alert]:
@@ -305,9 +300,7 @@ class AlertManager:
         return alerts
 
     def get_alert_history(
-        self,
-        limit: int = 100,
-        level: Optional[AlertLevel] = None
+        self, limit: int = 100, level: Optional[AlertLevel] = None
     ) -> List[Alert]:
         """
         Get alert history.
@@ -330,7 +323,9 @@ class AlertManager:
         return {
             "total_rules": len(self._rules),
             "active_alerts": len(active),
-            "critical_alerts": len([a for a in active if a.level == AlertLevel.CRITICAL]),
+            "critical_alerts": len(
+                [a for a in active if a.level == AlertLevel.CRITICAL]
+            ),
             "error_alerts": len([a for a in active if a.level == AlertLevel.ERROR]),
             "warning_alerts": len([a for a in active if a.level == AlertLevel.WARNING]),
             "history_count": len(self._alert_history),
@@ -354,65 +349,73 @@ def create_default_alerts(aggregator) -> AlertManager:
     manager = AlertManager()
 
     # High error rate alert
-    manager.register_rule(AlertRule(
-        name="high_error_rate",
-        description="Error rate exceeds 5%",
-        level=AlertLevel.ERROR,
-        condition=lambda: aggregator.requests.error_rate > 0.05,
-        threshold=0.05,
-        for_duration_seconds=60,
-        labels={"category": "availability"},
-    ))
+    manager.register_rule(
+        AlertRule(
+            name="high_error_rate",
+            description="Error rate exceeds 5%",
+            level=AlertLevel.ERROR,
+            condition=lambda: aggregator.requests.error_rate > 0.05,
+            threshold=0.05,
+            for_duration_seconds=60,
+            labels={"category": "availability"},
+        )
+    )
 
     # Low cache hit rate alert
-    manager.register_rule(AlertRule(
-        name="low_cache_hit_rate",
-        description="Cache hit rate below 20%",
-        level=AlertLevel.WARNING,
-        condition=lambda: (
-            aggregator.cache.total_operations > 100 and
-            aggregator.cache.hit_rate < 0.2
-        ),
-        threshold=0.2,
-        for_duration_seconds=300,
-        labels={"category": "performance"},
-    ))
+    manager.register_rule(
+        AlertRule(
+            name="low_cache_hit_rate",
+            description="Cache hit rate below 20%",
+            level=AlertLevel.WARNING,
+            condition=lambda: (
+                aggregator.cache.total_operations > 100
+                and aggregator.cache.hit_rate < 0.2
+            ),
+            threshold=0.2,
+            for_duration_seconds=300,
+            labels={"category": "performance"},
+        )
+    )
 
     # High LLM latency alert
-    manager.register_rule(AlertRule(
-        name="high_llm_latency",
-        description="Average LLM latency exceeds 5 seconds",
-        level=AlertLevel.WARNING,
-        condition=lambda: aggregator.llm.avg_latency_ms > 5000,
-        threshold=5000,
-        for_duration_seconds=120,
-        labels={"category": "performance"},
-    ))
+    manager.register_rule(
+        AlertRule(
+            name="high_llm_latency",
+            description="Average LLM latency exceeds 5 seconds",
+            level=AlertLevel.WARNING,
+            condition=lambda: aggregator.llm.avg_latency_ms > 5000,
+            threshold=5000,
+            for_duration_seconds=120,
+            labels={"category": "performance"},
+        )
+    )
 
     # LLM failure rate alert
-    manager.register_rule(AlertRule(
-        name="high_llm_failure_rate",
-        description="LLM failure rate exceeds 10%",
-        level=AlertLevel.ERROR,
-        condition=lambda: (
-            aggregator.llm.total_requests > 10 and
-            aggregator.llm.success_rate < 0.9
-        ),
-        threshold=0.1,
-        for_duration_seconds=60,
-        labels={"category": "availability"},
-    ))
+    manager.register_rule(
+        AlertRule(
+            name="high_llm_failure_rate",
+            description="LLM failure rate exceeds 10%",
+            level=AlertLevel.ERROR,
+            condition=lambda: (
+                aggregator.llm.total_requests > 10 and aggregator.llm.success_rate < 0.9
+            ),
+            threshold=0.1,
+            for_duration_seconds=60,
+            labels={"category": "availability"},
+        )
+    )
 
     # High cost alert
-    manager.register_rule(AlertRule(
-        name="high_llm_cost",
-        description="LLM cost exceeds $10",
-        level=AlertLevel.WARNING,
-        condition=lambda: aggregator.llm.total_cost > 10.0,
-        threshold=10.0,
-        for_duration_seconds=0,  # Immediate
-        labels={"category": "cost"},
-    ))
+    manager.register_rule(
+        AlertRule(
+            name="high_llm_cost",
+            description="LLM cost exceeds $10",
+            level=AlertLevel.WARNING,
+            condition=lambda: aggregator.llm.total_cost > 10.0,
+            threshold=10.0,
+            for_duration_seconds=0,  # Immediate
+            labels={"category": "cost"},
+        )
+    )
 
     return manager
-

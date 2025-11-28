@@ -161,4 +161,3 @@ class TestRequestLoggingMiddleware:
 
         assert id1 != id2
         assert len(id1) == 8
-

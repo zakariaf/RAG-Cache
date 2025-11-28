@@ -79,9 +79,7 @@ class TestParallelCacheChecker:
         return mock
 
     @pytest.mark.asyncio
-    async def test_check_miss_all(
-        self, mock_redis_cache, mock_semantic_matcher
-    ):
+    async def test_check_miss_all(self, mock_redis_cache, mock_semantic_matcher):
         """Test when both caches miss."""
         checker = ParallelCacheChecker(
             redis_cache=mock_redis_cache,
@@ -94,9 +92,7 @@ class TestParallelCacheChecker:
         assert result.source == CacheSource.NONE
 
     @pytest.mark.asyncio
-    async def test_check_exact_hit(
-        self, mock_redis_cache, mock_semantic_matcher
-    ):
+    async def test_check_exact_hit(self, mock_redis_cache, mock_semantic_matcher):
         """Test exact cache hit."""
         entry = CacheEntry(
             query_hash="hash",
@@ -120,9 +116,7 @@ class TestParallelCacheChecker:
         assert result.source == CacheSource.EXACT
 
     @pytest.mark.asyncio
-    async def test_check_semantic_hit(
-        self, mock_redis_cache, mock_semantic_matcher
-    ):
+    async def test_check_semantic_hit(self, mock_redis_cache, mock_semantic_matcher):
         """Test semantic cache hit when exact misses."""
         match = SemanticMatch(
             query_hash="hash",
@@ -194,9 +188,7 @@ class TestParallelCacheChecker:
         assert result.is_hit is False
 
     @pytest.mark.asyncio
-    async def test_check_batch(
-        self, mock_redis_cache, mock_semantic_matcher
-    ):
+    async def test_check_batch(self, mock_redis_cache, mock_semantic_matcher):
         """Test batch checking."""
         checker = ParallelCacheChecker(
             redis_cache=mock_redis_cache,
@@ -241,4 +233,3 @@ class TestCheckCachesParallel:
 
         assert result is not None
         assert result.is_hit is False
-

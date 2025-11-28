@@ -78,7 +78,7 @@ class TestPrometheusMetrics:
     def test_observe_histogram_buckets(self, metrics):
         """Test histogram bucket counting."""
         metrics.observe_histogram("test_histogram", 0.01)  # fits in 0.01 bucket
-        metrics.observe_histogram("test_histogram", 0.5)   # fits in 0.5 bucket
+        metrics.observe_histogram("test_histogram", 0.5)  # fits in 0.5 bucket
 
         hist = metrics._histograms["test_histogram"]["test_histogram"]
         assert hist.buckets[0.01] == 1
@@ -217,4 +217,3 @@ class TestMetricsMiddleware:
         result = middleware._normalize_path("/api/v1/health")
 
         assert result == "/api/v1/health"
-

@@ -118,4 +118,3 @@ class TestEmbeddingCache:
         key1 = cache._make_key("text one")
         key2 = cache._make_key("text two")
         assert key1 != key2
-

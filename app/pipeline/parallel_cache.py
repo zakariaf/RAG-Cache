@@ -198,4 +198,3 @@ async def check_caches_parallel(
         semantic_matcher=semantic_matcher,
     )
     return await checker.check(query)
-

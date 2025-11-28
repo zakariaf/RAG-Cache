@@ -18,12 +18,14 @@ class TestOperationMetrics:
     def test_duration_in_progress(self):
         """Test duration calculation while in progress."""
         import time
+
         op = OperationMetrics(name="test", start_time=time.time() - 0.1)
         assert op.duration_ms >= 100
 
     def test_duration_completed(self):
         """Test duration calculation when completed."""
         import time
+
         start = time.time()
         op = OperationMetrics(name="test", start_time=start, end_time=start + 0.5)
         assert abs(op.duration_ms - 500) < 1
@@ -31,6 +33,7 @@ class TestOperationMetrics:
     def test_complete(self):
         """Test completing an operation."""
         import time
+
         op = OperationMetrics(name="test", start_time=time.time())
         op.complete(success=False, error="test error")
 
@@ -214,4 +217,3 @@ class TestTrackOperation:
             await failing_func()
 
         assert "failing_op" in monitor.metrics.operation_timings
-

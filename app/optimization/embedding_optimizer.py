@@ -55,7 +55,7 @@ class BatchEmbeddingProcessor:
     def __init__(
         self,
         embed_fn: Callable[[List[str]], List[List[float]]],
-        config: Optional[EmbeddingConfig] = None
+        config: Optional[EmbeddingConfig] = None,
     ):
         """
         Initialize processor.
@@ -107,8 +107,7 @@ class BatchEmbeddingProcessor:
         # Wait for result
         try:
             result = await asyncio.wait_for(
-                future,
-                timeout=self._config.timeout_seconds
+                future, timeout=self._config.timeout_seconds
             )
             return result
         except asyncio.TimeoutError:
@@ -138,8 +137,8 @@ class BatchEmbeddingProcessor:
 
         try:
             # Get batch of requests
-            batch = self._pending_requests[:self._config.batch_size]
-            self._pending_requests = self._pending_requests[self._config.batch_size:]
+            batch = self._pending_requests[: self._config.batch_size]
+            self._pending_requests = self._pending_requests[self._config.batch_size :]
 
             # Extract texts
             texts = [req.text for req in batch]
@@ -186,7 +185,7 @@ class EmbeddingOptimizer:
         self,
         embed_fn: Callable[[str], List[float]],
         cache: Optional[Any] = None,
-        config: Optional[EmbeddingConfig] = None
+        config: Optional[EmbeddingConfig] = None,
     ):
         """
         Initialize optimizer.
@@ -230,11 +229,7 @@ class EmbeddingOptimizer:
 
         # Store in cache
         if self._config.enable_embedding_cache and self._cache:
-            await self._cache.set(
-                text,
-                embedding,
-                ttl=self._config.cache_ttl_seconds
-            )
+            await self._cache.set(text, embedding, ttl=self._config.cache_ttl_seconds)
 
         return embedding
 
@@ -278,9 +273,7 @@ class EmbeddingOptimizer:
             if self._config.enable_embedding_cache and self._cache:
                 for text, embedding in zip(uncached_texts, embeddings):
                     await self._cache.set(
-                        text,
-                        embedding,
-                        ttl=self._config.cache_ttl_seconds
+                        text, embedding, ttl=self._config.cache_ttl_seconds
                     )
 
             # Add to results
@@ -305,4 +298,3 @@ class EmbeddingOptimizer:
             **self._stats,
             "cache_hit_rate": round(self.cache_hit_rate, 4),
         }
-

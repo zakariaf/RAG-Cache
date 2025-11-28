@@ -55,9 +55,7 @@ class TestAnthropicProvider:
         assert provider.get_name() == "anthropic"
 
     @pytest.mark.asyncio
-    async def test_complete_success(
-        self, provider, mock_retry_handler, sample_request
-    ):
+    async def test_complete_success(self, provider, mock_retry_handler, sample_request):
         """Test successful completion."""
         from app.models.llm import LLMResponse
 
@@ -204,13 +202,10 @@ class TestAnthropicProviderMakeApiCall:
             mock_client_class.return_value = mock_client
 
             provider = AnthropicProvider(api_key="test-key")
-            request = QueryRequest(
-                query="test", model="claude-3-opus-20240229"
-            )
+            request = QueryRequest(query="test", model="claude-3-opus-20240229")
 
             result = await provider._make_api_call(request)
 
             mock_client.messages.create.assert_called_once()
             call_kwargs = mock_client.messages.create.call_args[1]
             assert call_kwargs["model"] == "claude-3-opus-20240229"
-

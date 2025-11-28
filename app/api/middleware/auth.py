@@ -210,9 +210,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         self._config = config or AuthConfig()
         self._authenticator = authenticator or APIKeyAuthenticator(self._config)
 
-    async def dispatch(
-        self, request: Request, call_next: Callable
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """
         Process request with authentication.
 
@@ -236,4 +234,3 @@ default_auth_config = AuthConfig(
     auth_type=AuthType.API_KEY,
     api_keys=[],
 )
-

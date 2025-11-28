@@ -34,11 +34,7 @@ class RequestMetrics:
     paths: Dict[str, int] = field(default_factory=dict)
 
     def record_request(
-        self,
-        method: str,
-        path: str,
-        status_code: int,
-        latency_ms: float
+        self, method: str, path: str, status_code: int, latency_ms: float
     ) -> None:
         """Record a request."""
         self.total_requests += 1
@@ -236,7 +232,7 @@ class LLMMetrics:
         cost: float,
         latency_ms: float,
         success: bool = True,
-        error_type: Optional[str] = None
+        error_type: Optional[str] = None,
     ) -> None:
         """Record an LLM request."""
         self.total_requests += 1
@@ -357,4 +353,3 @@ class SystemMetrics:
             "active_requests": self.active_requests,
             "peak_active_requests": self.peak_active_requests,
         }
-

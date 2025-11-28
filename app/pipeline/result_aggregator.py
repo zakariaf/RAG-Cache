@@ -129,7 +129,9 @@ class ResultAggregator:
             strategy_used=self._strategy,
             metadata={
                 "count": len(responses),
-                "selected_index": responses.index(selected) if selected in responses else -1,
+                "selected_index": responses.index(selected)
+                if selected in responses
+                else -1,
             },
         )
 
@@ -212,9 +214,7 @@ class BatchAggregator:
     Provides summary statistics.
     """
 
-    def aggregate_batch(
-        self, results: List[Optional[QueryResponse]]
-    ) -> BatchResult:
+    def aggregate_batch(self, results: List[Optional[QueryResponse]]) -> BatchResult:
         """
         Aggregate batch results.
 
@@ -227,9 +227,7 @@ class BatchAggregator:
         successful = sum(1 for r in results if r is not None)
         failed = len(results) - successful
 
-        total_latency = sum(
-            r.latency_ms for r in results if r is not None
-        )
+        total_latency = sum(r.latency_ms for r in results if r is not None)
 
         return BatchResult(
             results=results,
@@ -249,8 +247,7 @@ class BatchAggregator:
             Summary dictionary
         """
         cache_hits = sum(
-            1 for r in batch_result.results
-            if r is not None and r.from_cache
+            1 for r in batch_result.results if r is not None and r.from_cache
         )
 
         return {
@@ -262,4 +259,3 @@ class BatchAggregator:
             "avg_latency_ms": round(batch_result.avg_latency_ms, 2),
             "total_latency_ms": round(batch_result.total_latency_ms, 2),
         }
-

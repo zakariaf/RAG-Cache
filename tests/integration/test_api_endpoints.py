@@ -230,4 +230,3 @@ class TestOpenAPIDocumentation:
         # May be 404 if docs are disabled
         if response.status_code == 200:
             assert "swagger" in response.text.lower()
-

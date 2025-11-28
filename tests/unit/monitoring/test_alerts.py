@@ -243,20 +243,24 @@ class TestAlertManager:
 
     def test_get_firing_alerts_by_level(self, manager):
         """Test filtering firing alerts by level."""
-        manager.register_rule(AlertRule(
-            name="warning_alert",
-            description="Warning",
-            level=AlertLevel.WARNING,
-            condition=lambda: True,
-            for_duration_seconds=0,
-        ))
-        manager.register_rule(AlertRule(
-            name="error_alert",
-            description="Error",
-            level=AlertLevel.ERROR,
-            condition=lambda: True,
-            for_duration_seconds=0,
-        ))
+        manager.register_rule(
+            AlertRule(
+                name="warning_alert",
+                description="Warning",
+                level=AlertLevel.WARNING,
+                condition=lambda: True,
+                for_duration_seconds=0,
+            )
+        )
+        manager.register_rule(
+            AlertRule(
+                name="error_alert",
+                description="Error",
+                level=AlertLevel.ERROR,
+                condition=lambda: True,
+                for_duration_seconds=0,
+            )
+        )
 
         manager.evaluate_all()
         manager.evaluate_all()
@@ -320,4 +324,3 @@ class TestCreateDefaultAlerts:
         alerts = manager.evaluate_all()
 
         assert isinstance(alerts, list)
-

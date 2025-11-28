@@ -149,6 +149,7 @@ class TestResultAggregator:
 
     def test_custom_quality_scorer(self):
         """Test custom quality scorer."""
+
         def custom_scorer(r):
             return len(r.response)  # Prefer longer responses
 
@@ -209,4 +210,3 @@ class TestBatchAggregator:
         assert summary["successful"] == 2
         assert summary["cache_hits"] == 1
         assert summary["avg_latency_ms"] == 100.0
-

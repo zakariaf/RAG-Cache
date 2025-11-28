@@ -50,11 +50,15 @@ async def check_redis_health(request: Request) -> ComponentHealth:
 
     try:
         if not hasattr(request.app.state, "app_state"):
-            return ComponentHealth(status="unhealthy", message="App state not initialized")
+            return ComponentHealth(
+                status="unhealthy", message="App state not initialized"
+            )
 
         app_state = request.app.state.app_state
         if not app_state.redis_pool:
-            return ComponentHealth(status="unhealthy", message="Redis pool not available")
+            return ComponentHealth(
+                status="unhealthy", message="Redis pool not available"
+            )
 
         from app.repositories.redis_repository import RedisRepository
 
@@ -78,7 +82,9 @@ async def check_qdrant_health(request: Request) -> ComponentHealth:
 
     try:
         if not hasattr(request.app.state, "app_state"):
-            return ComponentHealth(status="unhealthy", message="App state not initialized")
+            return ComponentHealth(
+                status="unhealthy", message="App state not initialized"
+            )
 
         app_state = request.app.state.app_state
         if not app_state.qdrant_client:

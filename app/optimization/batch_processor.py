@@ -70,7 +70,7 @@ class BatchProcessor(Generic[T, R]):
     def __init__(
         self,
         process_fn: Callable[[List[T]], List[R]],
-        config: Optional[BatchConfig] = None
+        config: Optional[BatchConfig] = None,
     ):
         """
         Initialize processor.
@@ -120,8 +120,7 @@ class BatchProcessor(Generic[T, R]):
 
         try:
             return await asyncio.wait_for(
-                future,
-                timeout=self._config.processing_timeout_seconds
+                future, timeout=self._config.processing_timeout_seconds
             )
         except asyncio.TimeoutError:
             logger.error("Batch processing timeout")
@@ -143,8 +142,8 @@ class BatchProcessor(Generic[T, R]):
                     return
 
                 self._processing = True
-                batch = self._pending[:self._config.batch_size]
-                self._pending = self._pending[self._config.batch_size:]
+                batch = self._pending[: self._config.batch_size]
+                self._pending = self._pending[self._config.batch_size :]
 
             try:
                 await self._process_batch_internal(batch)
@@ -157,8 +156,7 @@ class BatchProcessor(Generic[T, R]):
                         asyncio.create_task(self._process_batch())
 
     async def _process_batch_internal(
-        self,
-        batch: List[tuple[T, asyncio.Future]]
+        self, batch: List[tuple[T, asyncio.Future]]
     ) -> None:
         """Internal batch processing."""
         if not batch:
@@ -200,14 +198,13 @@ class BatchProcessor(Generic[T, R]):
 
         # Running average of batch size
         self._stats["avg_batch_size"] = (
-            (self._stats["avg_batch_size"] * (batches - 1) + batch_size) / batches
-        )
+            self._stats["avg_batch_size"] * (batches - 1) + batch_size
+        ) / batches
 
         # Running average of processing time
         self._stats["avg_processing_time_ms"] = (
-            (self._stats["avg_processing_time_ms"] * (batches - 1) + processing_time_ms)
-            / batches
-        )
+            self._stats["avg_processing_time_ms"] * (batches - 1) + processing_time_ms
+        ) / batches
 
     async def process_many(self, items: List[T]) -> BatchResult[R]:
         """
@@ -225,7 +222,7 @@ class BatchProcessor(Generic[T, R]):
 
         # Process in chunks
         for i in range(0, len(items), self._config.batch_size):
-            chunk = items[i:i + self._config.batch_size]
+            chunk = items[i : i + self._config.batch_size]
 
             try:
                 chunk_results = await asyncio.to_thread(self._process_fn, chunk)
@@ -267,7 +264,7 @@ class AdaptiveBatchProcessor(BatchProcessor[T, R]):
         self,
         process_fn: Callable[[List[T]], List[R]],
         config: Optional[BatchConfig] = None,
-        target_latency_ms: float = 100.0
+        target_latency_ms: float = 100.0,
     ):
         """
         Initialize adaptive processor.
@@ -304,25 +301,14 @@ class AdaptiveBatchProcessor(BatchProcessor[T, R]):
 
         if avg_latency > self._target_latency * 1.2:
             # Too slow - reduce batch size
-            new_size = int(
-                self._current_batch_size * (1 - self._adjustment_factor)
-            )
-            self._current_batch_size = max(
-                self._config.min_batch_size,
-                new_size
-            )
+            new_size = int(self._current_batch_size * (1 - self._adjustment_factor))
+            self._current_batch_size = max(self._config.min_batch_size, new_size)
         elif avg_latency < self._target_latency * 0.8:
             # Fast enough - increase batch size
-            new_size = int(
-                self._current_batch_size * (1 + self._adjustment_factor)
-            )
-            self._current_batch_size = min(
-                self._config.max_batch_size,
-                new_size
-            )
+            new_size = int(self._current_batch_size * (1 + self._adjustment_factor))
+            self._current_batch_size = min(self._config.max_batch_size, new_size)
 
     @property
     def current_batch_size(self) -> int:
         """Get current adaptive batch size."""
         return self._current_batch_size
-

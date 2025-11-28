@@ -118,9 +118,7 @@ class SemanticMatcher:
             logger.error("Semantic matching failed", error=str(e))
             raise SemanticMatchError(f"Failed to find semantic match: {str(e)}")
 
-    async def find_matches(
-        self, query: str, limit: int = 5
-    ) -> List[SemanticMatch]:
+    async def find_matches(self, query: str, limit: int = 5) -> List[SemanticMatch]:
         """
         Find multiple semantic matches for a query.
 
@@ -264,4 +262,3 @@ class SemanticMatcher:
             logger.info("Similarity threshold updated", threshold=threshold)
         else:
             raise ValueError("Threshold must be between 0.0 and 1.0")
-

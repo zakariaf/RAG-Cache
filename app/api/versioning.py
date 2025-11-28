@@ -79,9 +79,7 @@ class VersionedAPIRouter:
             APIRouter for the version
         """
         if version not in self._routers:
-            self._routers[version] = APIRouter(
-                prefix=f"{self._prefix}/{version.value}"
-            )
+            self._routers[version] = APIRouter(prefix=f"{self._prefix}/{version.value}")
         return self._routers[version]
 
     def include_router(
@@ -209,4 +207,3 @@ def deprecation_warning(
         return wrapper
 
     return decorator
-

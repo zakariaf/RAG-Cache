@@ -21,8 +21,8 @@ class CacheStrategy(str, Enum):
     """Cache optimization strategies."""
 
     WRITE_THROUGH = "write_through"  # Write to cache on every write
-    WRITE_BEHIND = "write_behind"    # Async cache writes
-    READ_THROUGH = "read_through"    # Load on miss
+    WRITE_BEHIND = "write_behind"  # Async cache writes
+    READ_THROUGH = "read_through"  # Load on miss
     REFRESH_AHEAD = "refresh_ahead"  # Proactively refresh
 
 
@@ -148,9 +148,7 @@ class CacheOptimizer:
 
     def _update_query_stats(self, query_hash: str) -> None:
         """Update query frequency and recency."""
-        self._query_frequency[query_hash] = (
-            self._query_frequency.get(query_hash, 0) + 1
-        )
+        self._query_frequency[query_hash] = self._query_frequency.get(query_hash, 0) + 1
         self._query_recency[query_hash] = time.time()
 
         # Limit tracking size
@@ -165,8 +163,7 @@ class CacheOptimizer:
             k: v for k, v in self._query_recency.items() if v > cutoff
         }
         self._query_frequency = {
-            k: v for k, v in self._query_frequency.items()
-            if k in self._query_recency
+            k: v for k, v in self._query_frequency.items() if k in self._query_recency
         }
 
     def _maybe_adjust_threshold(self) -> None:
@@ -189,13 +186,13 @@ class CacheOptimizer:
             # Hit rate too low - lower threshold to get more matches
             self._current_threshold = max(
                 self._config.min_threshold,
-                self._current_threshold - self._config.threshold_adjustment_rate
+                self._current_threshold - self._config.threshold_adjustment_rate,
             )
         elif current_hit_rate > target + tolerance:
             # Hit rate exceeds target - can raise threshold for precision
             self._current_threshold = min(
                 self._config.max_threshold,
-                self._current_threshold + self._config.threshold_adjustment_rate
+                self._current_threshold + self._config.threshold_adjustment_rate,
             )
 
         if old_threshold != self._current_threshold:
@@ -206,7 +203,7 @@ class CacheOptimizer:
                 "Adjusted semantic threshold",
                 old=old_threshold,
                 new=self._current_threshold,
-                hit_rate=current_hit_rate
+                hit_rate=current_hit_rate,
             )
 
     def get_optimal_ttl(self, query_hash: str) -> int:
@@ -232,9 +229,7 @@ class CacheOptimizer:
             return self._config.min_ttl_seconds
 
     def get_eviction_candidates(
-        self,
-        cache_entries: List[Dict[str, Any]],
-        count: int
+        self, cache_entries: List[Dict[str, Any]], count: int
     ) -> List[str]:
         """
         Get candidates for cache eviction using LRU-LFU hybrid.
@@ -314,4 +309,3 @@ class CacheOptimizer:
             "threshold_adjustments": len(self._adjustment_history),
             "unique_queries_tracked": len(self._query_frequency),
         }
-

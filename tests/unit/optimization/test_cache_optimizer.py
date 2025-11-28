@@ -126,4 +126,3 @@ class TestCacheStrategy:
         """Test strategy enum values."""
         assert CacheStrategy.WRITE_THROUGH.value == "write_through"
         assert CacheStrategy.READ_THROUGH.value == "read_through"
-

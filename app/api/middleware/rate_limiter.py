@@ -148,9 +148,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._config = config or RateLimitConfig()
         self._limiter = rate_limiter or InMemoryRateLimiter(self._config)
 
-    async def dispatch(
-        self, request: Request, call_next: Callable
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """
         Process request with rate limiting.
 
@@ -176,9 +174,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Add rate limit headers
         remaining = self._limiter.get_remaining(request)
-        response.headers["X-RateLimit-Limit"] = str(
-            self._config.requests_per_minute
-        )
+        response.headers["X-RateLimit-Limit"] = str(self._config.requests_per_minute)
         response.headers["X-RateLimit-Remaining"] = str(remaining)
         response.headers["X-RateLimit-Reset"] = str(int(time.time()) + 60)
 
@@ -192,4 +188,3 @@ default_rate_limit_config = RateLimitConfig(
     burst_size=10,
     enabled=True,
 )
-

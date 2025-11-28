@@ -64,8 +64,10 @@ class TestBatchProcessor:
     @pytest.fixture
     def process_fn(self):
         """Create processing function."""
+
         def fn(items):
             return [item * 2 for item in items]
+
         return fn
 
     @pytest.fixture
@@ -125,11 +127,11 @@ class TestAdaptiveBatchProcessor:
     @pytest.fixture
     def processor(self, config):
         """Create adaptive processor."""
+
         def fn(items):
             return [item * 2 for item in items]
-        return AdaptiveBatchProcessor(
-            fn, config, target_latency_ms=50
-        )
+
+        return AdaptiveBatchProcessor(fn, config, target_latency_ms=50)
 
     def test_initial_batch_size(self, processor):
         """Test initial batch size."""
@@ -145,4 +147,3 @@ class TestAdaptiveBatchProcessor:
         # Stats should be updated
         stats = processor.get_stats()
         assert stats["batches_processed"] >= 10
-

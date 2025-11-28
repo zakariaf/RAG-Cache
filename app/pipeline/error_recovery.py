@@ -110,7 +110,9 @@ class CacheErrorRecovery(ErrorRecoveryStrategy):
 class LLMErrorRecovery(ErrorRecoveryStrategy):
     """Recovery strategy for LLM errors."""
 
-    def get_action(self, error: Exception, attempt: int, max_retries: int) -> RecoveryAction:
+    def get_action(
+        self, error: Exception, attempt: int, max_retries: int
+    ) -> RecoveryAction:
         """Get action for LLM error."""
         if self.should_retry(error, attempt, max_retries):
             return RecoveryAction.RETRY
@@ -195,7 +197,9 @@ class PipelineErrorHandler:
                 result = await operation()
                 return RecoveryResult(
                     success=True,
-                    action_taken=RecoveryAction.RETRY if attempt > 0 else RecoveryAction.SKIP,
+                    action_taken=RecoveryAction.RETRY
+                    if attempt > 0
+                    else RecoveryAction.SKIP,
                     result=result,
                     retries_used=attempt,
                 )
@@ -273,4 +277,3 @@ async def with_recovery(
     """
     handler = PipelineErrorHandler(max_retries=max_retries)
     return await handler.execute_with_recovery(operation, fallback, context)
-

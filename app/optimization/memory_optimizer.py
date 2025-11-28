@@ -82,18 +82,20 @@ class MemoryOptimizer:
         """
         # Get process memory (approximate)
         import os
+
         try:
             # Try to use resource module (Unix)
             import resource
+
             usage = resource.getrusage(resource.RUSAGE_SELF)
             memory_mb = usage.ru_maxrss / 1024  # KB to MB on macOS
             if sys.platform == "linux":
                 memory_mb = usage.ru_maxrss / 1024  # Already in KB on Linux
         except ImportError:
             # Fallback: estimate from gc
-            memory_mb = sum(
-                sys.getsizeof(obj) for obj in gc.get_objects()
-            ) / (1024 * 1024)
+            memory_mb = sum(sys.getsizeof(obj) for obj in gc.get_objects()) / (
+                1024 * 1024
+            )
 
         self._stats.current_mb = memory_mb
         if memory_mb > self._stats.peak_mb:
@@ -108,14 +110,14 @@ class MemoryOptimizer:
             logger.error(
                 "Critical memory usage",
                 memory_mb=memory_mb,
-                threshold=self._config.critical_threshold_mb
+                threshold=self._config.critical_threshold_mb,
             )
             self.force_cleanup()
         elif memory_mb >= self._config.warning_threshold_mb:
             logger.warning(
                 "High memory usage",
                 memory_mb=memory_mb,
-                threshold=self._config.warning_threshold_mb
+                threshold=self._config.warning_threshold_mb,
             )
 
     def maybe_gc(self) -> bool:
@@ -151,10 +153,7 @@ class MemoryOptimizer:
         collected = gc.collect()
         self._stats.gc_collections += 1
 
-        logger.debug(
-            "Garbage collection completed",
-            objects_collected=collected
-        )
+        logger.debug("Garbage collection completed", objects_collected=collected)
 
         return True
 
@@ -213,7 +212,7 @@ class MemoryOptimizer:
             logger.debug(
                 "Object too large to cache",
                 size_kb=size_kb,
-                max_kb=self._config.cache_item_max_size_kb
+                max_kb=self._config.cache_item_max_size_kb,
             )
             return False
 
@@ -273,8 +272,7 @@ class MemoryOptimizer:
             "gc_collections": self._stats.gc_collections,
             "objects_tracked": self._stats.objects_tracked,
             "object_pools": {
-                name: len(pool)
-                for name, pool in self._object_pools.items()
+                name: len(pool) for name, pool in self._object_pools.items()
             },
             "gc_enabled": gc.isenabled(),
         }
@@ -291,7 +289,7 @@ class ObjectPool:
         self,
         factory: Callable[[], T],
         reset_fn: Optional[Callable[[T], None]] = None,
-        max_size: int = 100
+        max_size: int = 100,
     ):
         """
         Initialize pool.
@@ -355,4 +353,3 @@ class ObjectPool:
             "reused_count": self._reused_count,
             "reuse_rate": round(self.reuse_rate, 4),
         }
-

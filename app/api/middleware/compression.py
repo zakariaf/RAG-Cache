@@ -107,9 +107,7 @@ class CompressionMiddleware(BaseHTTPMiddleware):
         """Compress body using gzip."""
         return gzip.compress(body, compresslevel=self._config.compression_level)
 
-    async def dispatch(
-        self, request: Request, call_next: Callable
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """
         Process request with compression.
 
@@ -166,4 +164,3 @@ default_compression_config = CompressionConfig(
     minimum_size=500,
     compression_level=6,
 )
-

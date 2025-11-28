@@ -277,4 +277,3 @@ class TestTokenCounting:
 
         # Counts should be within 2x of each other
         assert 0.5 < openai_count / max(anthropic_count, 1) < 2
-

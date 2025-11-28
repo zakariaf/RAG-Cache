@@ -203,4 +203,3 @@ class TestDeduplicatingProcessor:
         stats = processor.stats
         assert stats is not None
         assert hasattr(stats, "total_queries")
-
